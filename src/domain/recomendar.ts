@@ -153,10 +153,6 @@ export function necesidadesDe(p: Prospecto): Necesidad[] {
   // Cambio de seguro: lo que hoy le falla pesa más.
   if (esCambio(p))
     for (const m of motivosDe(p)) {
-      if (m === "cobertura") add("hospital", 3, "Su plan actual le queda corto");
-      if (m === "reembolsos") add("reembolso", 3, "Hoy le fallan los reembolsos");
-      if (m === "deducibles") add("deducible", 3, "Hoy paga deducibles o copagos altos");
-      if (m === "red") add("red", 3, v("red_falta") ? `No encuentra: ${v("red_falta")}` : "Hoy no encuentra sus médicos o clínicas", palabrasDe(v("red_falta")));
       if (m === "atencion") add("telemedicina", 2, "Hoy le falla la atención");
     }
   if (v("red_falta") && !out.has("red")) add("red", 2, `Busca: ${v("red_falta")}`, palabrasDe(v("red_falta")));
@@ -179,7 +175,7 @@ export function presupuestoDe(p: Prospecto): { limite: number | null; porPrecio:
   const limite = num(p, "pre_limite");
   return {
     limite: limite && limite > 0 ? limite : null,
-    porPrecio: txt(p, "criterio") === "Precio" || txt(p, "objecion") === "Precio" || motivosDe(p).includes("precio"),
+    porPrecio: txt(p, "criterio") === "Precio" || txt(p, "objecion") === "Precio" || motivosDe(p).includes("costos"),
   };
 }
 

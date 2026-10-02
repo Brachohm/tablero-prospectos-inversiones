@@ -46,9 +46,6 @@ describe("recomendar planes con los PDF", () => {
       expect.arrayContaining(["emergencias", "medicinas", "accidentes", "maternidad", "ninos", "ambulatorio"]),
     );
     expect(necesidadesDe(ficha("nuevo", { edad: "60" })).map((n) => n.id)).toContain("cronicas");
-    const cambio = necesidadesDe(ficha("cambio", { motivos: ["reembolsos", "red"], red_falta: "Clínica Pichincha" }));
-    expect(cambio.find((n) => n.id === "red")?.extra).toContain("pichincha");
-    expect(cambio.find((n) => n.id === "reembolso")?.peso).toBe(3);
   });
 
   it("recomienda el que respalda lo que necesita, citando el documento y la página", () => {

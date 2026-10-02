@@ -47,10 +47,5 @@ export const CONCEPTOS: readonly { id: IdConcepto; l: string; mejor: "mas" | "me
 
 /** Qué conceptos pesan más según los motivos de inconformidad de la persona. */
 export const CONCEPTOS_POR_MOTIVO: Readonly<Partial<Record<MotivoId, IdConcepto[]>>> = {
-  cobertura: ["maximo", "hospitalaria", "medicinas", "examenes", "maternidad", "preexistencias"],
-  reembolsos: ["reembolso"],
-  precio: ["prima"],
-  deducibles: ["deducible", "copago"],
-  red: ["red"],
-  atencion: ["telemedicina"],
+  costos: ["prima"],
 };

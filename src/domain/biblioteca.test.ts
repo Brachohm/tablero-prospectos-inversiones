@@ -77,13 +77,13 @@ describe("biblioteca: argumentos por ficha", () => {
   it("etiquetas de la ficha: objeción, motivos, familia, edad, emergencia", () => {
     const p = ficha("cambio", {
       objecion: "Precio",
-      motivos: ["reembolsos"],
+      motivos: ["costos"],
       depende: "Dos hijos",
       edad: "60",
       emergencia: "No sabría",
     });
     expect(etiquetasDeFicha(p).sort()).toEqual(
-      ["general", "obj:Precio", "mot:reembolsos", "familia", "mayor", "emergencia"].sort(),
+      ["general", "obj:Precio", "mot:costos", "familia", "mayor", "emergencia"].sort(),
     );
     expect(etiquetasDeFicha(ficha("nuevo", { objecion: "Ninguna" }))).toEqual(["general"]);
   });
@@ -91,7 +91,7 @@ describe("biblioteca: argumentos por ficha", () => {
   it("ordena por coincidencias específicas y deja los generales al final", () => {
     const g = crearArgumento(1, { id: "g", texto: "g", etiquetas: ["general"] });
     const pr = crearArgumento(1, { id: "pr", texto: "pr", etiquetas: ["obj:Precio"] });
-    const otro = crearArgumento(1, { id: "o", texto: "o", etiquetas: ["mot:red"] });
+    const otro = crearArgumento(1, { id: "o", texto: "o", etiquetas: ["mot:liquidez"] });
     const r = argumentosPara(ficha("nuevo", { objecion: "Precio" }), [g, otro, pr]);
     expect(r.map((a) => a.id)).toEqual(["pr", "g"]);
   });

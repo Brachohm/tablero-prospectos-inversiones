@@ -3,11 +3,11 @@
 export type Tipo = "nuevo" | "cambio";
 
 export type MotivoId =
-  | "cobertura"
-  | "reembolsos"
-  | "precio"
-  | "deducibles"
-  | "red"
+  | "rendimiento"
+  | "costos"
+  | "liquidez"
+  | "transparencia"
+  | "riesgo"
   | "atencion"
   | "otro";
 

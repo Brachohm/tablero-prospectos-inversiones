@@ -87,13 +87,13 @@ describe("CSV", () => {
     expect(csvCell(null)).toBe("");
   });
   it("los campos que no aplican salen en blanco y los checks en Sí/No", () => {
-    const csv = exportarCSV([ficha("cambio", { ded_anual: "500", pv_bienvenida: true, nombre: "Ana", etapa: "Cerrado" })]);
+    const csv = exportarCSV([ficha("cambio", { liq_penal: "5 %", pv_bienvenida: true, nombre: "Ana", etapa: "Cerrado" })]);
     expect(csv.startsWith("﻿Tipo,Consentimiento,Nombre")).toBe(true);
     const [head, row] = csv.slice(1).split("\n");
     const h = celdas(head);
     const r = celdas(row);
     expect(r).toHaveLength(h.length);
-    expect(r[h.indexOf("Pagado en deducibles y copagos el último año (USD)")]).toBe("");
+    expect(r[h.indexOf("Penalidad o recargo por retiro anticipado")]).toBe("");
     expect(r[h.indexOf("Bienvenida: le expliqué cómo usar su plan y a quién llamar")]).toBe("Sí");
     expect(r[h.indexOf("Nombre")]).toBe("Ana");
     expect(h.at(-3)).toBe("Preexistencias declaradas");

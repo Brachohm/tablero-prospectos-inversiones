@@ -7,11 +7,11 @@ describe("datos recabados", () => {
   });
 
   it("cuenta campos llenos que aplican, motivos e historial", () => {
-    const p = ficha("cambio", { edad: "40", motivos: ["red"], red_falta: "cardiólogo", historial: hist(1), cobertura: "IESS" });
-    expect(datosRecabados(p).sort()).toEqual(["contactos", "edad", "motivos", "red_falta"]);
+    const p = ficha("cambio", { edad: "40", motivos: ["liquidez"], liq_penal: "5 %", historial: hist(1), ahorroHoy: "Efectivo" });
+    expect(datosRecabados(p).sort()).toEqual(["contactos", "edad", "liq_penal", "motivos"]);
   });
 
   it("los detalles de un motivo no elegido no cuentan", () => {
-    expect(contarDatos(ficha("cambio", { ded_anual: "500" }))).toBe(0);
+    expect(contarDatos(ficha("cambio", { liq_penal: "5 %" }))).toBe(0);
   });
 });

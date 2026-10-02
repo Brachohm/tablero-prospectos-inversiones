@@ -126,7 +126,7 @@ export function estrategia(p: Prospecto): Estrategia {
   const familia = !!depende || personasDe(p).length > 1;
   const padresACargo = PADRES.test(depende);
   const precioSensible =
-    txt(p, "criterio") === "Precio" || txt(p, "objecion") === "Precio" || tieneMotivo(p, "precio") || num(p, "pre_limite") !== null;
+    txt(p, "criterio") === "Precio" || txt(p, "objecion") === "Precio" || tieneMotivo(p, "costos") || num(p, "pre_limite") !== null;
   const conIESS = /iess|seguro social/i.test(txt(p, "cobertura"));
   const conPre = tipoDe(p) === "nuevo" ? preStats(p).condiciones > 0 : txt(p, "declaro") === "Sí";
   const altoCosto = !!(txt(p, "costoEvento") || txt(p, "emergencia"));

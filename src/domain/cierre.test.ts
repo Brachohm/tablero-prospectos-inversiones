@@ -97,7 +97,7 @@ describe("pre-cierre y venta", () => {
     expect(errorVenta(p)).toBe("");
     const v = ventaExitosa(p, HOY);
     expect(etapaDe(v)).toBe("Venta exitosa");
-    expect(faltaCierre(v)).toEqual(["Número de contrato", "Fecha de emisión", "Comprobante de pago", "Contrato", "Ficha de preexistencias"]);
+    expect(faltaCierre(v)).toEqual(["Número de contrato", "Fecha de emisión", "Comprobante de pago", "Solicitud o contrato del plan", "Formulario KYC y perfil de riesgo"]);
     const doc = { nombre: "a.pdf", tipo: "application/pdf", bytes: 1 };
     const completo = { ...v, cli_contrato: "SAL-2026-0042A", cli_afiliacion: HOY, docsCierre: { pago: doc, contrato: doc, pre: doc } };
     expect(etapaDe(completo)).toBe("Cerrado");
@@ -124,7 +124,7 @@ describe("documentos del cierre", () => {
     expect(errorDocCierre({ type: "image/png", size: 1000, name: "a.png" })).toBe("Carga el archivo en JPEG o PDF");
     expect(errorDocCierre({ type: "application/pdf", size: 16 * 1024 * 1024, name: "a.pdf" })).toMatch(/15 MB/);
     const d = docsCierreListos(ficha("nuevo", { docsCierre: { pago: { nombre: "p.pdf", tipo: "application/pdf", bytes: 1 } } }));
-    expect(d).toEqual({ hechos: 1, total: 3, faltan: ["Contrato", "Ficha de preexistencias"] });
+    expect(d).toEqual({ hechos: 1, total: 3, faltan: ["Solicitud o contrato del plan", "Formulario KYC y perfil de riesgo"] });
   });
 });
 

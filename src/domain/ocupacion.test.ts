@@ -1,7 +1,6 @@
 import { argumentoOcupacion, perfilOcupacion, riesgosDe, riesgosPrincipales } from "./ocupacion";
-import { analisisLocal } from "./analisis";
 import { sugerencias } from "./oferta";
-import { ficha, HOY } from "./test-utils";
+import { ficha } from "./test-utils";
 
 describe("ocupación", () => {
   it("reconoce el grupo de riesgos (sin importar tildes ni mayúsculas)", () => {
@@ -26,7 +25,6 @@ describe("ocupación", () => {
     expect(a.titulo).toContain("Por su trabajo (Albañil)");
     expect(a.texto).toContain("validar coberturas con la aseguradora");
     expect(sugerencias(p).prueba.join()).toContain("Su trabajo es físico");
-    expect(analisisLocal(p, HOY).busca.join()).toMatch(/riesgos de su trabajo \(Albañil\)/);
     expect(argumentoOcupacion(ficha("nuevo"))).toBeNull();
   });
 });

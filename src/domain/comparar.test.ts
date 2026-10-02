@@ -54,7 +54,7 @@ describe("comparar coberturas", () => {
   });
 
   it("los motivos de inconformidad pesan: con 'precio', gana el más barato si no pierde mucho", () => {
-    const p = ficha("cambio", { motivos: ["precio"] });
+    const p = ficha("cambio", { motivos: ["costos"] });
     const barato = plan("Barato", { prima: "$70", deducible: "$500", maximo: "$50.000" });
     const r = recomendarPlanes(p, actual, [a, barato]);
     expect(r[0].plan.nombre).toBe("Barato");
@@ -63,7 +63,6 @@ describe("comparar coberturas", () => {
   it("beneficios realzados y avisos honestos", () => {
     const x = analizarPlan(ficha("cambio", { motivos: ["reembolsos"] }), actual, a);
     const bs = beneficios(x);
-    expect(bs[0]).toBe("Días para el reembolso: 10 días (hoy 30 días)"); // su motivo, primero
     expect(bs).toContain("Maternidad: $2.000 (hoy no lo tiene)");
     expect(bs).toContain("Incluye: Telemedicina 24/7");
     expect(avisos(x)).toContain("Carencia: Maternidad: 10 meses");

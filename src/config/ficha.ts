@@ -1,7 +1,7 @@
 /**
  * Definición de la ficha: tipos, etapas, motivos y misiones con sus campos.
  *
- * Los pesos de XP y las etapas son PROPUESTAS del asesor, no datos de SaludSA:
+ * Los pesos de XP y las etapas son PROPUESTAS del asesor, no datos de ninguna aseguradora:
  * ajustarlos aquí. No cambiar la clave `k` de un campo existente: es la que
  * se guarda en las fichas.
  */
@@ -54,8 +54,8 @@ export const REFERIDOS_PEDIR = 3;
 /** Documentos del cierre (se cargan en JPEG o PDF). */
 export const DOCS_CIERRE: readonly { id: string; l: string }[] = [
   { id: "pago", l: "Comprobante de pago" },
-  { id: "contrato", l: "Contrato" },
-  { id: "pre", l: "Ficha de preexistencias" },
+  { id: "contrato", l: "Solicitud o contrato del plan" },
+  { id: "pre", l: "Formulario KYC y perfil de riesgo" },
 ];
 export const TIPOS_DOC_CIERRE = ["image/jpeg", "application/pdf"] as const;
 export const MAX_MB_DOC_CIERRE = 15;
@@ -65,36 +65,46 @@ export const ORIGENES = ["Referido", "Redes sociales", "Contacto en frío", "Eve
 
 /**
  * Etapas en las que el nuevo prospecto ya va a contratar: desde aquí se
- * despliega la declaración de preexistencias. Antes, la ficha muestra solo
+ * despliega el cierre. Antes, la ficha muestra solo
  * la venta consultiva.
  */
 export const ETAPAS_COTIZACION = ["Pre-cierre", "Venta exitosa", "Cerrado"] as const;
 export const ETAPA_PERDIDO = "Perdido";
 
 export const TIPOS: Record<Tipo, { n: string; ic: string; desc: string }> = {
-  nuevo: { n: "Nuevo prospecto", ic: "🚀", desc: "Quiere contratar su seguro de salud." },
+  nuevo: { n: "Primera inversión", ic: "🌱", desc: "Quiere empezar a ahorrar o invertir con un plan." },
   cambio: {
-    n: "Persona asegurada",
+    n: "Ya invierte",
     ic: "🔄",
-    desc: "Está inconforme con su seguro actual y quiere cambiarse.",
+    desc: "Tiene ahorros o inversiones y no está conforme con su resultado.",
   },
 };
 
 export const MOTIVOS: readonly { id: MotivoId; ic: string; l: string }[] = [
-  { id: "cobertura", ic: "🛡️", l: "Cobertura" },
-  { id: "reembolsos", ic: "🧾", l: "Reembolsos" },
-  { id: "precio", ic: "💲", l: "Precio o alzas" },
-  { id: "deducibles", ic: "📉", l: "Deducibles y copagos" },
-  { id: "red", ic: "🏥", l: "Red de médicos y clínicas" },
-  { id: "atencion", ic: "📞", l: "Atención y servicio" },
+  { id: "rendimiento", ic: "📉", l: "Rendimiento bajo" },
+  { id: "costos", ic: "💲", l: "Comisiones y costos" },
+  { id: "liquidez", ic: "🔒", l: "Liquidez o penalidades" },
+  { id: "transparencia", ic: "🧾", l: "Poca transparencia" },
+  { id: "riesgo", ic: "🎢", l: "Riesgo o volatilidad" },
+  { id: "atencion", ic: "📞", l: "Atención y asesoría" },
   { id: "otro", ic: "💬", l: "Otro" },
 ];
 
-/** Tipo de póliza actual (cambio de seguro). Corporativo: de su empresa o de donde estudia. */
-export const TIPOS_POLIZA = ["Individual", "Masivo", "Corporativo"] as const;
+/** Tipos de plan que ofrece el asesor (unit linked). */
+export const TIPOS_PLAN = ["Contribución regular", "Contribución única"] as const;
 
-/** Edad (años) desde la que aplican los recordatorios de "edad mayor". */
-export const EDAD_MAYOR = 56;
+/** Metas de inversión. */
+export const METAS = [
+  "Retiro o jubilación",
+  "Educación de los hijos",
+  "Comprar vivienda",
+  "Crear patrimonio",
+  "Fondo de emergencia",
+  "Otro",
+] as const;
+
+/** Edad (años) desde la que aplican los recordatorios de "edad mayor" (cercanía al retiro). */
+export const EDAD_MAYOR = 50;
 
 /** Contactos mínimos antes de dar un prospecto por perdido. */
 export const CONTACTOS_MAX = 5;
@@ -109,7 +119,7 @@ export const MISIONES: readonly Mision[] = [
       { k: "correo", l: "Correo", t: "email", xp: 0, noCount: true },
       { k: "edad", l: "Edad (años)", t: "number", xp: 5, min: 0, max: 120 },
       { k: "ciudad", l: "Ciudad", t: "text", xp: 0, noCount: true },
-      { k: "ocupacion", l: "Ocupación", t: "text", xp: 10, ph: "Contador, chofer, docente, enfermera…" },
+      { k: "ocupacion", l: "Ocupación", t: "text", xp: 10, ph: "Contador, médico, comerciante, docente…" },
       {
         k: "origen",
         l: "¿De dónde llegó?",
@@ -139,193 +149,64 @@ export const MISIONES: readonly Mision[] = [
     id: "desc",
     titulo: "Descubrimiento",
     campos: [
-      { k: "cobertura", l: "¿Qué cobertura tiene hoy, si alguna?", t: "text", xp: 10, solo: "nuevo", ph: "IESS, ninguna…" },
-      { k: "porque", l: "¿Qué lo hizo pensar en contratar ahora?", t: "text", xp: 15, solo: "nuevo", ph: "Con sus palabras" },
-      { k: "aseguradora", l: "Aseguradora actual", t: "text", xp: 10, solo: "cambio" },
-      { k: "tiempoCon", l: "¿Cuánto tiempo lleva con ella?", t: "text", xp: 5, solo: "cambio" },
       {
-        k: "tipoPoliza",
-        l: "¿Su seguro actual es individual, masivo o corporativo?",
+        k: "ahorroHoy",
+        l: "¿Dónde guarda hoy su dinero?",
         t: "select",
-        o: [...TIPOS_POLIZA],
+        o: ["Cuenta de ahorros", "Depósito a plazo fijo", "Efectivo", "No logra ahorrar", "Otro"],
         xp: 10,
-        solo: "cambio",
+        solo: "nuevo",
       },
-      { k: "primaActual", l: "Lo que paga hoy (USD al mes)", t: "number", xp: 10, solo: "cambio", min: 0 },
+      { k: "porque", l: "¿Qué lo hizo pensar en invertir ahora?", t: "text", xp: 15, solo: "nuevo", ph: "Con sus palabras" },
+      { k: "institucion", l: "¿Dónde invierte hoy?", t: "text", xp: 10, solo: "cambio", ph: "Banco, aseguradora, fondo, casa de valores…" },
+      { k: "producto", l: "¿Qué producto tiene?", t: "text", xp: 5, solo: "cambio", ph: "Plazo fijo, fondo, unit linked…" },
+      { k: "tiempoCon", l: "¿Cuánto tiempo lleva con esa inversión?", t: "text", xp: 5, solo: "cambio" },
+      { k: "saldoActual", l: "Saldo acumulado hoy (USD)", t: "number", xp: 10, solo: "cambio", min: 0 },
+      { k: "aporteActual", l: "Lo que aporta hoy (USD al mes)", t: "number", xp: 5, solo: "cambio", min: 0 },
       { k: "motivos", l: "Motivos de inconformidad", t: "motivos", xp: 10, solo: "cambio" },
+      { k: "ren_tasa", l: "Rendimiento anual que recibe (%)", t: "number", xp: 10, solo: "cambio", motivo: "rendimiento" },
+      { k: "ren_esperado", l: "Rendimiento anual que esperaba (%)", t: "number", xp: 5, solo: "cambio", motivo: "rendimiento" },
       {
-        k: "cob_que",
-        l: "¿Qué le faltó o no le cubrieron?",
-        t: "select",
-        o: [
-          "Una cirugía o procedimiento",
-          "Medicamentos",
-          "Maternidad o pediatría",
-          "Exámenes y diagnóstico por imagen",
-          "Tratamiento crónico",
-          "Otro",
-        ],
-        xp: 5,
-        solo: "cambio",
-        motivo: "cobertura",
-      },
-      {
-        k: "cob_porque",
-        l: "¿Por qué no se lo cubrieron?",
-        t: "select",
-        o: [
-          "Exclusión de la póliza",
-          "Preexistencia",
-          "Período de carencia",
-          "Tope o límite agotado",
-          "Nunca supo si estaba cubierto",
-          "Otro",
-        ],
-        xp: 10,
-        solo: "cambio",
-        motivo: "cobertura",
-      },
-      { k: "cob_monto", l: "¿Cuánto pagó de su bolsillo? (USD)", t: "number", xp: 5, solo: "cambio", motivo: "cobertura", min: 0 },
-      {
-        k: "cob_pendiente",
-        l: "¿Tiene un procedimiento o tratamiento pendiente?",
-        t: "select",
-        o: ["No", "Sí"],
-        xp: 10,
-        solo: "cambio",
-        motivo: "cobertura",
-      },
-      {
-        k: "reem_dias",
-        l: "¿Cuánto tarda en recibir un reembolso?",
-        t: "select",
-        o: ["Menos de 15 días", "15 a 30 días", "30 a 60 días", "Más de 60 días"],
-        xp: 5,
-        solo: "cambio",
-        motivo: "reembolsos",
-      },
-      {
-        k: "reem_rech",
-        l: "¿Le han rechazado reembolsos?",
-        t: "select",
-        o: ["Nunca", "A veces", "Seguido"],
-        xp: 5,
-        solo: "cambio",
-        motivo: "reembolsos",
-      },
-      {
-        k: "reem_porque",
-        l: "¿Por qué suelen rechazarlos o demorarlos?",
-        t: "select",
-        o: [
-          "Falta de documentos",
-          "Exclusión o no cobertura",
-          "Monto menor al esperado",
-          "Sin explicación clara",
-          "No sabe",
-        ],
-        xp: 10,
-        solo: "cambio",
-        motivo: "reembolsos",
-      },
-      {
-        k: "reem_proceso",
-        l: "¿Conoce el proceso y qué documentos pedir?",
+        k: "cos_sabe",
+        l: "¿Sabe cuánto paga en comisiones y costos?",
         t: "select",
         o: ["Sí", "Más o menos", "No"],
-        xp: 5,
-        solo: "cambio",
-        motivo: "reembolsos",
-      },
-      { k: "pre_alza", l: "Alza en su última renovación (%)", t: "number", xp: 5, solo: "cambio", motivo: "precio" },
-      {
-        k: "pre_freq",
-        l: "¿Con qué frecuencia sube?",
-        t: "select",
-        o: ["Cada año", "Solo al cambiar de rango de edad", "De forma imprevista", "No sabe"],
-        xp: 5,
-        solo: "cambio",
-        motivo: "precio",
-      },
-      {
-        k: "pre_expl",
-        l: "¿Le explicaron por qué sube?",
-        t: "select",
-        o: ["Sí", "Parcialmente", "No"],
         xp: 10,
         solo: "cambio",
-        motivo: "precio",
+        motivo: "costos",
       },
-      { k: "pre_limite", l: "Máximo que podría pagar al mes (USD)", t: "number", xp: 10, solo: "cambio", motivo: "precio", min: 0 },
-      { k: "ded_monto", l: "Deducible que paga por evento (USD)", t: "number", xp: 5, solo: "cambio", motivo: "deducibles", min: 0 },
-      { k: "ded_copago", l: "Copago (porcentaje o monto)", t: "text", xp: 5, solo: "cambio", motivo: "deducibles" },
+      { k: "cos_detalle", l: "Costos que conoce (administración, entrada, salida…)", t: "text", xp: 5, solo: "cambio", motivo: "costos" },
       {
-        k: "ded_sorpresa",
-        l: "¿Sabía de deducibles y copagos al contratar?",
-        t: "select",
-        o: ["Sí", "No", "No recuerda"],
-        xp: 10,
-        solo: "cambio",
-        motivo: "deducibles",
-      },
-      {
-        k: "ded_tope",
-        l: "¿Se le han agotado topes anuales o por evento?",
+        k: "liq_necesita",
+        l: "¿Ha necesitado retirar dinero antes de tiempo?",
         t: "select",
         o: ["Nunca", "Una vez", "Varias veces"],
-        xp: 5,
-        solo: "cambio",
-        motivo: "deducibles",
-      },
-      {
-        k: "ded_anual",
-        l: "Pagado en deducibles y copagos el último año (USD)",
-        t: "number",
         xp: 10,
         solo: "cambio",
-        motivo: "deducibles",
-        min: 0,
+        motivo: "liquidez",
       },
-      { k: "red_falta", l: "Médicos, clínicas o especialidades que no encuentra", t: "text", xp: 10, solo: "cambio", motivo: "red" },
+      { k: "liq_penal", l: "Penalidad o recargo por retiro anticipado", t: "text", xp: 5, solo: "cambio", motivo: "liquidez" },
       {
-        k: "red_medico",
-        l: "¿Tiene un médico o clínica de confianza que no quiere dejar?",
+        k: "tra_informe",
+        l: "¿Cada cuánto recibe un estado de cuenta claro?",
         t: "select",
-        o: ["Sí", "No"],
+        o: ["Cada mes", "Cada trimestre", "Una vez al año", "Nunca"],
         xp: 10,
         solo: "cambio",
-        motivo: "red",
+        motivo: "transparencia",
       },
       {
-        k: "red_fuera",
-        l: "¿Ha tenido que pagar fuera de la red?",
+        k: "rie_caida",
+        l: "¿Ha visto caídas en su saldo que no esperaba?",
         t: "select",
-        o: ["Nunca", "A veces", "Seguido"],
-        xp: 5,
-        solo: "cambio",
-        motivo: "red",
-      },
-      {
-        k: "ate_canal",
-        l: "¿Dónde falla la atención?",
-        t: "select",
-        o: ["Autorizaciones", "Línea de atención", "Emergencias", "Su asesor", "Trámites administrativos", "Otro"],
+        o: ["Nunca", "Alguna vez", "Seguido"],
         xp: 10,
         solo: "cambio",
-        motivo: "atencion",
-      },
-      {
-        k: "ate_frec",
-        l: "¿Con qué frecuencia?",
-        t: "select",
-        o: ["Una vez", "A veces", "Siempre"],
-        xp: 5,
-        solo: "cambio",
-        motivo: "atencion",
+        motivo: "riesgo",
       },
       {
         k: "ate_asesor",
-        l: "¿Su asesor actual lo acompaña?",
+        l: "¿Su asesor actual le da seguimiento?",
         t: "select",
         o: ["Sí, me acompaña", "Responde poco", "No tengo uno"],
         xp: 10,
@@ -335,51 +216,12 @@ export const MISIONES: readonly Mision[] = [
       { k: "ate_ejemplo", l: "Último caso concreto", t: "text", xp: 5, solo: "cambio", motivo: "atencion" },
       { k: "otro_desc", l: "Descríbelo con sus palabras", t: "text", xp: 10, solo: "cambio", motivo: "otro" },
       { k: "grieta", l: "¿Qué le falla, con sus palabras?", t: "text", xp: 15, solo: "cambio" },
-      { k: "renovacion", l: "Fecha de renovación o vencimiento de su póliza", t: "date", xp: 10, solo: "cambio" },
-      { k: "exclus", l: "Exclusiones, carencias y preexistencias de su póliza actual", t: "textarea", xp: 15, solo: "cambio" },
-      {
-        k: "criterio",
-        l: "¿Con qué criterio piensa elegir su seguro?",
-        t: "select",
-        o: ["Precio", "Cobertura", "Red de médicos", "Recomendación", "Aún no sabe"],
-        xp: 10,
-        solo: "nuevo",
-      },
-      {
-        k: "contrato",
-        l: "¿Cómo lo eligió cuando lo contrató?",
-        t: "select",
-        o: [
-          "Por precio",
-          "Por recomendación de un asesor",
-          "Por su empresa",
-          "Por cobertura, comparando opciones",
-          "No recuerda",
-        ],
-        xp: 10,
-        solo: "cambio",
-      },
-      {
-        k: "uso",
-        l: "¿Cómo lo ha usado?",
-        t: "select",
-        o: ["Casi no lo usa", "Lo usa seguido y le responde", "Lo usa seguido y le falla", "Lo usó en un evento grande"],
-        xp: 10,
-        solo: "cambio",
-      },
+      { k: "vencimiento", l: "Fecha de vencimiento o fin del plazo actual", t: "date", xp: 10, solo: "cambio" },
       {
         k: "conoce",
-        l: "¿Conoce su cobertura y su proceso de reembolso?",
+        l: "¿Sabe en qué está invertido su dinero?",
         t: "select",
         o: ["Sí", "Más o menos", "No"],
-        xp: 10,
-        solo: "cambio",
-      },
-      {
-        k: "declaro",
-        l: "¿Declaró sus condiciones médicas al contratar?",
-        t: "select",
-        o: ["Sí", "No estoy seguro", "No"],
         xp: 10,
         solo: "cambio",
       },
@@ -389,13 +231,44 @@ export const MISIONES: readonly Mision[] = [
         t: "text",
         xp: 15,
         solo: "cambio",
-        ph: "Antigüedad, un tratamiento, su médico…",
+        ph: "Bonos de permanencia, aportes hechos, liquidez…",
       },
-      { k: "ultimavez", l: "¿Qué pasó la última vez que usó un médico?", t: "text", xp: 10 },
-      { k: "emergencia", l: "¿Qué haría si mañana hay una cirugía o emergencia?", t: "text", xp: 15 },
+      { k: "meta", l: "¿Para qué quiere invertir?", t: "select", o: METAS, xp: 15 },
+      { k: "metaMonto", l: "¿Cuánto necesita para esa meta? (USD)", t: "number", xp: 10, min: 0 },
+      {
+        k: "horizonte",
+        l: "¿En cuánto tiempo necesitará ese dinero?",
+        t: "select",
+        o: ["Menos de 3 años", "3 a 5 años", "5 a 10 años", "10 a 20 años", "Más de 20 años"],
+        xp: 10,
+      },
+      { k: "aporte", l: "¿Cuánto puede invertir al mes? (USD)", t: "number", xp: 10, min: 0 },
+      { k: "capital", l: "Capital disponible para un aporte único (USD)", t: "number", xp: 10, min: 0 },
+      {
+        k: "perfil",
+        l: "¿Cómo se describe al invertir?",
+        t: "select",
+        o: ["Conservador", "Moderado", "Arriesgado", "No sabe"],
+        xp: 10,
+      },
+      {
+        k: "reaccion",
+        l: "Si su inversión baja 15 % en un año, ¿qué haría?",
+        t: "select",
+        o: ["Retiraría todo", "Esperaría a que se recupere", "Aportaría más", "No sabe"],
+        xp: 10,
+      },
+      {
+        k: "emergencia",
+        l: "¿Tiene un fondo de emergencia de 3 a 6 meses de gastos?",
+        t: "select",
+        o: ["Sí", "Parcial", "No"],
+        xp: 10,
+      },
+      { k: "deudas", l: "Deudas que paga hoy (tarjetas, préstamos…)", t: "text", xp: 5 },
       {
         k: "costoEvento",
-        l: "Si hoy hubiera una hospitalización o cirugía, ¿cuánto estima que costaría y quién lo pagaría?",
+        l: "Si no empieza a invertir hoy, ¿cómo cubriría esa meta?",
         t: "text",
         xp: 15,
       },
@@ -403,12 +276,11 @@ export const MISIONES: readonly Mision[] = [
         k: "objecion",
         l: "Objeción principal",
         t: "select",
-        o: ["Ninguna", "Precio", "Ya tengo seguro", "Lo tengo que pensar", "Perder antigüedad o carencias", "Otra"],
+        o: ["Ninguna", "No tengo dinero ahora", "Lo tengo que pensar", "Desconfío de las inversiones", "Ya tengo ahorros", "Otra"],
         xp: 10,
       },
     ],
   },
-  { id: "pre", titulo: "Declaración de preexistencias", solo: "nuevo", custom: true, campos: [] },
 ];
 
 /**
@@ -424,8 +296,10 @@ export const CAMPOS_GESTION: readonly Campo[] = [
   { k: "reunionLugar", l: "¿Dónde? (lugar)", t: "text", xp: 0, noCount: true, ph: "Su oficina, cafetería…" },
   { k: "reunionLink", l: "Link de la reunión", t: "text", xp: 0, noCount: true, ph: "https://zoom.us/j/… o https://meet.google.com/…" },
   { k: "notas", l: "Notas", t: "textarea", xp: 5 },
-  { k: "gana", l: "¿Qué gana frente a su póliza actual?", t: "textarea", xp: 0, solo: "cambio", noCount: true },
-  { k: "precio", l: "Valor a pagar mensual (USD)", t: "number", xp: 0, noCount: true, min: 0 },
+  { k: "gana", l: "¿Qué gana frente a su inversión actual?", t: "textarea", xp: 0, solo: "cambio", noCount: true },
+  { k: "tipoPlan", l: "Tipo de plan", t: "select", o: TIPOS_PLAN, xp: 0, noCount: true },
+  { k: "plazo", l: "Plazo del plan (años)", t: "number", xp: 0, noCount: true, min: 1, max: 50 },
+  { k: "precio", l: "Aporte del plan (USD; mensual si es regular, total si es único)", t: "number", xp: 0, noCount: true, min: 0 },
 ];
 
 /** Todos los campos de la ficha (misiones + gestión). */

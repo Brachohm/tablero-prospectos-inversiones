@@ -1,8 +1,7 @@
 import { calcularIMC, imcPersona, pesoKg, tallaMetros, textoIMC } from "./imc";
-import { analisisLocal } from "./analisis";
 import { editarPersona } from "./pre-ops";
 import { preResumen, preTexto } from "./pre";
-import { ficha, HOY } from "./test-utils";
+import { ficha } from "./test-utils";
 import type { Persona } from "./tipos";
 
 const per = (x: Partial<Persona>): Persona => ({ id: "t", rol: "Titular", nombre: "", edad: "40", sexo: "", ...x });
@@ -40,7 +39,5 @@ describe("IMC", () => {
     p = { ...p, preSN: { t: "no" } };
     expect(preResumen(p)[0]).toMatchObject({ imc: "IMC 31,3 · Obesidad grado I", imcFactor: true });
     expect(preTexto(p)).toBe("Ana (IMC 31,3 · Obesidad grado I): sin preexistencias");
-    const a = analisisLocal(p, HOY);
-    expect(a.recs.find((r) => r.id === "imc")?.d).toMatch(/Sin juzgar/);
   });
 });

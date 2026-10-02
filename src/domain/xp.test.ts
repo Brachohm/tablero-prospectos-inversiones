@@ -10,15 +10,6 @@ describe("misiones por tipo", () => {
     expect(misionesDe(ficha("cambio")).map((m) => m.id)).toEqual(["datos", "desc"]);
   });
 
-  it("las preexistencias aparecen en nuevo cerca de contratar (etapa, a mano o con datos)", () => {
-    const ids = (p: Parameters<typeof misionesDe>[0]) => misionesDe(p).map((m) => m.id);
-    for (const etapa of ["Descubrimiento", "Primera reunión", "Segunda reunión", "Seguimiento"])
-      expect(ids(ficha("nuevo", { etapa }))).not.toContain("pre");
-    for (const etapa of ["Pre-cierre", "Cerrado"]) expect(ids(ficha("nuevo", { etapa }))).toEqual(["datos", "desc", "pre"]);
-    expect(ids(ficha("nuevo", { cotizar: true }))).toContain("pre");
-    expect(ids(ficha("nuevo", { preSN: { t: "no" } }))).toContain("pre");
-    expect(ids(ficha("cambio", { etapa: "Pre-cierre", cotizar: true }))).not.toContain("pre");
-  });
 });
 
 describe("XP", () => {
@@ -33,9 +24,9 @@ describe("XP", () => {
   });
 
   it("ignora los campos del otro tipo", () => {
-    // aseguradora es solo de cambio
-    expect(fichaXp(ficha("nuevo", { aseguradora: "X" }))).toBe(0);
-    expect(fichaXp(ficha("cambio", { aseguradora: "X" }))).toBe(10);
+    // institucion es solo de cambio
+    expect(fichaXp(ficha("nuevo", { institucion: "X" }))).toBe(0);
+    expect(fichaXp(ficha("cambio", { institucion: "X" }))).toBe(10);
   });
 
   it("los espacios en blanco no cuentan como lleno", () => {
@@ -57,14 +48,14 @@ describe("XP", () => {
   });
 
   it("los campos de un motivo no elegido no suman, y su dato se conserva", () => {
-    const p = ficha("cambio", { ded_anual: "800" });
+    const p = ficha("cambio", { cos_detalle: "2 % anual" });
     expect(fichaXp(p)).toBe(0);
-    p.motivos = ["deducibles"];
-    // motivos 10 + ded_anual 10
-    expect(fichaXp(p)).toBe(20);
+    p.motivos = ["costos"];
+    // motivos 10 + cos_detalle 5
+    expect(fichaXp(p)).toBe(15);
     p.motivos = [];
     expect(fichaXp(p)).toBe(0);
-    expect(p.ded_anual).toBe("800");
+    expect(p.cos_detalle).toBe("2 % anual");
   });
 });
 
@@ -84,15 +75,13 @@ describe("avance", () => {
     expect(misionStats(mision("datos"), p).pct).toBe(100);
     // 100 de 2 secciones (la otra en 0) = 50
     expect(fichaPct(p)).toBe(50);
-    // en nuevo, ya va a contratar, son 3 (con la declaración): 100 / 3 = 33
-    expect(fichaPct({ ...p, tipo: "nuevo", etapa: "Pre-cierre" })).toBe(33);
     expect(fichaPct({ ...p, tipo: "nuevo" })).toBe(50);
   });
 
   it("elegir un motivo agrega sus campos al total de la misión", () => {
     const desc = mision("desc");
     const sin = ficha("cambio", { motivos: ["otro"], otro_desc: "x" });
-    const con = ficha("cambio", { motivos: ["otro", "red"], otro_desc: "x" });
+    const con = ficha("cambio", { motivos: ["otro", "liquidez"], otro_desc: "x" });
     expect(misionStats(desc, con).pct).toBeLessThan(misionStats(desc, sin).pct);
   });
 });

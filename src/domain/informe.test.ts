@@ -37,7 +37,6 @@ describe("informe post reunión", () => {
     });
     const inf = informe(p, perfil, HOY);
     expect(inf.resumen).toContainEqual({ l: "Paga hoy", v: "$100 al mes" });
-    expect(inf.analisis).toContain("Lo que hoy no le funciona: reembolsos.");
     expect(inf.analisis).toContain("Su plan actual no incluye: maternidad, odontología.");
     expect(inf.estrategia.complementos).toContain("Cubrir lo que hoy no tiene: maternidad.");
     expect(inf.estrategia.costoBeneficio.join(" ")).toMatch(/lo que paga hoy \(\$100 al mes\)/);
