@@ -128,23 +128,23 @@ describe("cambio de seguro: lo que paga hoy vs. lo que pagará", () => {
     expect(comparativo(95, 95.4, [], 0)).toMatchObject({ tipo: "igual", titular: "Por lo mismo que paga hoy" });
   });
 
-  it("la propuesta lo arma con lo que paga hoy y lo que gana (de la comparación y lo anotado)", async () => {
+  it("la propuesta lleva la proyección del plan y su tipo y plazo", async () => {
     const { propuesta, textoPropuesta } = await import("./propuesta");
-    const plan = { id: "pl", nombre: "Plan Plus", coberturas: "", beneficios: "Telemedicina 24/7 sin costo", tabla: { hospitalaria: "100%", maternidad: "$3.000" } } as never;
-    const p = ficha("cambio", {
-      nombre: "Luis Paz",
-      primaActual: "120",
-      gana: "Reembolsos más rápidos",
-      planActual: { tabla: { hospitalaria: "80%", maternidad: "No incluye" } },
-      productos: [{ id: "prod-1", planId: "pl", nombre: "Plan Plus", deducible: "", mensual: "95" }],
+    const p = ficha("nuevo", {
+      nombre: "Ana",
+      tipoPlan: "Contribución regular",
+      plazo: "10",
+      precio: "100",
+      productos: [{ id: "a", nombre: "Plan Futuro", deducible: "", mensual: "100" }],
     });
-    const pr = propuesta(p, perfil, HOY, [plan]);
-    expect(pr.comparativo).toMatchObject({ hoy: 120, nuevo: 95, tipo: "ahorro" });
-    expect(pr.comparativo!.ganancias).toEqual(
-      expect.arrayContaining(["Hospitalización y cirugía: 100% (hoy 80%)", "Maternidad: $3.000 (hoy no lo tiene)", "Reembolsos más rápidos"]),
-    );
-    expect(textoPropuesta(pr)).toContain("Frente a lo que paga hoy ($120), son $25 menos al mes");
-    // Sin lo que paga hoy, o si no es cambio de seguro, no hay comparativo
-    expect(propuesta(ficha("nuevo", { productos: p.productos }), perfil, HOY, [plan]).comparativo).toBeNull();
+    const pr = propuesta(p, perfil, HOY, [], [], [], { conservador: 0, moderado: 0, optimista: 0 });
+    expect(pr.comparativo).toBeNull();
+    expect(pr.plan).toEqual({ tipo: "Contribución regular", plazo: 10 });
+    expect(pr.proyeccion?.final.moderado).toBe(12000);
+    const t = textoPropuesta(pr);
+    expect(t).toContain("- Plan Futuro: $100 al mes");
+    expect(t).toContain("Plazo: 10 años.");
+    expect(t).toMatch(/podría acumular cerca de \$12\.000 en 10 años.*no están garantizados/);
   });
+
 });

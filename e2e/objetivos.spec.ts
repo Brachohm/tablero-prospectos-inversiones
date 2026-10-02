@@ -16,10 +16,15 @@ test('Objetivo del mes: se llena con los cierres y muestra la comisión estimada
   await com.getByRole('button', { name: '+ Agregar comisión' }).click()
   await com.getByLabel('Desde (años de plazo)').fill('10')
   await com.getByLabel('Comisión (%)').fill('30')
+  // Escenarios de la proyección (por defecto 2 / 4 / 6 %)
+  const esc = page.getByRole('region', { name: '📈 Escenarios de la proyección' })
+  await expect(esc.getByLabel('Moderado (% anual)')).toHaveValue('4')
+  await esc.getByLabel('Moderado (% anual)').fill('5')
   await page.getByRole('button', { name: 'Guardar y actualizar' }).click()
   await expect(page.getByText('Configuración guardada y actualizada')).toBeVisible()
   await page.reload()
   await expect(com.getByLabel('Comisión (%)')).toHaveValue('30')
+  await expect(esc.getByLabel('Moderado (% anual)')).toHaveValue('5')
 
   const cerrar = async (nombre: string, aporte: string) => {
     await page.goto('/')

@@ -46,7 +46,7 @@ export function PostReunion({
   actualizar: (fn: (p: Prospecto) => Prospecto) => void;
 }) {
   const enl = useEnlaces();
-  const { perfil } = useAjustesPerfil();
+  const { perfil, ajustes } = useAjustesPerfil();
   const avisar = useAviso();
   const hoy = hoyISO();
   const id = useId();
@@ -56,7 +56,7 @@ export function PostReunion({
   // Tras la segunda reunión, el informe es la propuesta; se puede elegir cuál.
   const [n, setN] = useState<1 | 2>(reunionesDe(p).length >= 2 ? 2 : 1);
   const inf1 = informe(p, perfil, hoy, planes, argumentos);
-  const inf2 = propuesta(p, perfil, hoy, planes, argumentos, docs);
+  const inf2 = propuesta(p, perfil, hoy, planes, argumentos, docs, ajustes?.escenarios);
   const inf = n === 2 ? inf2 : inf1;
   const oferta = inf.oferta;
   const texto = n === 2 ? textoPropuesta(inf2) : textoPostReunion(inf1);

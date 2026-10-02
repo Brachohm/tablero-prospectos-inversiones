@@ -361,7 +361,7 @@ export function Ficha({ id }: { id: string }) {
             actualizar((x) => irAPrecierre(reunionesDe(x).length === 1 ? marcarReunionHecha(x, hoyISO()) : x));
             setAbierto(false);
             setPanel(null);
-            avisar("Pre-cierre: llena el producto, el deducible y el valor mensual");
+            avisar("Pre-cierre: llena el tipo de plan, el plazo, el producto y el aporte");
             irA("precierre");
           },
         };
@@ -388,7 +388,7 @@ export function Ficha({ id }: { id: string }) {
       actualizar(irAPrecierre);
       setAbierto(false);
       setPanel(null);
-      avisar("Pre-cierre: llena el producto, el deducible y el valor mensual");
+      avisar("Pre-cierre: llena el tipo de plan, el plazo, el producto y el aporte");
       return irA("precierre");
     }
     if (a === "hecha") return marcarHecha();

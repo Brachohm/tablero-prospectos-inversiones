@@ -8,7 +8,7 @@ const perfil = perfilDe(undefined);
 
 describe("PDF de los informes", () => {
   it("arma los dos informes (aun sin las fuentes) con su nombre de archivo", async () => {
-    const p = ficha("cambio", { nombre: "Luis Paz", ocupacion: "Albañil", objeciones2: ["precio"], productos: [{ id: "a", nombre: "Plan A", deducible: "", mensual: "80" }] });
+    const p = ficha("cambio", { nombre: "Luis Paz", ocupacion: "Albañil", objeciones2: ["dinero"], tipoPlan: "Contribución regular", plazo: "15", precio: "80", productos: [{ id: "a", nombre: "Plan A", deducible: "", mensual: "80" }] });
     const i1 = informe(p, perfil, "2026-10-07");
     const i2 = propuesta(p, perfil, "2026-10-09");
     const d1 = await armarPDF(i1, null);
@@ -18,8 +18,8 @@ describe("PDF de los informes", () => {
     // La oferta irresistible va al final de los dos informes
     expect(d1.output()).toContain("NUESTRA OFERTA PARA USTED");
     expect(d2.output()).toContain("SU INVERSI");
-    // Sin ocultar nada: el deducible siempre va explicado
-    expect(d2.output()).toContain("SU DEDUCIBLE");
+    // La proyección del plan va en la propuesta
+    expect(d2.output()).toContain("Su proyecci");
     // Con la foto del asesor en el membrete
     const png = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
     const conFoto = await armarPDF(i2, null, png);

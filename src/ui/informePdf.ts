@@ -10,11 +10,10 @@ import { fmtFecha } from "../domain/fechas";
 import { NOTA_INFORME, type EstadoCobertura, type Informe, type RiesgosInforme } from "../domain/informe";
 import { fmtUSD as fmtUSD0, type OfertaInforme } from "../domain/oferta";
 import { NOTA_PROPUESTA, type Comparativo, type ProductoPropuesta, type Propuesta } from "../domain/propuesta";
-import { explicarCopago, explicarDeducible, nombreCategoria } from "../domain/bondades";
-import { valorUSD } from "../domain/oferta";
-import { INTRO_VITALITY } from "../config/vitality";
-import type { LineaVitality, Vitality } from "../domain/vitality";
+import { nombreCategoria } from "../domain/bondades";
 import { VALIDAR } from "../config/saludsa";
+import { AVISO_PROYECCION, ESCENARIOS_L, type Escenarios } from "../config/proyeccion";
+import type { Proyeccion } from "../domain/proyeccion";
 import sora800 from "../assets/fonts/sora-800.ttf?url";
 import sora600 from "../assets/fonts/sora-600.ttf?url";
 import jakarta400 from "../assets/fonts/jakarta-400.ttf?url";
@@ -883,192 +882,7 @@ function dibujarFichaPlan(L: Lienzo, x: ProductoPropuesta) {
 
 /* ---------- Vitality: mini sección si el plan lo tiene ---------- */
 
-function dibujarVitality(L: Lienzo, plan: string, v: Vitality) {
-  const { doc, M } = L;
-  L.cabe(230);
-  L.seccion(`${plan} incluye Vitality`, C.menta, "estrella");
-  // Portada corta
-  L.fuente("s", 11.5);
-  const hI = L.alto(INTRO_VITALITY, L.ancho - 40, 11.5) + 24;
-  L.caja(M, L.y, L.ancho, hI, C.menta, 16);
-  L.fuente("s", 11.5, C.blanco);
-  L.texto(INTRO_VITALITY, M + 20, L.y + 10, L.ancho - 40, 11.5);
-  L.y += hI + 10;
 
-  // Cada semana · cada mes · cada año
-  const cols: [string, LineaVitality[], RGB, RGB][] = [
-    ["Cada semana", v.semanal, C.mentaSuave, C.menta],
-    ["Cada mes", v.mensual, C.violetaSuave, C.violeta],
-    ["Cada año", v.anual, C.solSuave, C.solOscuro],
-  ];
-  const w = (L.ancho - 16) / 3;
-  const vacio = "Con gusto le comparto el detalle del material de Vitality.";
-  const altoCol = (xs: LineaVitality[]) => {
-    L.fuente("c", 9.5);
-    return xs.length ? xs.reduce((a, x) => a + L.alto(x.t, w - 24, 9.5, 1.25) + 16, 0) : L.alto(vacio, w - 24, 9.5) + 6;
-  };
-  const h = 40 + Math.max(...cols.map(([, xs]) => altoCol(xs)));
-  L.cabe(h + 10);
-  cols.forEach(([t, xs, fondo, color], i) => {
-    const x = M + i * (w + 8);
-    L.caja(x, L.y, w, h, fondo, 14);
-    L.fuente("d", 11.5, color);
-    doc.text(t, x + 12, L.y + 22);
-    let y = L.y + 32;
-    if (!xs.length) {
-      L.fuente("c", 9.5, C.gris);
-      L.texto(vacio, x + 12, y, w - 24, 9.5);
-    }
-    for (const it of xs) {
-      L.fuente("c", 9.5, C.tinta);
-      const ht = L.texto(it.t, x + 12, y, w - 24, 9.5, 1.25);
-      L.fuente("c", 7, C.gris);
-      doc.text(L.lineas(it.fuente, w - 24)[0], x + 12, y + ht + 6);
-      y += ht + 16;
-    }
-  });
-  L.y += h + 10;
-  if (v.otros.length) {
-    L.sub("Además, con Vitality:");
-    L.vinetas(v.otros.map((x) => `${x.t} (${x.fuente})`), C.menta, 9.5);
-  }
-}
-
-/* ---------- Lo que debe saber de cada plan: deducible, carencias, exclusiones ---------- */
-
-/** Párrafo dentro de una caja: devuelve el alto. */
-function altoTexto(L: Lienzo, t: string, w: number, tam: number, cb = false): number {
-  L.fuente(cb ? "cb" : "c", tam);
-  return L.alto(t, w, tam);
-}
-
-function dibujarLetraChica(L: Lienzo, x: ProductoPropuesta) {
-  const { doc, M } = L;
-  L.cabe(220);
-  L.seccion(`Lo que debe saber de ${x.nombre}`, C.sol, "i");
-
-  // Deducible: siempre, aunque no se sepa el monto
-  const monto = x.deducible ?? (x.deducibleTxt ? valorUSD(x.deducibleTxt) : null);
-  const d = explicarDeducible(monto, x.deducibleTxt);
-  const w = L.ancho - 150;
-  const textos = [d.que, ...(d.ejemplo ? [d.ejemplo] : []), d.cuando];
-  const hT = textos.reduce((a, t, i) => a + altoTexto(L, t, w - 16, 10, i === 1 && !!d.ejemplo) + 6, 0);
-  const h = Math.max(96, 36 + hT);
-  L.cabe(h + 10);
-  L.caja(M, L.y, L.ancho, h, C.solSuave, 16);
-  L.caja(M + 12, L.y + 12, 120, h - 24, C.blanco, 12);
-  L.fuente("cb", 8, C.solOscuro);
-  doc.text("SU DEDUCIBLE", M + 72, L.y + 34, { align: "center" });
-  const partes = L.lineas(d.valor, 104);
-  L.fuente("d", partes.length > 1 || d.valor.length > 10 ? 13 : 20, C.tinta);
-  L.lineas(d.valor, 104)
-    .slice(0, 3)
-    .forEach((l, i) => doc.text(l, M + 72, L.y + 58 + i * 15, { align: "center" }));
-  L.fuente("d", 12, C.solOscuro);
-  doc.text("¿Qué es el deducible?", M + 146, L.y + 24);
-  let y = L.y + 32;
-  textos.forEach((t, i) => {
-    L.fuente(i === 1 && d.ejemplo ? "cb" : "c", 10, C.tinta);
-    y += L.texto(t, M + 146, y, w - 16, 10) + 6;
-  });
-  L.y += h + 10;
-
-  if (x.copago) {
-    L.tarjeta(`Copago o coaseguro: ${x.copago}`, explicarCopago(x.copago), C.fondo, C.solOscuro);
-  }
-
-  // Tiempos de espera (carencias): línea de tiempo
-  if (x.carencias.length) {
-    const conMeses = x.carencias.filter((c) => c.meses !== null);
-    L.cabe(conMeses.length ? 170 : 60);
-    L.sub("Tiempos de espera (carencias), desde el inicio de su póliza");
-    if (conMeses.length) {
-      const max = Math.max(...conMeses.map((c) => c.meses!));
-      const tope = max <= 12 ? 12 : Math.ceil(max / 12) * 12;
-      const x0 = M + 10;
-      const ancho = L.ancho - 20;
-      const pos = (m: number) => x0 + (m / tope) * ancho;
-      // Agrupa los que esperan lo mismo
-      const grupos = new Map<number, string[]>();
-      for (const c of conMeses) grupos.set(c.meses!, [...(grupos.get(c.meses!) ?? []), c.l]);
-      const puntos = [...grupos.entries()].sort((a, b) => a[0] - b[0]);
-      // Etiquetas en niveles para que no se monten
-      const niveles: number[] = [];
-      const nivel = puntos.map(([m]) => {
-        const px = pos(m);
-        let k = 0;
-        while (niveles[k] !== undefined && px - niveles[k] < 110) k++;
-        niveles[k] = px;
-        return k;
-      });
-      const altoEtiquetas = (Math.max(...nivel) + 1) * 26;
-      const ejeY = L.y + altoEtiquetas + 14;
-      L.cabe(altoEtiquetas + 70);
-      // Eje
-      doc.setDrawColor(...C.linea);
-      doc.setLineWidth(6);
-      doc.line(x0, ejeY, x0 + ancho, ejeY);
-      doc.setDrawColor(...C.menta);
-      doc.setLineWidth(6);
-      doc.line(x0, ejeY, x0 + 1, ejeY);
-      L.icono(x0, ejeY, "ok");
-      L.fuente("cb", 8, C.menta);
-      doc.text("Inicio", x0, ejeY + 20, { align: "left" });
-      // Marcas cada 6 meses
-      for (let m = 6; m <= tope; m += 6) {
-        L.fuente("c", 7.5, C.gris);
-        doc.text(`${m} m`, pos(m), ejeY + 20, { align: "center" });
-      }
-      puntos.forEach(([m, nombres], i) => {
-        const px = pos(m);
-        const yy = ejeY - 14 - nivel[i] * 26;
-        doc.setDrawColor(...C.sol);
-        doc.setLineWidth(1);
-        doc.line(px, yy + 4, px, ejeY);
-        doc.setFillColor(...C.sol);
-        doc.circle(px, ejeY, 6, "F");
-        L.fuente("cb", 8.5, C.solOscuro);
-        const etiqueta = `${m % 1 ? m.toLocaleString("es-EC") : m} ${m === 1 ? "mes" : "meses"}`;
-        const al = px > x0 + ancho - 60 ? "right" : px < x0 + 60 ? "left" : "center";
-        doc.text(etiqueta, px, yy - 8, { align: al });
-        L.fuente("c", 8.5, C.tinta);
-        doc.text(L.lineas(nombres.join(", "), 120)[0], px, yy + 2, { align: al });
-      });
-      L.y = ejeY + 32;
-    }
-    // Todas, tal cual y con su fuente
-    for (const c of x.carencias) {
-      L.fuente("c", 9.5);
-      const h2 = L.alto(c.t, L.ancho - 20, 9.5) + 12;
-      L.cabe(h2);
-      doc.setFillColor(...C.sol);
-      doc.circle(M + 4, L.y + 6, 2.6, "F");
-      L.fuente("c", 9.5);
-      const ht = L.texto(c.t, M + 14, L.y, L.ancho - 20, 9.5);
-      L.fuente("c", 7.5, C.gris);
-      doc.text(limpio(c.fuente), M + 14, L.y + ht + 6);
-      L.y += ht + 12;
-    }
-  }
-
-  // Lo que no cubre
-  if (x.exclusiones.length) {
-    L.cabe(70);
-    L.sub("Lo que no cubre (exclusiones)");
-    for (const e of x.exclusiones) {
-      L.fuente("c", 9.5);
-      const h2 = L.alto(e.t, L.ancho - 24, 9.5) + 12;
-      L.cabe(h2);
-      L.icono(M + 7, L.y + 6, "no");
-      L.fuente("c", 9.5);
-      const ht = L.texto(e.t, M + 22, L.y, L.ancho - 24, 9.5);
-      L.fuente("c", 7.5, C.gris);
-      doc.text(limpio(e.fuente), M + 22, L.y + ht + 6);
-      L.y += ht + 12;
-    }
-  }
-  L.y += 4;
-}
 
 /* ---------- Cambio de seguro: lo que paga hoy vs. lo que pagará ---------- */
 
@@ -1126,6 +940,44 @@ function dibujarComparativo(L: Lienzo, c: Comparativo) {
   if (chips.length) L.chips(chips, fondo, color);
 }
 
+/* ---------- Proyección del plan en tres escenarios ---------- */
+
+function dibujarProyeccion(L: Lienzo, x: Proyeccion) {
+  L.seccion(`Su proyección a ${x.anios} años`, C.menta, "subir");
+  const claves = Object.keys(ESCENARIOS_L) as (keyof Escenarios)[];
+  const colores: RGB[] = [C.gris, C.violeta, C.menta];
+  const tope = Math.max(x.final.optimista, x.final.aportado, x.meta ?? 0) || 1;
+  const filas: [string, number, RGB][] = [
+    ["Lo que aporta", x.final.aportado, C.coral],
+    ...claves.map((k, i): [string, number, RGB] => [`${ESCENARIOS_L[k]} (${x.tasas[k]}% anual)`, x.final[k], colores[i]]),
+  ];
+  const h = 26 + filas.length * 26 + (x.meta ? 20 : 0);
+  L.cabe(h + 8);
+  L.caja(L.M, L.y, L.ancho, h, C.fondo, 14);
+  const izq = 170;
+  const anchoB = L.ancho - izq - 110;
+  filas.forEach(([l, v, col], i) => {
+    const yy = L.y + 22 + i * 26;
+    L.fuente("c", 10);
+    L.doc.text(limpio(l), L.M + 14, yy + 4);
+    L.doc.setFillColor(...col);
+    L.doc.roundedRect(L.M + izq, yy - 5, Math.max(4, (v / tope) * anchoB), 12, 4, 4, "F");
+    L.fuente("cb", 10.5);
+    L.doc.text(fmtUSD(Math.round(v)), L.W - L.M - 14, yy + 4, { align: "right" });
+  });
+  if (x.meta) {
+    L.fuente("c", 9.5, C.gris);
+    const ok = x.alcanza && x.alcanza.moderado;
+    L.doc.text(limpio(`Su meta: ${fmtUSD(x.meta)}${ok ? " · el escenario moderado la alcanza" : ""}`), L.M + 14, L.y + h - 12);
+  }
+  L.y += h + 8;
+  L.fuente("c", 8.5, C.gris);
+  const hN = L.alto(AVISO_PROYECCION, L.ancho, 8.5);
+  L.cabe(hN + 6);
+  L.texto(AVISO_PROYECCION, L.M, L.y, L.ancho, 8.5);
+  L.y += hN + 8;
+}
+
 /* ---------- Informe 2: segunda reunión (propuesta) ---------- */
 
 function dibujarPropuesta(L: Lienzo, pr: Propuesta) {
@@ -1166,10 +1018,10 @@ function dibujarPropuesta(L: Lienzo, pr: Propuesta) {
     L.fuente("d", precio.length > 7 ? 20 : 26, C.blanco);
     L.doc.text(precio, L.M + 87, L.y + h / 2 + 2, { align: "center" });
     L.fuente("c", 9.5, C.violetaSuave);
-    L.doc.text("al mes", L.M + 87, L.y + h / 2 + 18, { align: "center" });
-    if (x.deducible !== null) {
+    L.doc.text(pr.plan?.tipo === "Contribución única" ? "aporte único" : "al mes", L.M + 87, L.y + h / 2 + 18, { align: "center" });
+    if (pr.plan?.plazo) {
       L.fuente("c", 8.5, C.violetaSuave);
-      L.doc.text(`Deducible ${fmtUSD(x.deducible)}`, L.M + 87, L.y + h / 2 + 32, { align: "center" });
+      L.doc.text(`Plazo ${pr.plan.plazo} años`, L.M + 87, L.y + h / 2 + 32, { align: "center" });
     }
     // Nombre y coberturas
     const xx = L.M + 178;
@@ -1178,7 +1030,7 @@ function dibujarPropuesta(L: Lienzo, pr: Propuesta) {
     let yy = L.y + 40;
     if (!x.coberturas.length) {
       L.fuente("c", 9.5, C.gris);
-      L.texto("Coberturas según las condiciones del plan: se las detallo con el documento oficial.", xx, yy, L.ancho - 196, 9.5);
+      L.texto(pr.plan?.tipo ? `${pr.plan.tipo}. Fondos y costos según las condiciones del plan: se los detallo con el documento oficial.` : "Fondos y costos según las condiciones del plan: se los detallo con el documento oficial.", xx, yy, L.ancho - 196, 9.5);
     }
     for (const c of x.coberturas) {
       L.icono(xx + 6, yy + 7, "ok");
@@ -1201,11 +1053,8 @@ function dibujarPropuesta(L: Lienzo, pr: Propuesta) {
     L.seccion(pr.poliza.titulo, C.sol, "i");
     L.vinetas(pr.poliza.puntos, C.sol);
   }
-  for (const x of pr.productos) {
-    dibujarFichaPlan(L, x);
-    if (x.vitality) dibujarVitality(L, x.nombre, x.vitality);
-    dibujarLetraChica(L, x);
-  }
+  if (pr.proyeccion) dibujarProyeccion(L, pr.proyeccion);
+  for (const x of pr.productos) dibujarFichaPlan(L, x);
 
   if (pr.gana.length) {
     L.seccion(pr.tipo === "Ya invierte" ? "Lo que gana frente a su inversión actual" : "Lo que gana", C.menta, "subir");

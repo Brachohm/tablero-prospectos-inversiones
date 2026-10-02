@@ -33,6 +33,8 @@ import { MAX_OBJETIVOS, MIN_OBJETIVOS } from "../config/objetivos";
 import { MAX_COMISIONES, type FilaComision } from "../config/comisiones";
 import { TIPOS_PLAN } from "../config/ficha";
 import { normalizarComisiones } from "../domain/comisiones";
+import { normalizarEscenarios } from "../domain/proyeccion";
+import { ESCENARIOS_L, type Escenarios } from "../config/proyeccion";
 import { conceptosLlenos, type TablaCoberturas } from "../domain/comparar";
 import { useArgumentos, useAviso } from "./hooks";
 import { ir, volver, type SeccionAjustes } from "./router";
@@ -60,6 +62,7 @@ export function AjustesVista({ sec }: { sec: SeccionAjustes }) {
   const [guardando, setGuardando] = useState(false);
   const [objetivos, setObjetivos] = useState<FilaObjetivo[] | null>(null);
   const [comisiones, setComisiones] = useState<FilaCom[] | null>(null);
+  const [escenarios, setEscenarios] = useState<Record<keyof Escenarios, string> | null>(null);
   /** Foto nueva (File), quitada (null) o sin cambio (undefined). */
   const [foto, setFoto] = useState<File | null | undefined>(undefined);
 
@@ -80,8 +83,15 @@ export function AjustesVista({ sec }: { sec: SeccionAjustes }) {
     normalizarObjetivos(guardados?.objetivos).map((o) => ({ monto: String(o.monto), beneficio: o.beneficio, detalle: o.detalle }));
   const comisionesActuales: FilaCom[] =
     comisiones ?? normalizarComisiones(guardados?.comisiones).map((c) => ({ plan: c.plan, desde: String(c.desde), pct: String(c.pct) }));
+  const escGuardados = normalizarEscenarios(guardados?.escenarios);
+  const escenariosActuales: Record<keyof Escenarios, string> = escenarios ?? {
+    conservador: String(escGuardados.conservador),
+    moderado: String(escGuardados.moderado),
+    optimista: String(escGuardados.optimista),
+  };
   const hayCambios =
     perfil !== null ||
+    escenarios !== null ||
     objetivos !== null ||
     comisiones !== null ||
     foto !== undefined ||
@@ -91,7 +101,7 @@ export function AjustesVista({ sec }: { sec: SeccionAjustes }) {
     foto === null ? undefined : foto ? { nombre: foto.name, tipo: foto.type, bytes: foto.size } : guardados?.perfil.foto;
 
   const guardar = async () => {
-    const ep = errorPerfil(perfilActual) || errorObjetivos(objetivosActuales) || errorComisiones(comisionesActuales);
+    const ep = errorPerfil(perfilActual) || errorObjetivos(objetivosActuales) || errorComisiones(comisionesActuales) || errorEscenarios(escenariosActuales);
     if (ep) return avisar(ep);
     setGuardando(true);
     const mensajes = { ...base.mensajes };
@@ -116,6 +126,11 @@ export function AjustesVista({ sec }: { sec: SeccionAjustes }) {
       objetivos: normalizarObjetivos(
         objetivosActuales.map((o) => ({ monto: valorUSD(o.monto) ?? 0, beneficio: o.beneficio, detalle: o.detalle })),
       ),
+      escenarios: normalizarEscenarios({
+        conservador: numero(escenariosActuales.conservador),
+        moderado: numero(escenariosActuales.moderado),
+        optimista: numero(escenariosActuales.optimista),
+      }),
       comisiones: normalizarComisiones(comisionesActuales.map((c) => ({ plan: c.plan, desde: numero(c.desde), pct: numero(c.pct) }))),
     };
     for (const [c, f] of Object.entries(archivos) as [ClaveMensaje, File | null][])
@@ -125,6 +140,7 @@ export function AjustesVista({ sec }: { sec: SeccionAjustes }) {
     setPerfil(null);
     setObjetivos(null);
     setComisiones(null);
+    setEscenarios(null);
     setTextos({});
     setArchivos({});
     setFoto(undefined);
@@ -136,6 +152,7 @@ export function AjustesVista({ sec }: { sec: SeccionAjustes }) {
     setPerfil(null);
     setObjetivos(null);
     setComisiones(null);
+    setEscenarios(null);
     setTextos({});
     setArchivos({});
     setFoto(undefined);
@@ -182,6 +199,7 @@ export function AjustesVista({ sec }: { sec: SeccionAjustes }) {
           <SeccionPerfil p={perfilActual} set={setPerfil} />
           <SeccionObjetivos filas={objetivosActuales} set={setObjetivos} />
           <SeccionComisiones filas={comisionesActuales} set={setComisiones} />
+          <SeccionEscenarios v={escenariosActuales} set={setEscenarios} />
           <Herramientas guardados={guardados} pendiente={hayCambios} />
         </>
       ) : (
@@ -321,6 +339,45 @@ function SeccionComisiones({ filas, set }: { filas: FilaCom[]; set: (f: FilaCom[
           + Agregar comisión
         </button>
       )}
+    </section>
+  );
+}
+
+function errorEscenarios(e: Record<keyof Escenarios, string>): string {
+  for (const k of Object.keys(ESCENARIOS_L) as (keyof Escenarios)[]) {
+    const n = numero(e[k]);
+    if (!e[k].trim() || !Number.isFinite(n) || n < -20 || n > 30) return `Escribe el rendimiento del escenario ${ESCENARIOS_L[k].toLowerCase()} (entre -20 y 30 %)`;
+  }
+  return "";
+}
+
+/** Rendimiento anual supuesto de cada escenario de la proyección. */
+function SeccionEscenarios({ v, set }: { v: Record<keyof Escenarios, string>; set: (e: Record<keyof Escenarios, string>) => void }) {
+  const id = useId();
+  return (
+    <section className="miss" aria-labelledby={id + "t"}>
+      <h2 className="sub-h" id={id + "t"}>
+        📈 Escenarios de la proyección
+      </h2>
+      <p className="an-note">
+        Rendimiento anual supuesto (%) para proyectar cada plan. Es una referencia, no una promesa: usa valores
+        prudentes y coherentes con los fondos que ofreces.
+      </p>
+      <div className="oe-fila">
+        {(Object.keys(ESCENARIOS_L) as (keyof Escenarios)[]).map((k) => (
+          <div className="f" key={k}>
+            <label htmlFor={id + k}>
+              <span>{ESCENARIOS_L[k]} (% anual)</span>
+            </label>
+            <input
+              id={id + k}
+              inputMode="decimal"
+              value={v[k]}
+              onChange={(e) => set({ ...v, [k]: e.target.value.replace(/[^\d.,-]/g, "") })}
+            />
+          </div>
+        ))}
+      </div>
     </section>
   );
 }

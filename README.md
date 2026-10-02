@@ -77,8 +77,13 @@ e2e/                Flujos completos en el navegador
 - **Se quitó:** declaración de preexistencias, escáner del cuerpo, IMC, médico de cabecera y riesgos laborales de salud. Las acciones "Plan recomendado" y "Comparar plan actual" están ocultas hasta adaptarlas.
 - **Datos separados:** base local, copias de seguridad y canales propios, así las fichas no se mezclan con las de SaludSA aunque las dos apps estén en el mismo dominio.
 
-## Pendiente (siguiente fase)
+## Fase 2 (hecha)
 
-- Adaptar la Biblioteca y el informe de la segunda reunión (propuesta): hoy siguen pensados en tablas de coberturas de salud.
-- Proyección de valor del plan (escenarios conservador, moderado y optimista, sin garantizar rendimientos).
-- Cuestionario de perfil de riesgo completo y checklist de KYC en el cierre.
+- **Proyección del plan** en el pre-cierre y en la propuesta (PDF y mensaje): escenarios conservador, moderado y optimista, con lo aportado, el valor por año y si alcanza la meta. Los porcentajes se editan en Configuración → Perfil → Escenarios (por defecto 2 / 4 / 6 %). Siempre con el aviso de que no son rendimientos garantizados.
+- **Checklist KYC** en el pre-cierre: cédula, formulario, origen de fondos, perfil de riesgo, PEP, beneficiarios y servicio básico.
+- **Propuesta de la segunda reunión** adaptada: tipo de plan, plazo y aporte; sin deducibles, coberturas de salud, Vitality ni comparativo de primas.
+
+## Pendiente
+
+- Biblioteca: hoy sigue pensada en tablas de coberturas de salud (planes, comparación, plan recomendado).
+- Cuestionario de perfil de riesgo con puntaje.

@@ -1,6 +1,6 @@
 /**
- * Informe de la segunda reunión: la propuesta trabajada (productos, cuota,
- * coberturas principales y bonos) y preguntas frecuentes pensadas para las
+ * Informe de la segunda reunión: la propuesta trabajada (plan, aporte, plazo,
+ * proyección en tres escenarios y bonos) y preguntas frecuentes pensadas para las
  * objeciones que planteó en la reunión (sin nombrarlas), reforzadas con tus
  * argumentos y con los riesgos de su trabajo. Corto y fácil de leer. Nada de datos de salud.
  */
@@ -16,10 +16,10 @@ import { fmtFecha, hoyISO } from "./fechas";
 import { esCambio, num, tipoDe, txt } from "./ficha";
 import { firma } from "./herramientas";
 import { riesgosInforme, type RiesgosInforme } from "./informe";
-import { argumentoPoliza } from "./poliza";
-import { vitalityDe, type Vitality } from "./vitality";
+import type { Vitality } from "./vitality";
+import { proyeccionDe, type Proyeccion } from "./proyeccion";
+import type { Escenarios } from "../config/proyeccion";
 import { fmtUSD, ofertaDe, ofertaInforme, planDeOferta, valorUSD, type OfertaInforme } from "./oferta";
-import { analizarPlan, beneficios, conceptosLlenos, primaActualDe, tablaDe } from "./comparar";
 import type { Prospecto } from "./tipos";
 import { TIPOS } from "../config/ficha";
 
@@ -69,8 +69,12 @@ export interface Propuesta {
   /** Cambio de seguro: lo que paga hoy frente a lo que pagará, con su encuadre de valor. */
   comparativo: Comparativo | null;
   /** Cambio de seguro desde un masivo o corporativo: por qué conviene uno propio. */
-  poliza: ReturnType<typeof argumentoPoliza>;
+  poliza: { titulo: string; puntos: string[] } | null;
   pasos: string[];
+  /** Proyección del plan en tres escenarios (supuestos, no garantizados). */
+  proyeccion: Proyeccion | null;
+  /** Tipo de plan y plazo del pre-cierre. */
+  plan: { tipo: string; plazo: number | null } | null;
   /** Aún no hay productos ni plan en la oferta. */
   pendiente: boolean;
 }
@@ -146,6 +150,7 @@ export function propuesta(
   planes: readonly Plan[] = [],
   argumentos: readonly Argumento[] = [],
   docs: readonly Documento[] = [],
+  escenarios?: Partial<Escenarios>,
 ): Propuesta {
   // Cada plan con sus PDF (también los que aún no se guardaron en Planes).
   const cat = catalogo(planes, docs);
@@ -154,7 +159,7 @@ export function propuesta(
     const f: FichaPlan = item ? fichaPlan(item) : { destacados: [], bondades: [], ...LETRA_CHICA_VACIA };
     // El deducible de la tabla va aparte: el del pre-cierre es un número.
     const { deducible, ...resto } = f;
-    return { ...resto, deducibleTxt: deducible, vitality: item ? vitalityDe(item, docs) : null };
+    return { ...resto, deducibleTxt: deducible, vitality: null };
   };
   const v = (k: string) => txt(p, k);
   const o = ofertaDe(p);
@@ -202,7 +207,6 @@ export function propuesta(
 
   const riesgos = riesgosInforme(p);
   const args = argumentosPara(p, argumentos);
-  const pol = argumentoPoliza(p);
   const objeciones: RespuestaObjecion[] = objecionesDe(p).flatMap((id) => {
     const ob = OBJECIONES_REUNION.find((x) => x.id === id);
     if (!ob) return [];
@@ -221,38 +225,15 @@ export function propuesta(
 
   const oferta = ofertaInforme(p, planDeOferta(p, planes), argumentos, total);
 
-  // Cambio de seguro: lo que paga hoy frente a lo que pagará
-  let comp: Comparativo | null = null;
-  const actual = tablaDe(p.planActual?.tabla);
-  const hoyPaga = esCambio(p) ? primaActualDe(p, actual) : null;
-  if (hoyPaga && total !== null) {
-    const ganancias: string[] = [];
-    const sumar = (x: string) => {
-      const t = x.trim();
-      if (t && !ganancias.some((g) => normalizar(g) === normalizar(t))) ganancias.push(t);
-    };
-    // De la comparación de coberturas: primero lo que mejora frente a hoy. Costos (deducible, copago) no son ganancias.
-    const comparadas: string[] = [];
-    if (conceptosLlenos(actual).length)
-      for (const x of productosDe(p)) {
-        const item = cat.find((c) => (x.planId && c.plan.id === x.planId) || normalizar(c.plan.nombre) === normalizar(x.nombre.trim()));
-        if (item) comparadas.push(...beneficios(analizarPlan(p, actual, item.plan)).filter((b) => !/^(Paga |Deducible|Copago|Prima)/.test(b)));
-      }
-    comparadas.filter((b) => b.includes("(hoy")).forEach(sumar);
-    // Lo que anotaste que gana
-    v("gana")
-      .split(/;|\n/)
-      .forEach(sumar);
-    comparadas.forEach(sumar);
-    productos.flatMap((x) => x.bondades.filter((b) => b.dato).map((b) => b.t)).forEach(sumar);
-    const prestaciones = productos.reduce((a, x) => a + x.bondades.length + x.destacados.filter((d) => d.id !== "modalidad").length, 0);
-    comp = comparativo(hoyPaga, total, ganancias.slice(0, 6), prestaciones);
-  }
+  const comp: Comparativo | null = null;
+  const proyeccion = proyeccionDe(p, escenarios);
+  const tipoPlan = v("tipoPlan");
+  const plazo = num(p, "plazo");
 
   const pasos = [
     "Revise esta propuesta con calma (y con quien decide con usted).",
     "Confírmeme el plan que elige y preparamos su contratación.",
-    ...(esCambio(p) ? ["Mantenga su póliza actual hasta que la nueva esté vigente."] : []),
+    ...(esCambio(p) ? ["No retire ni cancele su inversión actual hasta revisar juntos el costo de salir."] : []),
   ];
 
   return {
@@ -271,11 +252,13 @@ export function propuesta(
     pasos,
     pendiente: productos.length === 0,
     comparativo: comp,
-    poliza: pol,
+    poliza: null,
+    proyeccion,
+    plan: tipoPlan ? { tipo: tipoPlan, plazo } : null,
   };
 }
 
-export const NOTA_PROPUESTA = `Propuesta referencial preparada con la información de nuestras reuniones. Coberturas, carencias, deducibles y precios sujetos a las condiciones de la aseguradora (${VALIDAR}).`;
+export const NOTA_PROPUESTA = `Propuesta referencial preparada con la información de nuestras reuniones. Las proyecciones usan rendimientos supuestos: no son una promesa ni están garantizadas. Costos, rescates y condiciones sujetos a la aseguradora (${VALIDAR}).`;
 
 /** Mensaje que acompaña a la propuesta. Sin emojis. `whatsapp` = false lleva la firma completa. */
 export function textoPropuesta(pr: Propuesta, whatsapp = true): string {
@@ -288,17 +271,16 @@ export function textoPropuesta(pr: Propuesta, whatsapp = true): string {
   );
   if (pr.productos.length) {
     r.push("");
-    for (const x of pr.productos) r.push(`- ${x.nombre}${x.mensual !== null ? `: $${x.mensual} al mes` : ""}`);
+    const unico = pr.plan?.tipo === "Contribución única";
+    for (const x of pr.productos)
+      r.push(`- ${x.nombre}${x.mensual !== null ? (unico ? `: aporte único de ${usd2(x.mensual)}` : `: ${usd2(x.mensual)} al mes`) : ""}`);
+    if (pr.plan?.plazo) r.push(`Plazo: ${pr.plan.plazo} años.`);
   }
-  const c = pr.comparativo;
-  if (c) {
+  const py = pr.proyeccion;
+  if (py) {
     r.push("");
     r.push(
-      c.tipo === "ahorro"
-        ? `Frente a lo que paga hoy (${usd2(c.hoy)}), son ${usd2(-c.diferencia)} menos al mes, con más coberturas y beneficios.`
-        : c.tipo === "igual"
-          ? `Por lo mismo que paga hoy (${usd2(c.hoy)}), con más coberturas y beneficios.`
-          : `Frente a lo que paga hoy (${usd2(c.hoy)}), son ${usd2(c.diferencia)} más al mes (${usd2(c.porDia)} al día) por todo lo que gana en protección.`,
+      `Como referencia, con un rendimiento supuesto de ${py.tasas.moderado}% anual podría acumular cerca de ${usd2(Math.round(py.final.moderado))} en ${py.anios} años (aportando ${usd2(py.final.aportado)}). No es una promesa: los rendimientos no están garantizados.`,
     );
   }
   r.push("");
@@ -312,5 +294,5 @@ export function textoPropuesta(pr: Propuesta, whatsapp = true): string {
 }
 
 export function asuntoPropuesta(pr: Propuesta): string {
-  return `Su propuesta de protección${pr.cliente ? " – " + pr.cliente : ""} (${fmtFecha(pr.fecha)})`;
+  return `Su propuesta de inversión${pr.cliente ? " – " + pr.cliente : ""} (${fmtFecha(pr.fecha)})`;
 }

@@ -907,3 +907,17 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px))}
 .foto-mini.vacia{display:grid;place-items:center;background:var(--bg);font-size:32px}
 .foto-acciones{display:flex;gap:8px;flex-wrap:wrap}
 .foto-acciones label.btn{cursor:pointer}
+
+/* Proyección del plan */
+.proyeccion { margin-top: 14px; }
+.proy-esc { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 8px 0; }
+.proy-c { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 2px; }
+.proy-c small { font-size: 0.75rem; color: var(--muted); }
+.proy-c b { font-family: var(--display); font-size: 1.05rem; }
+.proy-c span { font-size: 0.75rem; }
+.proy-scroll { overflow-x: auto; }
+.proy-tabla { width: 100%; font-variant-numeric: tabular-nums; border-collapse: collapse; font-size: 0.8rem; margin: 6px 0; }
+.proy-tabla th, .proy-tabla td { padding: 4px 6px; text-align: right; border-bottom: 1px solid var(--line); }
+.proy-tabla th:first-child { text-align: left; }
+@media (max-width: 420px) { .proy-esc { grid-template-columns: 1fr; } }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

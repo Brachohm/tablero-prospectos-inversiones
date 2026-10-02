@@ -8,8 +8,10 @@ import { TituloPlegable } from "./comunes";
 import { usePlegado } from "./plegado";
 import { lugarFrase } from "../domain/reunion";
 import { useId } from "react";
-import { TIPOS_PLAN } from "../config/ficha";
+import { KYC, TIPOS_PLAN } from "../config/ficha";
 import { comisionDe } from "../domain/comisiones";
+import { proyeccionDe } from "../domain/proyeccion";
+import { Proyeccion } from "./Proyeccion";
 import { ROLES_PERSONA } from "../config/zonas";
 import { estadoIdentificacion } from "../domain/identificacion";
 import { etiquetaPersona, personasDe } from "../domain/pre";
@@ -266,6 +268,7 @@ export function PreCierre({
   const sim = simularCierre(items, p, hoy, ajustes?.objetivos);
   const meta = sim.con.escalones.find((e) => !e.logrado);
   const com = comisionDe(p, ajustes?.comisiones);
+  const proy = proyeccionDe(p, ajustes?.escenarios);
 
   const setPs = (fn: (ps: ProductoCierre[]) => ProductoCierre[]) => actualizar((x) => conProductos(x, fn(productosDe(x))));
   const setP = (id: string, cambio: Partial<ProductoCierre>) => setPs((xs) => xs.map((y) => (y.id === id ? { ...y, ...cambio } : y)));
@@ -376,6 +379,7 @@ export function PreCierre({
       <button type="button" className="btn ghost small" onClick={() => setPs((xs) => [...xs, nuevoProducto()])}>
         + Agregar otro producto
       </button>
+      {proy && <Proyeccion x={proy} />}
       {tipoDe(p) === "cambio" && (
         <div className="f" style={{ marginTop: 14 }}>
           <label htmlFor={base + "gana"}>
@@ -385,6 +389,7 @@ export function PreCierre({
         </div>
       )}
 
+      <ChecklistKYC p={p} actualizar={actualizar} />
       <IdentAsegurados p={p} actualizar={actualizar} />
 
       <div className="simulacion" aria-label="Simulación del objetivo">
@@ -511,7 +516,7 @@ export function DocsCierre({ p, actualizar }: { p: Prospecto; actualizar: Actual
   );
 }
 
-/* ---------- Identificación de los asegurados (pre-cierre) ---------- */
+/* ---------- Identificación del titular y asegurados (pre-cierre) ---------- */
 
 function IdentAsegurados({ p, actualizar }: { p: Prospecto; actualizar: Actualizar }) {
   const base = useId();
@@ -522,9 +527,9 @@ function IdentAsegurados({ p, actualizar }: { p: Prospecto; actualizar: Actualiz
   return (
     <section className="ident" aria-labelledby={base + "t"}>
       <h3 className="sub2" id={base + "t"}>
-        Identificación de los asegurados ({completos}/{pers.length})
+        Identificación del titular y asegurados ({completos}/{pers.length})
       </h3>
-      <p className="an-note">Número de cédula o pasaporte y las fechas del documento de cada persona a asegurar.</p>
+      <p className="an-note">Número de cédula o pasaporte y las fechas del documento del titular y de cada asegurado del plan.</p>
       {pers.map((per, i) => {
         const est = estadoIdentificacion(per, hoy);
         const nombre = etiquetaPersona(per, i);
@@ -626,3 +631,22 @@ function IdentAsegurados({ p, actualizar }: { p: Prospecto; actualizar: Actualiz
  * sus documentos o el que escribas). Al sumarlo, ese valor va al producto y a
  * la inversión de la propuesta.
  */
+
+/** Checklist KYC: lo que se necesita para emitir sin rechazos. */
+function ChecklistKYC({ p, actualizar }: { p: Prospecto; actualizar: Actualizar }) {
+  const hechos = KYC.filter((x) => p[x.k] === true).length;
+  return (
+    <div className="kyc" role="group" aria-label="Conocimiento del cliente (KYC)">
+      <p className="sub2">
+        🪪 Conocimiento del cliente (KYC) · {hechos} de {KYC.length}
+      </p>
+      {KYC.map((x) => (
+        <label key={x.k} className="ck">
+          <input type="checkbox" checked={p[x.k] === true} onChange={(e) => actualizar((f) => ({ ...f, [x.k]: e.target.checked }))} />
+          <span>{x.l}</span>
+        </label>
+      ))}
+      {hechos < KYC.length && <p className="an-note">Faltan {KYC.length - hechos}: complétalos antes de enviar a emisión.</p>}
+    </div>
+  );
+}

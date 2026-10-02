@@ -93,6 +93,17 @@ export const MOTIVOS: readonly { id: MotivoId; ic: string; l: string }[] = [
 /** Tipos de plan que ofrece el asesor (unit linked). */
 export const TIPOS_PLAN = ["Contribución regular", "Contribución única"] as const;
 
+/** Checklist de conocimiento del cliente (KYC) antes de emitir (booleanos `kyc_*`). Editable. */
+export const KYC: readonly { k: string; l: string }[] = [
+  { k: "kyc_cedula", l: "Copia de cédula vigente" },
+  { k: "kyc_formulario", l: "Formulario de conocimiento del cliente lleno y firmado" },
+  { k: "kyc_fondos", l: "Origen de los fondos declarado (y respaldo si el monto lo pide)" },
+  { k: "kyc_perfil", l: "Cuestionario de perfil de riesgo firmado" },
+  { k: "kyc_pep", l: "Preguntó si es persona expuesta políticamente (PEP)" },
+  { k: "kyc_beneficiarios", l: "Beneficiarios definidos" },
+  { k: "kyc_servicio", l: "Planilla de servicio básico (dirección)" },
+];
+
 /** Metas de inversión. */
 export const METAS = [
   "Retiro o jubilación",

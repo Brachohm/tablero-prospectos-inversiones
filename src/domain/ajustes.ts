@@ -9,6 +9,7 @@ import { HERRAMIENTAS_INICIALES, type Herramientas } from "./herramientas";
 import type { Jornada } from "./jornada";
 import type { ObjetivoConfig } from "./objetivos";
 import type { FilaComision } from "../config/comisiones";
+import type { Escenarios } from "../config/proyeccion";
 import { sinEmojis } from "./texto";
 
 export type ClaveMensaje =
@@ -68,6 +69,8 @@ export interface Ajustes {
   objetivos?: ObjetivoConfig[];
   /** Tabla de comisiones por tipo de plan y plazo (la escribe el asesor). */
   comisiones?: FilaComision[];
+  /** Rendimiento anual supuesto (%) de cada escenario de la proyección. */
+  escenarios?: Escenarios;
   /** Argumentos del sistema que el asesor ocultó (o guardó como suyos). */
   argumentosOcultos?: string[];
   creado: number;
