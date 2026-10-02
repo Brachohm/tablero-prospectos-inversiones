@@ -16,28 +16,28 @@ test('crear ficha → llenar → analizar → guardar → reabrir', async ({ pag
   // Misión 1
   await campo(page, 'Nombre').fill('Luis Andrade')
   await campo(page, 'WhatsApp').fill('0991234567')
-  await campo(page, 'Edad (años)').fill('58')
+  await campo(page, 'Edad (años)').fill('45')
   // Las secciones son desplegables: Descubrimiento se abre con su título
   await abrir(page, 'Descubrimiento')
-  await campo(page, 'Aseguradora actual').fill('Otra aseguradora')
-  await campo(page, 'Lo que paga hoy (USD al mes)').fill('80')
+  await campo(page, '¿Dónde invierte hoy?').fill('Banco X')
+  await campo(page, 'Saldo acumulado hoy (USD)').fill('20000')
 
-  // Motivos: al elegir "Deducibles y copagos" aparecen sus campos; al quitarlo se ocultan sin borrar
-  await expect(campo(page, 'Pagado en deducibles y copagos el último año (USD)')).toHaveCount(0)
-  await page.getByRole('button', { name: /Deducibles y copagos/ }).click()
-  await campo(page, 'Pagado en deducibles y copagos el último año (USD)').fill('640')
-  await campo(page, '¿Sabía de deducibles y copagos al contratar?').selectOption('No')
-  await campo(page, '¿Se le han agotado topes anuales o por evento?').selectOption('Una vez')
-  await page.getByRole('button', { name: /Deducibles y copagos/ }).click()
-  await expect(campo(page, 'Pagado en deducibles y copagos el último año (USD)')).toHaveCount(0)
-  await page.getByRole('button', { name: /Deducibles y copagos/ }).click()
-  await expect(campo(page, 'Pagado en deducibles y copagos el último año (USD)')).toHaveValue('640')
+  // Motivos: al elegir "Comisiones y costos" aparecen sus campos; al quitarlo se ocultan sin borrar
+  await expect(campo(page, 'Costos que conoce (administración, entrada, salida…)')).toHaveCount(0)
+  await page.getByRole('button', { name: /Comisiones y costos/ }).click()
+  await campo(page, 'Costos que conoce (administración, entrada, salida…)').fill('2 % anual')
+  await campo(page, '¿Sabe cuánto paga en comisiones y costos?').selectOption('No')
+  await page.getByRole('button', { name: /Comisiones y costos/ }).click()
+  await expect(campo(page, 'Costos que conoce (administración, entrada, salida…)')).toHaveCount(0)
+  await page.getByRole('button', { name: /Comisiones y costos/ }).click()
+  await expect(campo(page, 'Costos que conoce (administración, entrada, salida…)')).toHaveValue('2 % anual')
 
-  await campo(page, '¿Cómo lo eligió cuando lo contrató?').selectOption('Por precio')
-  await campo(page, '¿Cómo lo ha usado?').selectOption('Casi no lo usa')
+  await campo(page, '¿Para qué quiere invertir?').selectOption('Retiro o jubilación')
+  await campo(page, '¿En cuánto tiempo necesitará ese dinero?').selectOption('10 a 20 años')
 
-  // Ya va a contratar: pre-cierre con producto y valor mensual
-  await precierre(page, 'Plan Salud', '95')
+  // Ya va a contratar: pre-cierre con tipo de plan, plazo y aporte → comisión estimada
+  await precierre(page, 'Plan Futuro', '100', '12')
+  await expect(page.getByText(/Comisión estimada: \$360/)).toBeVisible()
 
   // Historial de contactos (desde + acciones)
   await accion(page, 'Registrar contacto')
@@ -49,117 +49,21 @@ test('crear ficha → llenar → analizar → guardar → reabrir', async ({ pag
   // Analizar: veredicto sincero, calculado en el dispositivo
   await accion(page, 'Analizar ficha')
   const an = page.getByRole('region', { name: 'Análisis para la propuesta' })
-  await expect(an.getByText('Aún no conviene cambiar')).toBeVisible()
-  await expect(an.getByText(/\$15 más al mes \(\$180 al año\)/)).toBeVisible()
-  await expect(an.getByText(/pagó \$640 el último año/)).toBeVisible()
+  await expect(an.getByText('Aún no conviene mover su dinero')).toBeVisible()
 
   // Guardar y volver: aparece en la lista
   await page.getByRole('button', { name: 'Guardar y volver' }).click()
-  const card = page.getByRole('button', { name: /Luis Andrade/ })
-  await expect(card).toBeVisible()
+  await expect(page.getByRole('button', { name: /Luis Andrade/ })).toBeVisible()
 
   // Recargar la página (reabrir la app) y abrir la ficha: nada se perdió
   await page.reload()
   await page.getByRole('button', { name: /Luis Andrade/ }).click()
-  // Ya en pre-cierre: Datos y Descubrimiento quedan plegados
-  await expect(campo(page, 'Edad (años)')).toBeHidden()
   await abrir(page, 'Datos del prospecto')
   await abrir(page, 'Descubrimiento')
-  await expect(campo(page, 'Edad (años)')).toHaveValue('58')
-  await expect(campo(page, 'Pagado en deducibles y copagos el último año (USD)')).toHaveValue('640')
-  await expect(campo(page, 'Valor a pagar mensual (USD)')).toHaveValue('95')
-  await accion(page, 'Registrar contacto')
-  await expect(page.getByText('Primera llamada')).toBeVisible()
-  await expect(page.getByText('Aún no conviene cambiar')).toHaveCount(0) // el panel se abre solo al analizar
-})
-
-test('nuevo prospecto: escáner del cuerpo, cierre, cliente y referido', async ({ page }) => {
-  await page.goto('/')
-  await page.goto('/#/nueva/nuevo')
-  await page.getByLabel(/La persona aceptó/).click()
-  await campo(page, 'Nombre').fill('Marta')
-
-  // Al inicio solo venta consultiva: la declaración no aparece hasta que va a contratar
-  await expect(page.getByRole('heading', { name: 'Declaración de preexistencias' })).toHaveCount(0)
-  await accion(page, 'Ya va a contratar')
-  await expect(page.getByRole('heading', { name: 'Declaración de preexistencias' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Pre-cierre' })).toBeVisible()
-
-  // Talla y peso: IMC automático, con su rango y factor de riesgo (sin juzgar)
-  await page.getByLabel('Talla', { exact: true }).fill('160')
-  await page.getByLabel('Unidad de la talla').selectOption('cm')
-  await page.getByLabel('Peso', { exact: true }).fill('176')
-  await page.getByLabel('Unidad del peso').selectOption('lb')
-  const imc = page.getByRole('region', { name: 'Índice de masa corporal' })
-  await expect(imc).toContainText('31,2')
-  await expect(imc).toContainText('Obesidad grado I')
-  await expect(imc).toContainText('Factor de riesgo a tener presente')
-  await expect(imc).toContainText('no un juicio')
-  await imc.screenshot({ path: test.info().outputPath('imc.png') })
-
-  // Dos personas: titular "No", la segunda declara una condición y "el resto sin antecedentes"
-  await page.getByRole('button', { name: 'Una persona más' }).click()
-  await page.getByRole('button', { name: /^Marta/ }).click()
-  await page.getByRole('button', { name: 'No, ninguna' }).click()
-  // Salta sola a la siguiente persona sin responder
-  await expect(page.getByRole('button', { name: 'Marta✓' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: '¿Hijo(a) tiene alguna condición médica previa que declarar?' })).toBeVisible()
-  await page.getByRole('button', { name: 'Sí, declarar' }).click()
-  await page.getByRole('button', { name: /Corazón y circulación: sin revisar/ }).click()
-  await page.getByLabel('Hipertensión arterial').check()
-  await page.getByRole('button', { name: /El resto sin antecedentes/ }).click()
-  await page.getByRole('button', { name: /Toca otra vez/ }).click()
-  await expect(page.getByText('Declaración completa ✓')).toBeVisible()
-  await expect(page.getByText('Escaneo completo. ✓')).toBeVisible()
-
-  // Venta exitosa: pide producto y valor mensual
-  await page.getByRole('button', { name: 'Venta exitosa', exact: true }).click()
-  await expect(page.getByText('Elige al menos un producto')).toBeVisible()
-  await campo(page, 'Producto seleccionado').fill('Plan Familia')
-  await campo(page, 'Monto de deducible (USD)').fill('500')
-  await campo(page, 'Valor a pagar mensual (USD)').fill('120')
-  await expect(page.getByText(/con esta venta: \$120/)).toBeVisible()
-  await page.getByRole('button', { name: 'Venta exitosa', exact: true }).click()
-
-  // Cerrado: plan contratado, fechas y documentos (JPEG o PDF)
-  const cer = page.getByRole('region', { name: 'Cerrado' })
-  await expect(cer).toBeVisible()
-  await expect(campo(page, 'Plan contratado')).toHaveValue('Plan Familia')
-  // Venta exitosa: pasa a Cerrado al completar contrato, emisión y documentos
-  await expect(page.getByText('Etapa: Venta exitosa')).toBeVisible()
-  await expect(cer).toContainText('Para pasar a Cerrados falta: Número de contrato, Fecha de emisión')
-  await campo(page, 'Número de contrato').fill('SAL-2026-0042A')
-  await campo(page, 'Fecha de emisión').fill('2026-01-10')
-  await expect(page.getByText(/estimada a un año de la emisión/)).toBeVisible()
-  await cer.getByLabel('Cargar Comprobante de pago').setInputFiles({ name: 'pago.png', mimeType: 'image/png', buffer: Buffer.from('x') })
-  await expect(page.getByText('Carga el archivo en JPEG o PDF')).toBeVisible()
-  await cer.getByLabel('Cargar Comprobante de pago').setInputFiles({ name: 'pago.jpg', mimeType: 'image/jpeg', buffer: Buffer.from('jpg') })
-  await cer.getByLabel('Cargar Contrato').setInputFiles({ name: 'contrato.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4') })
-  await expect(cer.getByText('Documentos (2/3)', { exact: false })).toBeVisible()
-  await expect(cer.getByText(/pago\.jpg/)).toBeVisible()
-  await expect(page.getByText('Etapa: Venta exitosa')).toBeVisible()
-  await cer.getByLabel('Cargar Ficha de preexistencias').setInputFiles({ name: 'pre.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4') })
-  await expect(cer.getByText('Documentos (3/3)', { exact: false })).toBeVisible()
-  await expect(page.getByText('Etapa: Cerrado')).toBeVisible()
-  await expect(cer).toContainText('Cierre completo: está en Cerrados.')
-  await page.getByLabel(/Le pedí referidos/).check()
-  await page.getByRole('button', { name: '+ Referido que quiere contratar' }).click()
-  await expect(page.getByText(/Referido por/)).toBeVisible()
-  await page.getByLabel(/La persona aceptó/).click()
-  await expect(campo(page, '¿De dónde llegó?')).toHaveValue('Referido')
-  await campo(page, 'Nombre').fill('Pedro (referido)')
-  await page.getByRole('button', { name: 'Volver', exact: true }).click()
-
-  // Volvemos a la ficha de Marta: el referido aparece en su lista
-  await expect(page.getByRole('region', { name: 'Cerrado' }).getByText(/Pedro \(referido\)/)).toBeVisible()
-  await page.getByRole('button', { name: 'Volver', exact: true }).click()
-
-  // Tablero: Marta en la pestaña Cerrados, Pedro en Prospectos
-  await page.getByRole('tab', { name: /Cerrados/ }).click()
-  await expect(page.getByRole('button', { name: /Marta/ })).toContainText('Cerrado')
-  await page.getByRole('tab', { name: 'Prospectos' }).click()
-  await expect(page.getByRole('button', { name: /Pedro/ })).toBeVisible()
-  await expect(page.getByText('Escaneo de cuerpo completo')).toBeVisible()
+  await expect(campo(page, 'Edad (años)')).toHaveValue('45')
+  await expect(campo(page, 'Costos que conoce (administración, entrada, salida…)')).toHaveValue('2 % anual')
+  await expect(campo(page, 'Aporte mensual (USD)')).toHaveValue('100')
+  await expect(campo(page, 'Plazo (años)')).toHaveValue('12')
 })
 
 test('eliminar pide un segundo toque y la ficha no revive', async ({ page }) => {

@@ -35,7 +35,7 @@ export const MENSAJES_CONFIG: readonly {
     ayuda: "Si sigue sin responder: aporta algo de valor.",
     adjunto: "cualquiera",
     inicial:
-      "Hola {nombre}, {saludo}. Le comparto algo que le puede servir para cuidar su salud y su economía. Si le parece, lo revisamos juntos en 15 minutos.",
+      "Hola {nombre}, {saludo}. Le comparto algo que le puede servir para cuidar y hacer crecer su dinero. Si le parece, lo revisamos juntos en 15 minutos.",
   },
   {
     clave: "seg3",
@@ -76,7 +76,7 @@ export const MENSAJES_CONFIG: readonly {
     l: "Presentación (si no le tiene registrado)",
     ayuda: "Se agrega al saludo de los contactos que aún no tienen su número registrado, después de la primera frase.",
     adjunto: null,
-    inicial: "Le saluda {asesor}, {rol}. Quedo a sus órdenes en todo lo relacionado con su salud y la de su familia.",
+    inicial: "Le saluda {asesor}, {rol}. Quedo a sus órdenes para ayudarle con sus metas de ahorro e inversión.",
   },
   {
     clave: "invitacion",

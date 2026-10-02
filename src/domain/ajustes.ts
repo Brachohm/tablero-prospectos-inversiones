@@ -95,7 +95,7 @@ export function perfilDe(a: Ajustes | undefined): Perfil {
  */
 const INICIALES_ANTERIORES: readonly string[] = [
   "Hola {nombre}, soy {asesor}. ¿Pudiste revisar lo que conversamos? Quedo atento a cualquier duda.",
-  "Hola {nombre}, te comparto algo que te puede servir para cuidar tu salud y tu bolsillo. Si quieres, lo revisamos juntos en 15 minutos.",
+  "Hola {nombre}, te comparto algo que te puede servir para cuidar y hacer crecer tu dinero. Si quieres, lo revisamos juntos en 15 minutos.",
   "Hola {nombre}, no quiero ser insistente. Si ahora no es el momento, lo entiendo. Cuando quieras retomar, aquí estoy. ¡Un abrazo!",
   "Hola {nombre}, ¡buenos días! Te escribo para saludarte y desearte un excelente día.",
   "Hola {nombre}, te comparto este video. ¡Que tengas un gran día!",
@@ -103,7 +103,7 @@ const INICIALES_ANTERIORES: readonly string[] = [
   "Hola {nombre}, soy {asesor}, {rol}. Te invito a una reunión para conocer tu situación y lo que es importante para ti: {fecha} a las {hora}{lugar}. ¿Te queda bien?",
   // Con trato de tú (antes de pasar a usted)
   "Hola {nombre}, {saludo}. Soy {asesor}. ¿Pudiste revisar lo que conversamos? Quedo atento a cualquier duda.",
-  "Hola {nombre}, {saludo}. Te comparto algo que te puede servir para cuidar tu salud y tu bolsillo. Si quieres, lo revisamos juntos en 15 minutos.",
+  "Hola {nombre}, {saludo}. Te comparto algo que te puede servir para cuidar y hacer crecer tu dinero. Si quieres, lo revisamos juntos en 15 minutos.",
   "Hola {nombre}, {saludo}. No quiero ser insistente: si ahora no es el momento, lo entiendo. Cuando quieras retomar, aquí estoy. ¡Un abrazo!",
   "Hola {nombre}, ¡{saludo}! Te escribo para saludarte y desearte {deseo}.",
   "Hola {nombre}, {saludo}. Te comparto este video. ¡Que tengas {deseo}!",

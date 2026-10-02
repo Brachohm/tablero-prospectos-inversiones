@@ -109,7 +109,10 @@ describe("pre-cierre y venta", () => {
   it("la simulación suma esta venta al objetivo del mes y avisa qué desbloquea", () => {
     const cerrada = ficha("nuevo", { id: "a", etapa: "Cerrado", cerradoEn: HOY, precio: "700" });
     const p = ficha("nuevo", { id: "b", etapa: "Pre-cierre", productos: [prod("Plan A", "80")] });
-    const s = simularCierre([cerrada, p], p, HOY);
+    const s = simularCierre([cerrada, p], p, HOY, [
+      { monto: 750, beneficio: true, detalle: "90% de comisión" },
+      { monto: 1100, beneficio: true, detalle: "120% de comisión" },
+    ]);
     expect(s.hoy.prima).toBe(700);
     expect(s.con.prima).toBe(780);
     expect(s.suma).toBe(80);

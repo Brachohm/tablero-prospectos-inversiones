@@ -7,10 +7,9 @@ import { FormReunion } from "./Reunion";
 import { TituloPlegable } from "./comunes";
 import { usePlegado } from "./plegado";
 import { lugarFrase } from "../domain/reunion";
-import { useId, useMemo } from "react";
-import { VALIDAR } from "../config/saludsa";
-import { consejoModalidad, medicoDe, recomendar, type Recomendacion } from "../domain/recomendar";
-import { usePlanEnPropuesta } from "./usarPlan";
+import { useId } from "react";
+import { TIPOS_PLAN } from "../config/ficha";
+import { comisionDe } from "../domain/comisiones";
 import { ROLES_PERSONA } from "../config/zonas";
 import { estadoIdentificacion } from "../domain/identificacion";
 import { etiquetaPersona, personasDe } from "../domain/pre";
@@ -46,9 +45,6 @@ import {
   totalMensual,
   conProductos,
   nuevoProducto,
-  fijarValorRec,
-  tieneProducto,
-  valorRecomendado,
 } from "../domain/cierre";
 import { claves } from "../domain/importar";
 import { fmtFecha, hoyISO, usd } from "../domain/fechas";
@@ -258,9 +254,7 @@ export function PreCierre({
   alVender: () => void;
   alVolver: () => void;
 }) {
-  const { planes, docs } = useBiblioteca();
-  const recs = useMemo(() => recomendar(p, planes, docs), [p, planes, docs]);
-  const rec = recs[0];
+  const { planes } = useBiblioteca();
   const items = useFichas();
   const { ajustes } = useAjustesPerfil();
   const avisar = useAviso();
@@ -271,6 +265,7 @@ export function PreCierre({
   const hoy = hoyISO();
   const sim = simularCierre(items, p, hoy, ajustes?.objetivos);
   const meta = sim.con.escalones.find((e) => !e.logrado);
+  const com = comisionDe(p);
 
   const setPs = (fn: (ps: ProductoCierre[]) => ProductoCierre[]) => actualizar((x) => conProductos(x, fn(productosDe(x))));
   const setP = (id: string, cambio: Partial<ProductoCierre>) => setPs((xs) => xs.map((y) => (y.id === id ? { ...y, ...cambio } : y)));
@@ -287,14 +282,30 @@ export function PreCierre({
         <span className="mp">{total > 0 ? `${usd(total)}/mes` : "por llenar"}</span>
       </div>
       <p className="an-note">Lo que decidió el cliente. Si aplica más de un producto, agrégalo.</p>
-      <MedicoCabecera p={p} actualizar={actualizar} />
-      {rec && rec.ajuste > 0 && (
-        <p className="an-status rec-sugerido">
-          🧭 Recomendado para su caso: <b>{rec.item.plan.nombre}</b> ({rec.ajuste}% de lo que necesita, según tus
-          documentos). Detalle en "+ acciones" → Plan recomendado.
+      <div className="two">
+        <div className="f">
+          <label htmlFor={base + "tipoPlan"}>
+            <span>Tipo de plan</span>
+          </label>
+          <select id={base + "tipoPlan"} value={txt(p, "tipoPlan")} onChange={(e) => actualizar((x) => ({ ...x, tipoPlan: e.target.value }))}>
+            <option value="">Elegir…</option>
+            {TIPOS_PLAN.map((t) => (
+              <option key={t}>{t}</option>
+            ))}
+          </select>
+        </div>
+        <div className="f">
+          <label htmlFor={base + "plazo"}>
+            <span>Plazo (años)</span>
+          </label>
+          <input id={base + "plazo"} inputMode="numeric" value={txt(p, "plazo")} onChange={(e) => actualizar((x) => ({ ...x, plazo: e.target.value }))} />
+        </div>
+      </div>
+      {com && (
+        <p className="an-status">
+          💼 Comisión estimada: <b>{usd(com.monto)}</b> ({com.pct}% sobre {usd(com.base)})
         </p>
       )}
-      <ValoresRecomendados p={p} recs={recs} actualizar={actualizar} />
       {ps.map((x, i) => {
         const otro = !!x.nombre && !planes.some((pl) => pl.nombre === x.nombre);
         return (
@@ -349,14 +360,8 @@ export function PreCierre({
             </div>
             <div className="two">
               <div className="f">
-                <label htmlFor={base + x.id + "d"}>
-                  <span>Monto de deducible (USD)</span>
-                </label>
-                <input id={base + x.id + "d"} inputMode="decimal" value={x.deducible} onChange={(e) => setP(x.id, { deducible: e.target.value })} />
-              </div>
-              <div className="f">
                 <label htmlFor={base + x.id + "m"}>
-                  <span>Valor a pagar mensual (USD)</span>
+                  <span>{txt(p, "tipoPlan") === "Contribución única" ? "Aporte único (USD)" : "Aporte mensual (USD)"}</span>
                 </label>
                 <input id={base + x.id + "m"} inputMode="decimal" value={x.mensual} onChange={(e) => setP(x.id, { mensual: e.target.value })} />
               </div>
@@ -370,7 +375,7 @@ export function PreCierre({
       {tipoDe(p) === "cambio" && (
         <div className="f" style={{ marginTop: 14 }}>
           <label htmlFor={base + "gana"}>
-            <span>¿Qué gana frente a su póliza actual?</span>
+            <span>¿Qué gana frente a su inversión actual?</span>
           </label>
           <textarea id={base + "gana"} rows={2} value={txt(p, "gana")} onChange={(e) => actualizar((x) => ({ ...x, gana: e.target.value }))} />
         </div>
@@ -611,115 +616,9 @@ function IdentAsegurados({ p, actualizar }: { p: Prospecto; actualizar: Actualiz
   );
 }
 
-/** Médico de cabecera: solo si tiene, se despliega; si no, se sigue con el pre-cierre. */
-function MedicoCabecera({ p, actualizar }: { p: Prospecto; actualizar: Actualizar }) {
-  const base = useId();
-  const m = medicoDe(p);
-  const tiene = txt(p, "medicoCabecera");
-  const set = (k: string, v: string) => actualizar((x) => ({ ...x, [k]: v }));
-  const campo = (k: string, l: string, ph: string) => (
-    <div className="f">
-      <label htmlFor={base + k}>
-        <span>{l}</span>
-      </label>
-      <input id={base + k} value={txt(p, k)} placeholder={ph} onChange={(e) => set(k, e.target.value)} />
-    </div>
-  );
-  return (
-    <div className="medico-cabecera">
-      <p className="sub2">¿Tiene médico de cabecera?</p>
-      <div className="ideas" role="group" aria-label="¿Tiene médico de cabecera?">
-        {["Sí", "No"].map((o) => (
-          <button key={o} type="button" className="chip" aria-pressed={tiene === o} onClick={() => set("medicoCabecera", tiene === o ? "" : o)}>
-            {o}
-          </button>
-        ))}
-      </div>
-      {m.tiene && (
-        <>
-          <div className="two" style={{ marginTop: 10 }}>
-            {campo("medicoNombre", "Nombre del médico", "Dr. / Dra.")}
-            {campo("medicoEspecialidad", "Especialidad", "Medicina general, pediatría…")}
-          </div>
-          {campo("medicoLugar", "Consultorio o clínica donde lo atiende", "Clínica, centro médico…")}
-          <p className="sub2" style={{ marginTop: 10 }}>
-            ¿Tiene problema en atenderse con la red de convenio?
-          </p>
-          <div className="ideas" role="group" aria-label="¿Tiene problema en atenderse con la red de convenio?">
-            {/* redConvenio = "Sí": acepta atenderse en la red de convenio. */}
-            {[
-              ["Sí", "No tiene problema"],
-              ["No", "Prefiere seguir con su médico"],
-            ].map(([v, l]) => (
-              <button key={v} type="button" className="chip" aria-pressed={txt(p, "redConvenio") === v} onClick={() => set("redConvenio", v)}>
-                {l}
-              </button>
-            ))}
-          </div>
-          <p className="an-status medico-consejo">🩺 {consejoModalidad(m)}</p>
-          {m.aceptaRed && <p className="an-note">Verifica que su médico esté en la red de convenio ({VALIDAR}).</p>}
-        </>
-      )}
-      {tiene === "No" && <p className="an-note">Sin médico de cabecera: continúa con el producto.</p>}
-    </div>
-  );
-}
-
-/** Cuántas recomendaciones se muestran con su valor mensual (más las que ya están en la propuesta). */
-const MAX_VALORES_REC = 3;
 
 /**
  * Valor mensual por recomendación: cada plan recomendado con su valor (el de
  * sus documentos o el que escribas). Al sumarlo, ese valor va al producto y a
  * la inversión de la propuesta.
  */
-function ValoresRecomendados({ p, recs, actualizar }: { p: Prospecto; recs: Recomendacion[]; actualizar: Actualizar }) {
-  const base = useId();
-  const { usar, quitar } = usePlanEnPropuesta(actualizar);
-  const filas = recs.filter((r, i) => i < MAX_VALORES_REC || tieneProducto(p, r.item.plan));
-  if (!filas.length) return null;
-  return (
-    <div className="valores-rec" role="group" aria-label="Valor mensual por recomendación">
-      <p className="sub2">Valor mensual por recomendación</p>
-      <p className="an-note">Escribe el valor de cada plan recomendado: es la inversión que va en el informe.</p>
-      {filas.map((r, i) => {
-        const pl = r.item.plan;
-        const valor = valorRecomendado(p, pl, r.precio);
-        const en = tieneProducto(p, pl);
-        const id = base + i;
-        return (
-          <div key={pl.id} className={"valor-rec" + (en ? " en" : "")}>
-            <div className="valor-rec-plan">
-              <b>{pl.nombre}</b>
-              <small>
-                {i === 0 ? "Mejor opción · " : ""}
-                {r.ajuste}% de lo que necesita{r.noApta ? " · red cerrada" : ""}
-              </small>
-            </div>
-            <div className="f">
-              <label htmlFor={id}>
-                <span>Valor mensual (USD)</span>
-              </label>
-              <input
-                id={id}
-                inputMode="decimal"
-                value={valor}
-                placeholder={r.precio === null ? "No está en sus documentos" : ""}
-                onChange={(e) => actualizar((x) => fijarValorRec(x, pl, e.target.value))}
-              />
-            </div>
-            {en ? (
-              <button type="button" className="btn ghost small" onClick={() => quitar(r)}>
-                ✓ En la propuesta · Quitar
-              </button>
-            ) : (
-              <button type="button" className="btn small" onClick={() => usar(r, valor)}>
-                Sumar a la propuesta
-              </button>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}

@@ -108,7 +108,7 @@ function Consentimiento({ p, aceptar }: { p: Prospecto; aceptar?: () => void }) 
     <section className="consent" aria-label="Consentimiento">
       <h2>Antes de empezar</h2>
       <p>
-        Esta ficha guarda datos personales y puede guardar datos de salud de la persona y de su familia. Pídele permiso
+        Esta ficha guarda datos personales y financieros de la persona y de su familia. Pídele permiso
         para registrarlos y úsalos solo para asesorarla.
       </p>
       <label className="ck">
@@ -296,8 +296,9 @@ export function Ficha({ id }: { id: string }) {
     },
     { id: "cadena", l: "Cadena de referido", nota: cadenaCompleta(datosRef) ? undefined : "pendiente", si: conCadena },
     { id: "contacto", l: "Registrar contacto" },
-    { id: "recomendar", l: "Plan recomendado" },
-    { id: "comparar", l: "Comparar plan actual", si: tipoDe(p) === "cambio" },
+    // "Plan recomendado" y "Comparar plan actual" (tablas de coberturas) quedan fuera hasta adaptarlos a inversiones.
+    { id: "recomendar", l: "Plan recomendado", si: false },
+    { id: "comparar", l: "Comparar plan actual", si: false },
     { id: "analizar", l: "Analizar ficha" },
     { id: "notas", l: "Notas" },
     { id: "contratar", l: "Ya va a contratar", clase: "fuerte", si: !cerrado && !perdido && !precierre },

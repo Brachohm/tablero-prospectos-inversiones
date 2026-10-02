@@ -206,7 +206,7 @@ export function recomendacion(g: Gestionable, hoy: string): Recomendacion {
       titulo: "Primer contacto",
       pasos: [
         g.referidor ? `Preséntate de parte de ${g.referidor.split(/\s+/)[0]} (cadena de referido).` : "Llámale o envíale tu saludo para presentarte.",
-        "Escucha antes de ofrecer: pregunta qué le preocupa de su salud y la de su familia.",
+        "Escucha antes de ofrecer: pregunta qué metas tiene para su dinero y su familia.",
       ],
     };
 
@@ -222,8 +222,8 @@ export function recomendacion(g: Gestionable, hoy: string): Recomendacion {
   const extras: string[] = [];
   if (tiene(res, "caro", "precio", "presupuesto", "costoso", "plata", "dinero"))
     extras.push("Prepara una opción que se ajuste a su presupuesto (arma la oferta con bonos reales).");
-  if (tiene(res, "ya tiene", "tiene seguro", "su seguro", "otra aseguradora"))
-    extras.push("Ofrece comparar su póliza actual sin compromiso.");
+  if (tiene(res, "ya tiene", "tiene ahorros", "ya invierte", "otro banco", "plazo fijo"))
+    extras.push("Ofrece comparar su inversión actual sin compromiso.");
   if (tiene(res, "despues", "mas adelante", "proximo mes", "mes que viene", "no es el momento", "ahora no"))
     extras.push("Agenda el próximo contacto en 2 a 4 semanas, con algo de valor para compartir.");
   if (tiene(res, "esposa", "esposo", "pareja", "familia", "consultar"))

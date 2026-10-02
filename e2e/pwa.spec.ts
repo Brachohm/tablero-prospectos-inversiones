@@ -16,7 +16,7 @@ test('se instala: manifiesto e íconos', async ({ page, request }) => {
   const href = await page.locator('link[rel="manifest"]').getAttribute('href')
   expect(href).toBeTruthy()
   const m = await (await request.get('/' + href!.replace(/^\//, ''))).json()
-  expect(m).toMatchObject({ short_name: 'Prospectos', display: 'standalone', start_url: './' })
+  expect(m).toMatchObject({ short_name: 'Inversiones', display: 'standalone', start_url: './' })
   for (const i of m.icons) expect((await request.get('/' + i.src)).ok()).toBe(true)
   expect(m.icons.some((i: { purpose?: string }) => i.purpose === 'maskable')).toBe(true)
 })

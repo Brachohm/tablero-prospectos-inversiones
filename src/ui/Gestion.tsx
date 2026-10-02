@@ -170,7 +170,7 @@ export function GestionVista({ modo }: { modo: ModoGestion }) {
 
 type Panel = null | "saludo" | "seguimiento" | "invitacion" | "recordatorio" | "reunion" | "pasar";
 
-const TIPO_REUNION: Record<Tipo, string> = { nuevo: "Nuevo cliente", cambio: "Cambio de seguro" };
+const TIPO_REUNION: Record<Tipo, string> = { nuevo: "Nuevo cliente", cambio: "Ya invierte" };
 
 /** Texto con el que cada acción queda en "Hecho en esta gestión". */
 const MARCA_ACCION: Record<string, string> = {

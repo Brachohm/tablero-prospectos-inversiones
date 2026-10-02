@@ -153,7 +153,7 @@ function HojaFin({ cerrar }: { cerrar: () => void }) {
     [r.contactosRegistrados, "contactos en el historial"],
     [r.contactosNuevos + r.fichasNuevas, "nuevos (contactos y fichas)"],
     [r.cierres, r.cierres === 1 ? "cierre" : "cierres"],
-    ...(r.prima ? ([[fmtUSD(r.prima), "en prima cerrada"]] as [string, string][]) : []),
+    ...(r.prima ? ([[fmtUSD(r.prima), "en aportes cerrados"]] as [string, string][]) : []),
     [r.reunionesManana, r.reunionesManana === 1 ? "reunión mañana" : "reuniones mañana"],
   ];
 

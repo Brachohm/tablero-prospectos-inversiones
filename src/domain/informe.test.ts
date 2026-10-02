@@ -14,76 +14,59 @@ const HOY = "2026-10-07";
 const perfil = perfilDe(undefined);
 
 describe("informe post reunión", () => {
-  it("estrategia: individual, familiar, dos planes o con complemento", () => {
-    expect(estrategia(ficha("nuevo", { edad: "30" }))).toMatchObject({ tipo: "un plan", titulo: "Un plan individual integral" });
-    expect(estrategia(ficha("nuevo", { edad: "35", depende: "Esposa e hijo" })).titulo).toBe("Un plan familiar integral");
-    expect(estrategia(ficha("nuevo", { edad: "40", depende: "Mis padres" })).tipo).toBe("dos planes");
-    expect(estrategia(ficha("nuevo", { edad: "60", depende: "Dos hijos" })).tipo).toBe("dos planes");
-    const c = estrategia(ficha("nuevo", { edad: "30", cobertura: "IESS", criterio: "Precio" }));
+  it("estrategia: regular, única o regular + aporte único", () => {
+    expect(estrategia(ficha("nuevo", { aporte: "100" }))).toMatchObject({ tipo: "un plan", titulo: "Un plan de contribución regular" });
+    expect(estrategia(ficha("nuevo", { capital: "10000" })).titulo).toBe("Un plan de contribución única");
+    const c = estrategia(ficha("nuevo", { aporte: "100", capital: "5000", perfil: "Conservador", emergencia: "No" }));
     expect(c.tipo).toBe("plan + complemento");
-    expect(c.complementos.join(" ")).toMatch(/IESS/);
-    expect(c.complementos.join(" ")).toMatch(/alto costo/);
-    expect(c.costoBeneficio[0]).toMatch(/deducible/);
+    expect(c.complementos.join(" ")).toMatch(/conservadores/);
+    expect(c.complementos.join(" ")).toMatch(/fondo de emergencia/);
+    expect(c.costoBeneficio.join(" ")).toMatch(/\$100 al mes/);
   });
 
-  it("cambio de seguro: lo que no incluye su plan, referencia de lo que paga y pedidos", () => {
+  it("ya invierte: resumen, análisis, pedidos y pasos", () => {
     const p = ficha("cambio", {
       nombre: "Luis Paz",
-      aseguradora: "Otra",
-      motivos: ["reembolsos"],
-      planActual: { tabla: { prima: "$100", maternidad: "No incluye", odontologia: "No" } },
+      institucion: "Banco X",
+      saldoActual: "20000",
+      motivos: ["costos"],
+      conoce: "No",
       reunion: "2026-10-09T10:30",
       reunionLugar: "su oficina",
     });
     const inf = informe(p, perfil, HOY);
-    expect(inf.resumen).toContainEqual({ l: "Paga hoy", v: "$100 al mes" });
-    expect(inf.analisis).toContain("Su plan actual no incluye: maternidad, odontología.");
-    expect(inf.estrategia.complementos).toContain("Cubrir lo que hoy no tiene: maternidad.");
-    expect(inf.estrategia.costoBeneficio.join(" ")).toMatch(/lo que paga hoy \(\$100 al mes\)/);
+    expect(inf.tipo).toBe("Ya invierte");
+    expect(inf.resumen).toContainEqual({ l: "Saldo acumulado", v: "$20.000" });
+    expect(inf.analisis).toContain("Lo que hoy no le funciona: comisiones y costos.");
     expect(inf.segunda).toBe("El viernes 9 de octubre a las 10:30 · su oficina");
     expect(inf.pedidos).toHaveLength(2);
-    expect(inf.pasos).toContain("Mantenga su póliza actual hasta que la nueva esté vigente.");
+    expect(inf.pasos).toContain("No retire ni cancele su inversión actual hasta revisar juntos el costo de salir.");
   });
 
-  it("no detalla datos de salud en el informe", () => {
-    const p = ficha("nuevo", {
-      nombre: "Ana",
-      preSN: { t: "si" },
-      pre: { t: { corazon: { it: { co_hta: { a: "2020", e: "Controlado", t: "Losartán" } } } } },
-    });
-    const todo = JSON.stringify(informe(p, perfil, HOY));
-    expect(todo).toContain("Registramos su declaración de salud");
-    expect(todo).not.toMatch(/Losart|hipertens/i);
-  });
-
-  it("mensaje: segunda reunión agendada, recordatorio, calificación y (cambio) pedidos", () => {
+  it("mensaje: segunda reunión agendada, recordatorio, calificación y (ya invierte) pedidos", () => {
     const p = ficha("cambio", { nombre: "Luis Paz", reunion: "2026-10-09T10:30" });
     const t = textoPostReunion(informe(p, perfil, HOY));
     expect(t).toMatch(/^Hola Luis, buenos días\. Muchas gracias por su tiempo hoy/);
-    expect(t).toContain("Ya estamos trabajando en la mejor propuesta para usted.");
     expect(t).toContain("Nuestra segunda reunión ya quedó agendada: El viernes 9 de octubre a las 10:30. Le enviaré un recordatorio antes.");
-    expect(t).toContain("1. El PDF de la tabla de coberturas de su plan actual.");
-    expect(t).toContain("2. La sábana de reclamos (su historial de reclamos): puede solicitarla a su asesor o a su aseguradora.");
+    expect(t).toContain("1. Su último estado de cuenta.");
     expect(t).toContain("¿Cómo calificaría la asesoría de hoy, del 1 al 5?");
     expect(t).toMatch(/Bracho, asesor de inversiones$/);
     const nuevo = textoPostReunion(informe(ficha("nuevo", { nombre: "Ana" }), perfil, HOY), false);
-    expect(nuevo).not.toContain("sábana");
+    expect(nuevo).not.toContain("estado de cuenta");
     expect(nuevo).not.toMatch(/[⭐📅🙌]/u);
   });
 });
 
-describe("informe 1: protección hoy y riesgos de su trabajo", () => {
-  it("nivel de protección con lo que contó y riesgos por ocupación", () => {
-    const iess = informe(ficha("nuevo", { nombre: "Ana", cobertura: "IESS", ocupacion: "Enfermera" }), perfil, HOY);
-    expect(iess.proteccion.every((x) => x.estado === "parcial")).toBe(true);
-    expect(iess.nivel).toBe(50);
-    expect(iess.riesgos).toMatchObject({ ocupacion: "Enfermera", grupo: "Salud" });
-    expect(iess.resumen).toContainEqual({ l: "Ocupación", v: "Enfermera" });
-    expect(iess.analisis.join()).toMatch(/Por su trabajo \(enfermera\)/);
-    expect(informe(ficha("nuevo", { cobertura: "Ninguna" }), perfil, HOY).nivel).toBe(0);
-    const c = informe(ficha("cambio", { planActual: { tabla: { hospitalaria: "80%", emergencias: "100%", ambulatoria: "No incluye" } } }), perfil, HOY);
-    expect(c.proteccion.map((x) => x.estado)).toEqual(["si", "si", "no", "?", "?"]);
-    expect(c.nivel).toBe(60);
+describe("informe 1: situación financiera hoy", () => {
+  it("nivel con lo que contó", () => {
+    const i = informe(
+      ficha("nuevo", { emergencia: "Sí", meta: "Retiro o jubilación", metaMonto: "100000", horizonte: "Más de 20 años", aporte: "200", perfil: "Moderado" }),
+      perfil,
+      HOY,
+    );
+    expect(i.proteccion.every((x) => x.estado === "si")).toBe(true);
+    expect(i.nivel).toBe(100);
+    expect(informe(ficha("nuevo", { emergencia: "No" }), perfil, HOY).proteccion[0].estado).toBe("no");
     expect(informe(ficha("nuevo"), perfil, HOY).riesgos).toBeNull();
   });
 });

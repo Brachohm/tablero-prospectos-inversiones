@@ -11,12 +11,13 @@ export async function accion(page: Page, nombre: string | RegExp) {
   if ((await b.getAttribute('aria-pressed')) !== 'true') await b.click()
 }
 
-/** Pre-cierre sin planes en la Biblioteca: el producto se escribe. */
-export async function precierre(page: Page, producto: string, mensual: string, deducible = '') {
+/** Pre-cierre sin planes en la Biblioteca: el producto se escribe (contribución regular por defecto). */
+export async function precierre(page: Page, producto: string, aporte: string, plazo = '') {
   await accion(page, 'Ya va a contratar')
+  await campo(page, 'Tipo de plan').selectOption('Contribución regular')
+  if (plazo) await campo(page, 'Plazo (años)').fill(plazo)
   await campo(page, 'Producto seleccionado').fill(producto)
-  if (deducible) await campo(page, 'Monto de deducible (USD)').fill(deducible)
-  await campo(page, 'Valor a pagar mensual (USD)').fill(mensual)
+  await campo(page, 'Aporte mensual (USD)').fill(aporte)
 }
 
 /** Abre una sección desplegable de la ficha (si está plegada). */

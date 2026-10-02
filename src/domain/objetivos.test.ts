@@ -1,6 +1,12 @@
 import { conEtapa, fechaCierre, normalizarObjetivos, objetivoMes } from "./objetivos";
 import { ficha } from "./test-utils";
 
+/** Escalones de ejemplo para las pruebas. */
+const OS = [
+  { monto: 750, beneficio: true, detalle: "90% de comisión" },
+  { monto: 1100, beneficio: true, detalle: "120% de comisión" },
+];
+
 const cerrada = (id: string, precio: string, cerradoEn: string) =>
   ficha("nuevo", { id, etapa: "Cerrado", precio, cerradoEn });
 
@@ -26,7 +32,7 @@ describe("objetivo mensual", () => {
       cerrada("c", "300", "2026-09-30"), // mes pasado
       ficha("nuevo", { id: "d", etapa: "Seguimiento", precio: "80" }),
     ];
-    const o = objetivoMes(items, "2026-10-21");
+    const o = objetivoMes(items, "2026-10-21", OS);
     expect(o.prima).toBe(300);
     expect(o.cierres).toBe(2);
     expect(o.pct).toBe(40);
@@ -42,18 +48,18 @@ describe("objetivo mensual", () => {
   });
 
   it("desbloquea 90% al llegar a 750 y 120% a 1100", () => {
-    const o750 = objetivoMes([cerrada("a", "750", "2026-10-01")], "2026-10-01");
+    const o750 = objetivoMes([cerrada("a", "750", "2026-10-01")], "2026-10-01", OS);
     expect(o750.desbloqueado).toBe("90% de comisión");
     expect(o750.escalones[0]).toMatchObject({ logrado: true, falta: 0, clientes: 0 });
-    const o1100 = objetivoMes([cerrada("a", "600", "2026-10-01"), cerrada("b", "500", "2026-10-02")], "2026-10-05");
+    const o1100 = objetivoMes([cerrada("a", "600", "2026-10-01"), cerrada("b", "500", "2026-10-02")], "2026-10-05", OS);
     expect(o1100.desbloqueado).toBe("120% de comisión");
   });
 
   it("sin cierres estima con las propuestas; sin precios no estima", () => {
-    const o = objetivoMes([ficha("nuevo", { precio: "150" })], "2026-10-01");
+    const o = objetivoMes([ficha("nuevo", { precio: "150" })], "2026-10-01", OS);
     expect(o).toMatchObject({ base: "propuestas", promedio: 150 });
     expect(o.escalones[0].clientes).toBe(5);
-    const vacio = objetivoMes([], "2026-02-10");
+    const vacio = objetivoMes([], "2026-02-10", OS);
     expect(vacio).toMatchObject({ prima: 0, promedio: null, base: null, diasRestantes: 18 });
     expect(vacio.escalones[0].clientes).toBeNull();
   });

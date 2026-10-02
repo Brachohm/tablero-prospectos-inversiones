@@ -70,8 +70,8 @@ export function Analisis({ p, actualizar }: { p: Prospecto; actualizar: (fn: (p:
           <div className="pill-causa">{CAUSA_L[v.causa.tipo]}</div>
           <p className="an-p">{v.causa.explicacion}</p>
           <p className="an-note">
-            Producto = coberturas, tarifa o servicio. Uso = cómo lo usa o si conoce su proceso. Contratación = plan mal
-            dimensionado o mal explicado al inicio.
+            Producto = rendimiento, costos o servicio. Uso = cómo lo usa o si conoce su inversión. Contratación = plan mal
+            elegido para su perfil o mal explicado al inicio.
           </p>
         </div>
       )}
@@ -123,7 +123,7 @@ export function Analisis({ p, actualizar }: { p: Prospecto; actualizar: (fn: (p:
                 {r[1] || "—"}
               </div>
               <div>
-                <small>SaludSA</small>
+                <small>Propuesta</small>
                 {r[2]}
               </div>
             </div>
@@ -176,7 +176,7 @@ export function Analisis({ p, actualizar }: { p: Prospecto; actualizar: (fn: (p:
       </div>
       <p className="an-note" style={{ marginTop: 12 }}>
         Se calcula con las reglas de la ficha, en tu dispositivo: nada se envía a internet. Es una lectura de apoyo,
-        no una decisión: todo lo que dependa de la aseguradora (preexistencias, continuidad, carencias, garantías) valídalo
+        no una decisión: todo lo que dependa de la aseguradora (costos, rescates, fondos, rendimientos) valídalo
         con el material oficial.
       </p>
     </section>

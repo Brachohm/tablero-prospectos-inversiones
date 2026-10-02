@@ -252,7 +252,7 @@ function ListaProspectos({ items, hoy, abrir }: { items: Prospecto[]; hoy: strin
   const tipos: [FiltroTipo, string][] = [
     ["Todos", "Todos"],
     ["nuevo", "Contratar"],
-    ["cambio", "Cambio de seguro"],
+    ["cambio", "Ya invierte"],
   ];
   return (
     <>

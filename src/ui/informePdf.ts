@@ -697,7 +697,7 @@ function dibujarInforme1(L: Lienzo, inf: Informe) {
     "PASO 1 DE 3 COMPLETADO",
     inf.asesor.nombreCompleto || inf.asesor.apodo,
   );
-  L.camino(["Primera reunión: conocerle", "Segunda reunión: su propuesta", "Su protección activa"], 1);
+  L.camino(["Primera reunión: conocerle", "Segunda reunión: su propuesta", "Su plan en marcha"], 1);
 
   if (inf.resumen.length) {
     L.seccion("Su perfil", C.violeta, "1");
@@ -719,8 +719,8 @@ function dibujarInforme1(L: Lienzo, inf: Informe) {
     }
   }
 
-  // Protección hoy: nivel + lista
-  L.seccion("Su protección hoy", C.menta, "+");
+  // Situación hoy: nivel + lista
+  L.seccion("Su situación financiera hoy", C.menta, "+");
   const h = 40 + inf.proteccion.length * 22;
   L.cabe(h + 8);
   const izq = 150;
@@ -736,7 +736,7 @@ function dibujarInforme1(L: Lienzo, inf: Informe) {
     L.fuente("c", 10.5);
     L.doc.text(limpio(x.l), L.M + izq + 26, yy + 3.5);
     L.fuente("c", 9, C.gris);
-    const t = x.estado === "si" ? "Cubierto" : x.estado === "no" ? "Sin cobertura" : x.estado === "parcial" ? "Solo pública" : "Por confirmar";
+    const t = x.estado === "si" ? "Listo" : x.estado === "no" ? "Pendiente" : x.estado === "parcial" ? "En camino" : "Por conversar";
     L.doc.text(t, L.W - L.M - 14, yy + 3.5, { align: "right" });
   });
   L.y += h + 8;
@@ -772,7 +772,7 @@ function dibujarInforme1(L: Lienzo, inf: Informe) {
   }
   L.y += hE + 10;
   if (e.complementos.length) {
-    L.sub("Para protegerte al máximo:");
+    L.sub("Cómo lo cuidamos:");
     L.vinetas(e.complementos.slice(0, 3), C.menta);
   }
   if (e.costoBeneficio.length) {
@@ -1130,13 +1130,13 @@ function dibujarComparativo(L: Lienzo, c: Comparativo) {
 
 function dibujarPropuesta(L: Lienzo, pr: Propuesta) {
   L.encabezado(
-    "Su propuesta de protección",
+    "Su propuesta de inversión",
     `${pr.cliente || "Cliente"} · ${pr.tipo} · ${fmtFecha(pr.fecha)}`,
     lineaAsesor(pr),
     "PASO 2 DE 3 COMPLETADO",
     pr.asesor.nombreCompleto || pr.asesor.apodo,
   );
-  L.camino(["Primera reunión: conocerle", "Segunda reunión: su propuesta", "Su decisión y su protección"], 2);
+  L.camino(["Primera reunión: conocerle", "Segunda reunión: su propuesta", "Su decisión y su plan"], 2);
 
   if (pr.busca.length) {
     L.seccion("Lo que busca", C.coral, "“");

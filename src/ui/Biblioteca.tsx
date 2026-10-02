@@ -75,9 +75,9 @@ export function BibliotecaVista({ sec }: { sec: SeccionBiblioteca }) {
         </div>
       </div>
       <p className="an-note">
-        De aquí se alimenta el sistema: condiciones generales, anexos y tablas de coberturas de los planes, y tus
+        De aquí se alimenta el sistema: condiciones generales, fichas de los planes y de los fondos, y tus
         argumentos. Con esto se arman los análisis, la comparación de planes, las ofertas y los informes. Vive solo en
-        este dispositivo; confirma coberturas, carencias y precios con el material vigente.
+        este dispositivo; confirma costos, rescates y fondos con el material vigente.
       </p>
       <div className="tabs tres" role="tablist" aria-label="Secciones de la biblioteca">
         {secciones.map(([id, l, n]) => (
@@ -155,7 +155,7 @@ function Documentos({
             id={idBuscar}
             type="search"
             value={q}
-            placeholder="maternidad carencia, reembolso, preexistencia…"
+            placeholder="rescate, costo de administración, fondo conservador…"
             onChange={(e) => setQ(e.target.value)}
           />
         </div>

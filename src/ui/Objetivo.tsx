@@ -1,4 +1,4 @@
-/** Objetivo del mes: tu propósito, la prima mensual cerrada y tus objetivos (1 a 4) con su beneficio. */
+/** Objetivo del mes: tu propósito, los aportes cerrados y tus objetivos (1 a 4) con su beneficio. */
 import type { CSSProperties } from "react";
 import { usd } from "../domain/fechas";
 import { nombreMes, objetivoMes, type Objetivo as ObjetivoT } from "../domain/objetivos";
@@ -63,8 +63,8 @@ export function Objetivo({ items, hoy }: { items: readonly Prospecto[]; hoy: str
       </ul>
       <p className="an-note">
         {o.promedio !== null
-          ? `Estimado con tu prima promedio de ${usd(o.promedio)} (${o.base === "cierres" ? "tus cierres" : "tus propuestas"}).`
-          : 'Pon el "Precio mensual" en tus fichas para estimar cuántos clientes te faltan.'}
+          ? `Estimado con tu aporte promedio de ${usd(o.promedio)} (${o.base === "cierres" ? "tus cierres" : "tus propuestas"}).`
+          : 'Pon el aporte en el pre-cierre de tus fichas para estimar cuántos clientes te faltan.'}
         {siguiente && o.enJuego > 0 && ` Tienes ${usd(o.enJuego)} en propuestas abiertas.`}
       </p>
     </section>
@@ -72,7 +72,7 @@ export function Objetivo({ items, hoy }: { items: readonly Prospecto[]; hoy: str
 }
 
 /** Barra del objetivo: lo cerrado y, rayado, lo que se sumaría (simulación del pre-cierre). */
-export function BarraObjetivo({ o, simulado, etiqueta = "Prima mensual cerrada" }: { o: ObjetivoT; simulado?: number; etiqueta?: string }) {
+export function BarraObjetivo({ o, simulado, etiqueta = "Aportes cerrados" }: { o: ObjetivoT; simulado?: number; etiqueta?: string }) {
   const tope = Math.max(o.meta, ...o.escalones.map((e) => e.prima));
   const ancho = Math.min(100, (o.prima / tope) * 100);
   const sim = simulado !== undefined && simulado > o.prima ? Math.min(100, (simulado / tope) * 100) : 0;

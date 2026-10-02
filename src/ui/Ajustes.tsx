@@ -246,7 +246,7 @@ function SeccionObjetivos({ filas, set }: { filas: FilaObjetivo[]; set: (f: Fila
         🎯 Objetivos del mes
       </h2>
       <p className="an-note">
-        De {MIN_OBJETIVOS} a {MAX_OBJETIVOS} objetivos de prima mensual cerrada. El primero es tu meta; cada uno puede
+        De {MIN_OBJETIVOS} a {MAX_OBJETIVOS} objetivos de aportes cerrados en el mes. El primero es tu meta; cada uno puede
         desbloquear un beneficio.
       </p>
       <ol className="objetivos-edit">
@@ -327,7 +327,7 @@ function SeccionBiblioteca() {
       sec: "planes",
       ic: "🗂️",
       l: `Planes (${planes.length})`,
-      d: `Coberturas, carencias, beneficios y su tabla de coberturas${planes.length ? ` (${conTabla} con tabla)` : ""}.`,
+      d: `Condiciones, fondos, costos y su tabla de datos${planes.length ? ` (${conTabla} con tabla)` : ""}.`,
     },
     {
       sec: "argumentos",
@@ -409,7 +409,7 @@ function SeccionPerfil({ p, set }: { p: Perfil; set: (p: Perfil) => void }) {
         "Es tu nombre en las presentaciones de WhatsApp: “Soy …”.",
         "Bracho",
       )}
-      {campo("rol", "Rol", "Se usa después de tu nombre: “Soy Bracho, asesor de SaludSA”.", "asesor de SaludSA")}
+      {campo("rol", "Rol", "Se usa después de tu nombre: “Soy Bracho, asesor de inversiones”.", "asesor de inversiones")}
       {campo("celular", "Celular (WhatsApp)", "El número con el que usas WhatsApp para la gestión.", "099 123 4567", "tel")}
       {campo("correo", "Correo electrónico", "Según su dominio se abre Gmail, Outlook, Yahoo o tu app de correo.", "tu@correo.com", "email")}
       <p className="an-status">
