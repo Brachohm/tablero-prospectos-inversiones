@@ -107,7 +107,7 @@ export function insignias(items: readonly Prospecto[]): Insignia[] {
     {
       id: "cierreCambio",
       ic: "🔄",
-      t: "Cierre de cambio de seguro",
+      t: "Cierre de quien ya invierte",
       on: items.some((p) => cerrado(p) && tipoDe(p) === "cambio"),
     },
     {

@@ -1208,7 +1208,7 @@ function dibujarPropuesta(L: Lienzo, pr: Propuesta) {
   }
 
   if (pr.gana.length) {
-    L.seccion(pr.tipo === "Cambio de seguro" ? "Lo que gana frente a su plan actual" : "Lo que gana", C.menta, "subir");
+    L.seccion(pr.tipo === "Ya invierte" ? "Lo que gana frente a su inversión actual" : "Lo que gana", C.menta, "subir");
     L.vinetas(pr.gana, C.menta);
   }
 

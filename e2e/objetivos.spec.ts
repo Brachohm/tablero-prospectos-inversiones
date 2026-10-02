@@ -3,46 +3,43 @@ import { precierre } from './util'
 
 const campo = (page: Page, etiqueta: string) => page.getByLabel(etiqueta, { exact: true })
 
-test('Objetivo del mes: se llena con los cierres y desbloquea la comisión', async ({ page }) => {
+test('Objetivo del mes: se llena con los cierres y muestra la comisión estimada', async ({ page }) => {
   await page.goto('/')
   const obj = page.getByRole('region', { name: /Objetivo de/ })
-  await expect(obj).toContainText('$0 de $750 en prima mensual')
-  await expect(obj).toContainText('Te faltan $750')
+  await expect(obj).toContainText('$0 de $2000 en aportes cerrados')
+  await expect(obj).toContainText('Te faltan $2000')
 
-  const cerrar = async (nombre: string, precio: string) => {
+  const cerrar = async (nombre: string, aporte: string) => {
     await page.goto('/')
     await page.goto('/#/nueva/nuevo')
     await page.getByLabel(/La persona aceptó/).click()
     await campo(page, 'Nombre').fill(nombre)
-    await precierre(page, 'Plan Salud', precio)
+    await precierre(page, 'Plan Futuro', aporte, '12')
     await page.getByRole('button', { name: 'Venta exitosa', exact: true }).click()
   }
   const volver = () => page.getByRole('button', { name: 'Guardar y volver' }).click()
 
-  await cerrar('Ana', '300')
+  await cerrar('Ana', '1500')
   await volver()
-  await expect(obj).toContainText('$300 de $750')
-  await expect(obj).toContainText('1 contrato cerrado')
-  // promedio 300 → faltan 450 ≈ 2 clientes para 750; 800 ≈ 3 para 1100
-  await expect(obj).toContainText('Te faltan $450 · ≈ 2 clientes')
-  await expect(obj).toContainText('Te faltan $800 · ≈ 3 clientes')
+  await expect(obj).toContainText('$1500 de $2000')
+  // 1500 × 12 × 30 % = 5400 de comisión estimada
+  await expect(obj).toContainText(/1 contrato cerrado · comisión estimada \$5\.?400/)
+  await expect(obj).toContainText('Te faltan $500 · ≈ 1 cliente')
+  await expect(obj).toContainText('Te faltan $2500 · ≈ 2 clientes')
 
-  await cerrar('Luis', '500')
-  await expect(page.getByText(/Desbloqueaste: 90% de comisión/)).toBeVisible()
+  await cerrar('Luis', '1000')
+  await expect(page.getByText(/Llegaste a tu objetivo de \$2000 este mes/)).toBeVisible()
   await volver()
-  await expect(obj).toContainText('$800 de $750')
-  await expect(obj.getByText('¡Desbloqueado este mes!')).toHaveCount(1)
-  await expect(obj).toContainText('Te faltan $300 · ≈ 1 cliente')
+  await expect(obj).toContainText('$2500 de $2000')
 
   // Pre-cierre: simulación en la línea de progreso (en la ficha y en el inicio)
   await page.goto('/#/nueva/nuevo')
   await page.getByLabel(/La persona aceptó/).click()
   await campo(page, 'Nombre').fill('Rosa')
-  await precierre(page, 'Plan Salud', '200')
-  await expect(page.getByLabel('Simulación del objetivo', { exact: true })).toContainText(/con esta venta: \$1\.?000/)
+  await precierre(page, 'Plan Futuro', '200')
+  await expect(page.getByLabel('Simulación del objetivo', { exact: true })).toContainText(/con esta venta: \$2\.?700/)
   await volver()
-  await expect(obj).toContainText(/En pre-cierre: \$200\. Si se cierran, llegas a \$1\.?000/)
-  await expect(obj).toContainText('$800 de $750')
+  await expect(obj).toContainText(/En pre-cierre: \$200\. Si se cierran, llegas a \$2\.?700/)
 })
 
 test('Contactos nuevos: registrar, saludar cada día y pasar a prospecto', async ({ page }) => {
@@ -77,7 +74,7 @@ test('Contactos nuevos: registrar, saludar cada día y pasar a prospecto', async
   const wa = sal.getByRole('link', { name: 'Saludar por WhatsApp a María José Vera' })
   await expect(wa).toHaveAttribute('href', /^https:\/\/wa\.me\/593991234567\?text=.*Mar%C3%ADa/)
   // Sin registrar: el saludo lleva la presentación breve
-  await expect(wa).toHaveAttribute('href', /Le%20saluda%20Bracho%2C%20asesor%20de%20SaludSA/)
+  await expect(wa).toHaveAttribute('href', /Le%20saluda%20Bracho%2C%20asesor%20de%20inversiones/)
   await wa.click()
   await expect(sal).toContainText('1 de 1 saludados')
   await expect(sal).toContainText('¡Saludaste a todos tus contactos hoy!')
@@ -130,9 +127,9 @@ test('Propósito en grande y objetivos configurables (1 a 4, con beneficio si ap
 
   await campo(page, 'Propósito').fill('Darle a mi familia una vida tranquila')
   const sec = page.getByRole('region', { name: '🎯 Objetivos del mes' })
-  // Hay dos por defecto: $750 → 90% y $1100 → 120%
-  await expect(sec.getByLabel('Objetivo 1 (USD)')).toHaveValue('750')
-  await expect(sec.getByLabel('Objetivo 2 (USD)')).toHaveValue('1100')
+  // Hay dos por defecto: $2000 y $4000
+  await expect(sec.getByLabel('Objetivo 1 (USD)')).toHaveValue('2000')
+  await expect(sec.getByLabel('Objetivo 2 (USD)')).toHaveValue('4000')
   // Agregar uno sin beneficio, de $500 (se ordena primero)
   await sec.getByRole('button', { name: '+ Agregar objetivo' }).click()
   await sec.getByLabel('Objetivo 3 (USD)').fill('500')
@@ -143,20 +140,21 @@ test('Propósito en grande y objetivos configurables (1 a 4, con beneficio si ap
   await expect(sec.getByRole('button', { name: '+ Agregar objetivo' })).toHaveCount(0) // máximo 4
   await page.getByRole('button', { name: 'Guardar y actualizar' }).click()
   await expect(page.getByText('Escribe el beneficio del objetivo 4')).toBeVisible()
-  await sec.getByLabel('Detalle').nth(2).fill('Bono de viaje')
+  await sec.getByLabel('Detalle').last().fill('Bono de viaje')
   await page.getByRole('button', { name: 'Guardar y actualizar' }).click()
   await expect(page.getByText('Configuración guardada y actualizada')).toBeVisible()
   // Quedaron ordenados
   await expect(sec.getByLabel('Objetivo 1 (USD)')).toHaveValue('500')
-  await expect(sec.getByLabel('Objetivo 4 (USD)')).toHaveValue('1500')
+  await expect(sec.getByLabel('Objetivo 2 (USD)')).toHaveValue('1500')
+  await expect(sec.getByLabel('Objetivo 4 (USD)')).toHaveValue('4000')
 
   await page.getByRole('navigation').getByRole('button', { name: 'Inicio' }).click()
   await expect(obj.getByLabel('Mi propósito')).toContainText('Darle a mi familia una vida tranquila')
-  await expect(obj).toContainText('$0 de $500 en prima mensual')
+  await expect(obj).toContainText('$0 de $500 en aportes cerrados')
   const lista = obj.locator('.obj-escalones li')
   await expect(lista).toHaveCount(4)
   await expect(lista.nth(0)).toContainText('$500')
   await expect(lista.nth(0)).not.toContainText('→')
-  await expect(lista.nth(1)).toContainText('$750 → 90% de comisión')
-  await expect(lista.nth(3)).toContainText('$1500 → Bono de viaje')
+  await expect(lista.nth(1)).toContainText('$1500 → Bono de viaje')
+  await expect(lista.nth(3)).toContainText('$4000')
 })

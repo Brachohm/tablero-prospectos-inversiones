@@ -22,7 +22,7 @@ test('Mensajes por fase y recordatorio de reunión por WhatsApp y SMS', async ({
   await accion(page, 'Mensajes')
   const msj = page.getByRole('region', { name: 'Mensajes de seguimiento' })
   await expect(msj.getByRole('button', { name: 'Primer contacto' })).toHaveAttribute('aria-pressed', 'true')
-  await expect(campo(page, 'Mensaje (puedes editarlo)')).toHaveValue(/^Hola Ana, buenas tardes\. Soy Bracho, asesor de SaludSA/)
+  await expect(campo(page, 'Mensaje (puedes editarlo)')).toHaveValue(/^Hola Ana, buenas tardes\. Soy Bracho, asesor de inversiones/)
 
   // Al agendar la primera reunión, la fase avanza sola y aparecen los recordatorios primero
   const iso = '2026-10-08'

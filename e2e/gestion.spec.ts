@@ -148,17 +148,17 @@ test('Pasar a reunión: elige nuevo cliente o cambio de seguro y abre su ficha',
   const opc = card.getByLabel('Pasar a reunión')
   await expect(opc.getByRole('button', { name: /Nuevo cliente/ })).toBeVisible()
   // Sin resumen no pasa
-  await opc.getByRole('button', { name: /Cambio de seguro/ }).click()
+  await opc.getByRole('button', { name: /Ya invierte/ }).click()
   await expect(card.getByRole('alert')).toHaveText('Escribe un resumen de la gestión para continuar')
-  await card.getByRole('textbox', { name: /Resumen de la gestión/ }).fill('Quiere cambiarse, su seguro actual no le reembolsa')
-  await opc.getByRole('button', { name: /Cambio de seguro/ }).click()
+  await card.getByRole('textbox', { name: /Resumen de la gestión/ }).fill('Tiene un plazo fijo y no le rinde')
+  await opc.getByRole('button', { name: /Ya invierte/ }).click()
 
   // Ficha de persona asegurada con sus datos
-  await expect(page.getByText(/Cambio de seguro: completa su ficha para la reunión/)).toBeVisible()
+  await expect(page.getByText(/Ya invierte: completa su ficha para la reunión/)).toBeVisible()
   await page.getByLabel(/La persona aceptó/).click()
   await expect(page.getByLabel('Nombre', { exact: true })).toHaveValue('Marta Lino')
-  await expect(page.getByLabel('Aseguradora actual', { exact: true })).toBeVisible()
-  await expect(page.locator('.top .who small')).toContainText('Persona asegurada')
+  await expect(page.getByLabel('¿Dónde invierte hoy?', { exact: true })).toBeVisible()
+  await expect(page.locator('.top .who small')).toContainText('Ya invierte')
   // Al pasar a reunión, la etapa avanza sola
   await expect(page.getByText('Etapa: Primera reunión')).toBeVisible()
   // La gestión quedó guardada en la ficha
@@ -172,8 +172,8 @@ test('Pasar a reunión: elige nuevo cliente o cambio de seguro y abre su ficha',
   await page.getByLabel('Celular', { exact: true }).fill('0987654321')
   await page.getByRole('button', { name: 'Guardar contacto' }).click()
   await page.getByRole('button', { name: '🤝 Pasar a reunión' }).click()
-  await page.getByRole('group', { name: '¿Nuevo cliente o cambio de seguro?' }).getByRole('button', { name: '🚀 Nuevo cliente' }).click()
-  await expect(page.locator('.top .who small')).toContainText('Nuevo prospecto')
+  await page.getByRole('group', { name: '¿Nuevo cliente o ya invierte?' }).getByRole('button', { name: '🚀 Nuevo cliente' }).click()
+  await expect(page.locator('.top .who small')).toContainText('Primera inversión')
 })
 
 test('Inicio: nuevo contacto que queda en la Base de datos y en el Centro de Gestión (sin repetir)', async ({ page }) => {

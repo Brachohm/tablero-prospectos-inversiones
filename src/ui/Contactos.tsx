@@ -328,7 +328,7 @@ export function NuevoContactoRapido() {
   );
 }
 
-/** "Pasar a reunión": elegir si es nuevo cliente o cambio de seguro y abrir su ficha. */
+/** "Pasar a reunión": elegir si es nuevo cliente o ya invierte y abrir su ficha. */
 function PasarAReunion({ id }: { id: string }) {
   const [abierto, setAbierto] = useState(false);
   if (!abierto)
@@ -338,12 +338,12 @@ function PasarAReunion({ id }: { id: string }) {
       </button>
     );
   return (
-    <div className="pasar-mini" role="group" aria-label="¿Nuevo cliente o cambio de seguro?">
+    <div className="pasar-mini" role="group" aria-label="¿Nuevo cliente o ya invierte?">
       <button type="button" className="btn small" onClick={() => ir({ v: "nueva", tipo: "nuevo", contacto: id })}>
         🚀 Nuevo cliente
       </button>
       <button type="button" className="btn small cambio" onClick={() => ir({ v: "nueva", tipo: "cambio", contacto: id })}>
-        🔄 Cambio de seguro
+        🔄 Ya invierte
       </button>
       <button type="button" className="btn ghost small" onClick={() => setAbierto(false)}>
         Cancelar

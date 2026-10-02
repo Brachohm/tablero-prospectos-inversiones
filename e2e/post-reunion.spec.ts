@@ -18,7 +18,7 @@ test.beforeEach(async ({ page }) => {
   })
 })
 
-test('Post reunión (cambio de seguro): informe PDF, segunda reunión, pedidos y calificación', async ({ page }, info) => {
+test('Post reunión (ya invierte): informe PDF, segunda reunión, pedidos y calificación', async ({ page }, info) => {
   await page.goto('/')
   await page.goto('/#/nueva/cambio')
   await page.getByLabel(/La persona aceptó/).click()
@@ -28,10 +28,9 @@ test('Post reunión (cambio de seguro): informe PDF, segunda reunión, pedidos y
   await campo(page, 'Edad (años)').fill('45')
   await campo(page, '¿Quién depende de esta persona?').fill('Esposa e hijos')
   await abrir(page, 'Descubrimiento')
-  await campo(page, 'Aseguradora actual').fill('Otra aseguradora')
-  // Tipo de póliza actual: individual, masivo o corporativo
-  await campo(page, '¿Su seguro actual es individual, masivo o corporativo?').selectOption('Corporativo')
-  await page.getByRole('button', { name: /Reembolsos/ }).click()
+  await campo(page, '¿Dónde invierte hoy?').fill('Banco X')
+  await campo(page, '¿Cuánto puede invertir al mes? (USD)').fill('150')
+  await page.getByRole('button', { name: /Comisiones y costos/ }).click()
 
   // Primera reunión hecha → se abre el informe post reunión
   await accion(page, 'Agendar 1ª reunión')
@@ -54,15 +53,15 @@ test('Post reunión (cambio de seguro): informe PDF, segunda reunión, pedidos y
   await expect(botones.getByRole('button')).toHaveCount(1)
   await expect(botones.getByRole('link')).toHaveCount(2)
 
-  // Vista previa de la estrategia (familia → plan familiar + complemento)
-  await expect(post.getByLabel('Vista previa del informe')).toContainText('Un plan familiar integral')
+  // Vista previa de la estrategia (aporte mensual → contribución regular)
+  await expect(post.getByLabel('Vista previa del informe')).toContainText('Un plan de contribución regular')
 
   // Mensaje: segunda reunión, recordatorio, pedidos de cambio y calificación
   await post.getByText('Mensaje que lo acompaña').click()
   const msj = post.locator('.msj-vista .paso-txt')
   await expect(msj).toContainText('Nuestra segunda reunión ya quedó agendada: El viernes 9 de octubre a las 10:30 · su oficina. Le enviaré un recordatorio antes.')
-  await expect(msj).toContainText('1. El PDF de la tabla de coberturas de su plan actual.')
-  await expect(msj).toContainText('2. La sábana de reclamos (su historial de reclamos): puede solicitarla a su asesor o a su aseguradora.')
+  await expect(msj).toContainText('1. Su último estado de cuenta.')
+  await expect(msj).toContainText('2. Las condiciones de su inversión actual: costos y penalidades por retiro anticipado.')
   await expect(msj).toContainText('¿Cómo calificaría la asesoría de hoy, del 1 al 5?')
 
   // PDF
@@ -74,17 +73,17 @@ test('Post reunión (cambio de seguro): informe PDF, segunda reunión, pedidos y
   expect(bytes.subarray(0, 5).toString()).toBe('%PDF-')
   expect(bytes.length).toBeGreaterThan(3000)
 
-  // WhatsApp: el mensaje listo (con la sábana de reclamos) y queda registrado
+  // WhatsApp: el mensaje listo (con el estado de cuenta) y queda registrado
   const wa = botones.getByRole('link', { name: '💬 WhatsApp' })
   await expect(wa).toHaveAttribute('href', /^https:\/\/wa\.me\/593991234567\?text=Hola%20Luis/)
-  await expect(wa).toHaveAttribute('href', /s%C3%A1bana%20de%20reclamos/)
+  await expect(wa).toHaveAttribute('href', /estado%20de%20cuenta/)
   await wa.click()
   await expect(post.getByText('Enviado')).toBeVisible()
 
   // Correo: asunto y cuerpo listos; además descarga el PDF para adjuntarlo
   const mail = botones.getByRole('link', { name: '📧 Correo' })
   await expect(mail).toHaveAttribute('href', /^mailto:luis%40correo\.com\?subject=Informe%20de%20nuestra%20reuni%C3%B3n/)
-  await expect(mail).toHaveAttribute('href', /s%C3%A1bana%20de%20reclamos/)
+  await expect(mail).toHaveAttribute('href', /estado%20de%20cuenta/)
   const [pdf2] = await Promise.all([page.waitForEvent('download'), mail.click()])
   expect(pdf2.suggestedFilename()).toBe('informe-Luis-Paz-2026-10-07.pdf')
 
@@ -128,7 +127,7 @@ test('Post reunión (nuevo cliente): sin pedidos de cambio', async ({ page }) =>
   await post.getByLabel('Link de la reunión').fill('https://zoom.us/j/555')
   await post.getByRole('button', { name: 'Guardar reunión' }).click()
   await post.getByText('Mensaje que lo acompaña').click()
-  await expect(post.locator('.msj-vista .paso-txt')).not.toContainText('sábana')
+  await expect(post.locator('.msj-vista .paso-txt')).not.toContainText('estado de cuenta')
   await expect(post.locator('.msj-vista .paso-txt')).toContainText('Zoom: https://zoom.us/j/555')
   await expect(post.getByRole('link', { name: '💬 WhatsApp' })).toHaveAttribute('href', /wa\.me\/593991234567\?text=Hola%20Ana/)
 })

@@ -29,7 +29,7 @@ test('Contacto referido: referidor, relación y cadena de mensajes que se activa
   await expect(page.getByRole('region', { name: /Saludar hoy/ })).toHaveCount(0)
 
   const cad = page.getByRole('region', { name: '🔗 Cadena de referido' })
-  await expect(cad).toContainText(/¡Hola, buen(os|as) (días|tardes|noches)! ¿Tengo el gusto de hablar con Carla\? Soy Bracho, asesor de SaludSA\. María, su amiga, me compartió su contacto/)
+  await expect(cad).toContainText(/¡Hola, buen(os|as) (días|tardes|noches)! ¿Tengo el gusto de hablar con Carla\? Soy Bracho, asesor de inversiones\. María, su amiga, me compartió su contacto/)
   await expect(cad.getByRole('link', { name: 'Enviar mensaje 2', exact: true })).toHaveCount(0)
   const m1 = cad.getByRole('link', { name: 'Enviar mensaje 1', exact: true })
   await expect(m1).toHaveAttribute('href', /^https:\/\/wa\.me\/593991234567\?text=/)

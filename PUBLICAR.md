@@ -2,13 +2,14 @@
 
 La app es 100 % local: tus fichas se guardan **solo en cada dispositivo** y nunca salen a internet. Para instalarla en el celular hace falta abrirla desde una dirección web, así que se publica **solo la app** (sin datos, sin documentos) como página gratuita de GitHub.
 
-## Una sola vez: crear el repo de la página
+## Una sola vez: activar GitHub Pages
 
-1. En GitHub: **New repository** → nombre **`prospectos`** → **Public** → sin README → **Create**.
-   (Tiene que ser público para que GitHub Pages sea gratis. Solo contendrá la app compilada: nada de tus fichas, del brief ni de tus documentos.)
-2. Dale acceso a la app de Claude a ese repo (igual que con el otro) y avísame: yo subo la app.
-3. En el repo `prospectos`: **Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: `main` / `(root)` → Save**.
-4. En 1–2 minutos la app queda en: **`https://brachohm.github.io/prospectos/`**
+Este repo ya trae el flujo `.github/workflows/pages.yml`, que compila y publica la app sola en cada cambio de `main`.
+
+1. En este repo: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+2. En 1–2 minutos la app queda en: **`https://brachohm.github.io/tablero-prospectos-inversiones/`**
+
+Las fichas de esta app no se mezclan con las de SaludSA aunque las dos estén en `brachohm.github.io`: cada una usa su propia base en el dispositivo.
 
 ## Instalar
 

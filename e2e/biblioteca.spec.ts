@@ -93,7 +93,7 @@ test('Biblioteca: cargar PDF, buscar, guardar argumento, plan y la oferta del in
   await campo(page, '¿Quién depende de esta persona?').fill('su hija')
   await accion(page, 'Ya va a contratar')
   await campo(page, 'Producto seleccionado').selectOption({ label: 'Plan Familia' })
-  await campo(page, 'Valor a pagar mensual (USD)').fill('90')
+  await campo(page, 'Aporte mensual (USD)').fill('90')
   // La oferta ya no se llena a mano: no está en "+ acciones"
   await expect(page.getByRole('group', { name: 'Acciones con el prospecto' }).getByRole('button', { name: /Oferta irresistible/ })).toHaveCount(0)
 
@@ -105,8 +105,8 @@ test('Biblioteca: cargar PDF, buscar, guardar argumento, plan y la oferta del in
   const post = page.getByRole('region', { name: 'Post reunión' })
   const oferta = post.getByLabel('Nuestra oferta para usted')
   await expect(oferta).toContainText('Nuestra oferta para usted · al final del informe, en grande')
-  await expect(oferta).toContainText('Familia protegida')
-  await expect(oferta).toContainText('Que su hija esté protegido si algo pasa')
+  await expect(oferta).toContainText('Futuro familiar asegurado')
+  await expect(oferta).toContainText('Que su hija tenga un futuro respaldado')
   await expect(oferta).toContainText('4 bonos')
   await expect(oferta.getByText(/Sin plan de la Biblioteca/)).toHaveCount(0)
   await post.getByRole('button', { name: '2ª reunión: propuesta' }).click()

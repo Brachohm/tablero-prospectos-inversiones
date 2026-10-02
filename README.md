@@ -1,6 +1,6 @@
-# Tablero de prospectos SaludSA
+# Tablero de prospectos · Asesoría de inversiones
 
-App mobile-first para registrar y analizar prospectos de medicina prepagada. **Uso 100 % local:** las fichas viven solo en cada dispositivo (IndexedDB) y nunca salen a internet; se pasan entre dispositivos con la copia de seguridad. El brief está en `CLAUDE.md`, las decisiones tomadas en `DECISIONES.md` y el prototipo de referencia en `prototipo/`.
+App mobile-first para registrar y analizar prospectos de **asesoría de inversiones** (planes unit linked de contribución regular y de contribución única) en Ecuador. Nace como copia de [tablero-prospectos-saludsa](https://github.com/Brachohm/tablero-prospectos-saludsa) y comparte su núcleo (etapas, gamificación, CRM, mensajes, copias de seguridad). **Uso 100 % local:** las fichas viven solo en cada dispositivo (IndexedDB) y nunca salen a internet; se pasan entre dispositivos con la copia de seguridad. El brief está en `CLAUDE.md` y las decisiones heredadas en `DECISIONES.md`.
 
 ## Comandos
 
@@ -13,7 +13,7 @@ npm run lint      # oxlint
 npm run dev       # servidor de desarrollo
 npm run build
 node scripts/iconos.mjs  # regenera los PNG del ícono desde public/*.svg
-npm run build:pages      # compila para GitHub Pages (en /prospectos/)
+npm run build:pages      # compila para GitHub Pages (en /tablero-prospectos-inversiones/)
 ```
 
 Para instalarla en el celular y la computadora: **[PUBLICAR.md](PUBLICAR.md)**.
@@ -25,10 +25,10 @@ src/
   config/           Lo editable sin tocar la lógica
     ficha.ts        Tipos, etapas, motivos, misiones y campos (con su XP)
     juego.ts        Niveles, bonus de cierre, XP de preexistencias
-    zonas.ts        Zonas del cuerpo y condiciones (propuesta, no formulario oficial)
-    saludsa.ts      Referencias a servicios de SaludSA (siempre "validar")
+    comisiones.ts   Tabla de comisiones por tipo de plan y plazo (VALORES DE EJEMPLO: pon los tuyos)
+    saludsa.ts      Texto "validar con la aseguradora" (nombre heredado)
     crm.ts          Canales de contacto, campos de cliente, posventa, agenda
-    objetivos.ts    Meta mensual de prima y escalones de comisión
+    objetivos.ts    Meta mensual de aportes cerrados y sus escalones
     frases.ts       Frases del día del Inicio
     coberturas.ts   Conceptos de la tabla de coberturas y su peso por motivo
     ajustes.ts      Textos iniciales de la Configuración y el máximo de adjuntos (30 MB)
@@ -38,16 +38,15 @@ src/
   domain/           Lógica pura, con pruebas
     ficha.ts        Acceso a campos, campo activo, consentimiento
     xp.ts           XP, avance, niveles, insignias, tablero
-    pre.ts          Declaración de preexistencias
     analisis.ts     Análisis local, diagnóstico, veredicto, comparativo, resumen
     datos.ts        Datos recabados (mínimos para opinar)
     crm.ts          Historial de contactos, cartera de clientes y agenda
     lista.ts        Orden y filtros
     csv.ts          Exportar CSV
-    pre-ops.ts      Operaciones del escáner (agregar personas, marcar zonas…)
     respaldo.ts     Copia de seguridad (crear y combinar; la validación se carga aparte)
     biblioteca.ts   Documentos, planes y argumentos; búsqueda sin conexión; argumentos por ficha
-    objetivos.ts    Prima cerrada del mes, escalones y clientes que faltan
+    objetivos.ts    Aportes cerrados del mes, comisión estimada, escalones y clientes que faltan
+    comisiones.ts   Comisión estimada de un cierre (tipo de plan, plazo y aporte)
     contactos.ts    Contactos nuevos y saludo diario
     comparar.ts     Cambio de seguro: tablas de coberturas, comparación y recomendación
     informe.ts      Informe post reunión: resumen, análisis, estrategia y mensaje
@@ -61,26 +60,26 @@ src/
     referidos.ts    Pasos de la cadena de referido (texto, orden, fecha de envío)
     oferta.ts       Oferta tipo Hormozi: ecuación de valor, bonos, garantía, urgencia, mensaje
   store/            Estado de la app y guardado en IndexedDB (fichas y Biblioteca)
-  ui/               Pantallas: Tablero (agenda, lista, clientes), Ficha, Escaner, Analisis, Historial, Cliente,
+  ui/               Pantallas: Tablero (agenda, lista, clientes), Ficha, Analisis, Historial, Cliente,
                     Biblioteca, Oferta; pdf.ts lee el texto de los PDF en el dispositivo (pdf.js)
   styles/           Tokens de diseño y estilos
 e2e/                Flujos completos en el navegador
 ```
 
-## Estado
+## Qué cambió frente a la app de SaludSA
 
-- [x] Fase 1 · Núcleo: modelo de datos, configuración, lógica pura con pruebas, tokens de diseño, lógica del CRM.
-- [x] Fase 2 · Interfaz: tablero con agenda, prospectos y clientes; ficha con consentimiento, misiones, historial, escáner del cuerpo, sección de cliente y referidos; panel de análisis; exportar CSV. Datos en localStorage (pasan a IndexedDB en la Fase 3).
-- [x] Fase 3 · PWA y local-first: IndexedDB (Dexie) con escritura inmediata por ficha, lápidas al borrar, migración desde localStorage, pestañas sincronizadas, almacenamiento persistente, instalable y sin conexión (service worker, fuentes locales), copia de seguridad JSON (descargar y restaurar).
-- [x] Fase 4 · Uso local (decisión de Bracho): sin nube, sin cuentas y sin IA. Pasar fichas entre dispositivos con "Enviar a mi otro dispositivo" / "Restaurar copia". Publicación como página estática (solo la app, sin datos) en GitHub Pages. La versión con nube e IA quedó en el historial de git (commit 67adef8) por si algún día se quiere.
-- [x] Preexistencias solo cerca de contratar: el nuevo prospecto ve solo la venta consultiva hasta "Presentado" (o el botón "Declarar preexistencias").
-- [x] Biblioteca SaludSA (PDF con búsqueda sin conexión, catálogo de planes, argumentos) y armador de ofertas tipo Hormozi en la ficha.
-- [x] Objetivo del mes ($750 → 90% de comisión, $1100 → 120%) y contactos nuevos con recordatorio diario de saludo.
-- [x] Mensajes de seguimiento por fase, próxima reunión y recordatorios por WhatsApp y SMS.
-- [x] Referidos: quién refiere y su relación; cadena de mensajes que el asesor activa paso a paso.
-- [x] Configuración: perfil del agente, seguimiento 1-2-3 (un mensaje por día, sin domingos), saludos (texto, video, foto) e invitación (WhatsApp o correo), con emojis y adjuntos.
-- [x] Reorganización: Inicio (saludo, fecha y frase del día), Centro de Gestión (uno por uno, resumen obligatorio y recomendación), Base de datos (Excel/CSV con filtros) y Configuración (incluye Datos: copias y exportar). Navegación inferior.
-- [x] Cambio de seguro: tabla de coberturas del plan actual, comparación con los planes de la Biblioteca y plan recomendado con sus beneficios.
-- [x] Post reunión: informe PDF con resumen, análisis y estrategia (un plan, dos o complemento), por WhatsApp o correo, con segunda reunión, calificación y pedidos para cambio de seguro.
-- [x] Fin de gestión con copia de seguridad, inicio de jornada (cargar la copia) y modo sin conexión.
-- [ ] Fase 5 · Pulido
+- **Tipos de ficha:** 🌱 Primera inversión (quiere empezar a invertir) y 🔄 Ya invierte (tiene ahorros o inversiones y no está conforme).
+- **Descubrimiento:** meta y monto, plazo, aporte mensual, capital para aporte único, perfil de riesgo (con la pregunta de qué haría ante una caída), fondo de emergencia y deudas. Para quien ya invierte: dónde, saldo, aporte, vencimiento y motivos (rendimiento, costos, liquidez, transparencia, riesgo, asesoría).
+- **Análisis:** veredicto honesto (por ejemplo, "primero un fondo de emergencia", "horizonte corto: un plan de largo plazo aún no conviene", "aún no conviene mover su dinero"), costo de oportunidad, comparativo y recordatorios (perfil de riesgo, rendimientos no garantizados, costos, rescates y KYC).
+- **Pre-cierre:** tipo de plan, plazo y aporte; muestra la **comisión estimada** según `src/config/comisiones.ts`.
+- **Objetivo del mes:** suma los aportes cerrados y muestra la comisión estimada del mes.
+- **Informe de primera reunión (PDF):** perfil, situación financiera hoy, lo que vemos en su caso y estrategia (regular, única o regular + aporte único).
+- **Se quitó:** declaración de preexistencias, escáner del cuerpo, IMC, médico de cabecera y riesgos laborales de salud. Las acciones "Plan recomendado" y "Comparar plan actual" están ocultas hasta adaptarlas.
+- **Datos separados:** base local, copias de seguridad y canales propios, así las fichas no se mezclan con las de SaludSA aunque las dos apps estén en el mismo dominio.
+
+## Pendiente (siguiente fase)
+
+- Cargar tu tabla real de comisiones en `src/config/comisiones.ts`.
+- Adaptar la Biblioteca y el informe de la segunda reunión (propuesta): hoy siguen pensados en tablas de coberturas de salud.
+- Proyección de valor del plan (escenarios conservador, moderado y optimista, sin garantizar rendimientos).
+- Cuestionario de perfil de riesgo completo y checklist de KYC en el cierre.

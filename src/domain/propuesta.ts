@@ -260,7 +260,7 @@ export function propuesta(
     cliente: v("nombre"),
     fecha: hoy,
     asesor: perfil,
-    tipo: esCambio(p) ? "Cambio de seguro" : TIPOS[tipoDe(p)].n,
+    tipo: TIPOS[tipoDe(p)].n,
     busca,
     productos,
     total,
