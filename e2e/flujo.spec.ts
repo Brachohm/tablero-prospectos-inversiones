@@ -32,7 +32,7 @@ test('crear ficha → llenar → analizar → guardar → reabrir', async ({ pag
   await page.getByRole('button', { name: /Comisiones y costos/ }).click()
   await expect(campo(page, 'Costos que conoce (administración, entrada, salida…)')).toHaveValue('2 % anual')
 
-  await campo(page, '¿Para qué quiere invertir?').selectOption('Retiro o jubilación')
+  await campo(page, '¿Para qué quiere invertir? (meta principal)').selectOption('Retiro o jubilación')
   await campo(page, '¿En cuánto tiempo necesitará ese dinero?').selectOption('10 a 20 años')
 
   // Ya va a contratar: pre-cierre con tipo de plan, plazo y aporte (sin tabla de comisiones, avisa dónde escribirla)
@@ -354,4 +354,52 @@ test('Pre-cierre: identificación de cada asegurado (número, emisión y expirac
     .toBe('2026-10-12')
   await page.reload()
   await expect(page.getByRole('region', { name: /Identificación del titular y asegurados/ }).getByLabel('Número de identificación de Sofía Paz')).toHaveValue('AB123456')
+})
+
+test('levantamiento: meta de retiro, capacidad de ahorro y perfil de riesgo con puntaje', async ({ page }) => {
+  await page.goto('/')
+  await page.goto('/#/nueva/nuevo')
+  await page.getByLabel(/La persona aceptó/).click()
+  await campo(page, 'Nombre').fill('Rosa Mena')
+  await campo(page, 'Edad (años)').fill('40')
+  await campo(page, '¿Aporta al IESS?').selectOption('Sí')
+  await expect(campo(page, 'Años de aportes al IESS')).toBeVisible()
+
+  // Metas: retiro calculado con la renta deseada
+  await abrir(page, 'Descubrimiento')
+  await campo(page, '¿Para qué quiere invertir? (meta principal)').selectOption('Retiro o jubilación')
+  await campo(page, '¿A qué edad quiere retirarse?').fill('65')
+  await campo(page, '¿Con cuánto al mes quiere vivir en su retiro? (USD de hoy)').fill('800')
+  await expect(page.getByLabel('Resumen de metas')).toContainText(/Meta de retiro estimada: \$192\.?000/)
+  await campo(page, 'Segunda meta (opcional)').selectOption('Educación de los hijos')
+  await expect(campo(page, 'Tercera meta (opcional)')).toBeVisible()
+  await campo(page, '¿Cuánto puede invertir al mes? (USD)').fill('300')
+
+  // Flujo: le quedan 500 → cómodo hasta 150; 300 es exigente
+  await abrir(page, 'Flujo y patrimonio')
+  await expect(page.getByText('Con el ingreso y los gastos calculo su capacidad de ahorro.')).toBeVisible()
+  await campo(page, 'Ingreso mensual neto del hogar').selectOption('$1.000 a $2.000')
+  await campo(page, 'Gastos fijos del hogar (USD al mes, aproximado)').fill('900')
+  await campo(page, 'Cuotas de deudas que paga al mes (USD)').fill('100')
+  const cap = page.getByLabel('Capacidad de ahorro')
+  await expect(cap).toContainText('Le quedan $500 al mes')
+  await expect(cap).toContainText('Aporte de $300 = 60 % de lo que le sobra')
+  await expect(cap).toContainText('puede ser exigente')
+
+  // Perfil: se describe arriesgado, sus respuestas dicen conservador
+  await abrir(page, 'Perfil de riesgo')
+  await campo(page, '¿Cómo se describe al invertir?').selectOption('Arriesgado')
+  await campo(page, '¿En qué ha invertido antes?').selectOption('Nunca he invertido')
+  await campo(page, 'Si su inversión baja 15 % en un año, ¿qué haría?').selectOption('Retiraría todo')
+  await campo(page, '¿Qué valora más de su inversión?').selectOption('Que no baje nunca')
+  await campo(page, '¿Qué parte de todos sus ahorros sería esta inversión?').selectOption('Más del 50 %')
+  const per = page.getByLabel('Perfil sugerido')
+  await expect(per).toContainText('Perfil sugerido: Conservador')
+  await expect(per).toContainText('la estrategia usa el más prudente')
+
+  // El análisis lo recoge
+  await accion(page, 'Analizar ficha')
+  const an = page.getByRole('region', { name: 'Análisis para la propuesta' })
+  await expect(an).toContainText('Aporte exigente para su flujo')
+  await expect(an).toContainText('Perfil declarado vs. cuestionario')
 })

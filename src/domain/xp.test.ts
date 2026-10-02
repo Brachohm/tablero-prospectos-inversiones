@@ -5,9 +5,9 @@ import { ficha, hist } from "./test-utils";
 const mision = (id: string) => MISIONES.find((m) => m.id === id)!;
 
 describe("misiones por tipo", () => {
-  it("al inicio, nuevo y cambio tienen 2 secciones: datos y descubrimiento (sin presentación ni seguimiento)", () => {
-    expect(misionesDe(ficha("nuevo")).map((m) => m.id)).toEqual(["datos", "desc"]);
-    expect(misionesDe(ficha("cambio")).map((m) => m.id)).toEqual(["datos", "desc"]);
+  it("nuevo y cambio tienen 4 secciones: datos, descubrimiento, flujo y patrimonio, perfil de riesgo", () => {
+    expect(misionesDe(ficha("nuevo")).map((m) => m.id)).toEqual(["datos", "desc", "fin", "riesgo"]);
+    expect(misionesDe(ficha("cambio")).map((m) => m.id)).toEqual(["datos", "desc", "fin", "riesgo"]);
   });
 
 });
@@ -68,14 +68,18 @@ describe("avance", () => {
       origen: "Referido",
       depende: "hijos",
       ocupacion: "Docente",
+      estadoCivil: "Casado(a)",
+      tipoIngreso: "Negocio propio",
+      ingresoEstable: "Variable",
+      iess: "No",
     });
-    // Referido: también cuentan quién lo refirió y la relación
-    expect(misionStats(mision("datos"), p).pct).toBe(75);
+    // Referido: también cuentan quién lo refirió y la relación (10 de 12)
+    expect(misionStats(mision("datos"), p).pct).toBe(83);
     Object.assign(p, { referidor: "María", relacion: "Amiga" });
     expect(misionStats(mision("datos"), p).pct).toBe(100);
-    // 100 de 2 secciones (la otra en 0) = 50
-    expect(fichaPct(p)).toBe(50);
-    expect(fichaPct({ ...p, tipo: "nuevo" })).toBe(50);
+    // 100 de 4 secciones (las otras en 0) = 25
+    expect(fichaPct(p)).toBe(25);
+    expect(fichaPct({ ...p, tipo: "nuevo" })).toBe(25);
   });
 
   it("elegir un motivo agrega sus campos al total de la misión", () => {

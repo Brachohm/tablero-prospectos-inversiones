@@ -70,6 +70,36 @@ describe("análisis local", () => {
     const r = ids(ficha("nuevo", { emergencia: "No", deudas: "Tarjeta", edad: "55", horizonte: "3 a 5 años" }));
     expect(r).toEqual(expect.arrayContaining(["emer", "deu", "e50", "hcor"]));
   });
+  it("recordatorios de la foto financiera", () => {
+    const r = ids(
+      ficha("nuevo", {
+        ingreso: "1200",
+        gastos: "1000",
+        deudaCuota: "100",
+        deudaTasa: "Más de 15 % (como una tarjeta)",
+        aporte: "90",
+        seguroVida: "No",
+        depende: "2 hijos",
+        iess: "Sí",
+        tipoIngreso: "Negocio propio",
+        malaExp: "Sí, con un asesor",
+        decideCon: "Su esposa",
+        metaFlex: "Es indispensable: tiene que llegar",
+        capital: "5000",
+        fuenteUnico: "Herencia",
+      }),
+    );
+    expect(r).toEqual(expect.arrayContaining(["capa", "dcar", "svid", "iess", "ivar", "malx", "deci", "mind", "orig"]));
+    expect(ids(ficha("nuevo", { decideCon: "Nadie" }))).not.toContain("deci");
+  });
+  it("si el aporte no le alcanza, el veredicto pide ajustarlo", () => {
+    const d = diagLocal(ficha("nuevo", { ...baseNuevo, ingreso: "1000", gastos: "950" }), HOY);
+    expect(d.veredicto.titulo).toBe("Viable, con un aporte que sí le alcance");
+  });
+  it("varias metas van a lo que busca", () => {
+    const a = analisisLocal(ficha("nuevo", { meta: "Crear patrimonio", meta2: "Comprar vivienda", meta2Monto: "40000" }), HOY);
+    expect(a.busca.join("|")).toMatch(/Meta 2: comprar vivienda \(\$40\.?000\)/);
+  });
   it("avisa cuando la meta y el aporte no cuadran", () => {
     expect(ids(ficha("nuevo", { metaMonto: "100000", aporte: "100", horizonte: "5 a 10 años" }))).toContain("brec");
   });
@@ -88,7 +118,7 @@ describe("análisis local", () => {
   });
   it("información que falta según el tipo", () => {
     const a = analisisLocal(ficha("nuevo"), HOY);
-    expect(a.vacios).toContain("¿Para qué quiere invertir?");
+    expect(a.vacios).toContain("¿Para qué quiere invertir? (meta principal)");
   });
 });
 

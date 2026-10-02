@@ -38,8 +38,10 @@ export interface Campo {
   solo?: Tipo;
   /** Solo aplica si este motivo de inconformidad está elegido. */
   motivo?: MotivoId;
-  /** Solo aplica si el campo `k` vale `v` (p. ej. origen = "Referido"). */
+  /** Solo aplica si el campo `k` vale `v` (p. ej. origen = "Referido"); `v: "*"` = si `k` tiene algo escrito. */
   cuando?: { k: string; v: string };
+  /** Subtítulo del grupo al que pertenece (dentro de la sección). */
+  grupo?: string;
   /** Texto de ayuda dentro del campo. */
   ph?: string;
   /** No cuenta para el avance (la etapa). */
@@ -51,7 +53,7 @@ export interface Campo {
   max?: number;
 }
 
-export type MisionId = "datos" | "desc" | "pre";
+export type MisionId = "datos" | "desc" | "fin" | "riesgo" | "pre";
 
 export interface Mision {
   id: MisionId;

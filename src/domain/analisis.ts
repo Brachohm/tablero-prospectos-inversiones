@@ -9,6 +9,7 @@ import { VALIDAR } from "../config/saludsa";
 import { CAMPO, campoActivo, esCambio, num, tieneMotivo, tipoDe, txt, vacio } from "./ficha";
 import { diasHasta, fmtFecha, hoyISO, usd } from "./fechas";
 import { contarDatos } from "./datos";
+import { capacidadDe, metasDe, montoMeta, puntajePerfil } from "./finanzas";
 import type { Causa, NivelVeredicto, Prospecto, TipoCausa, Veredicto } from "./tipos";
 
 export interface Recordatorio {
@@ -51,10 +52,11 @@ export const MAP_OBJ: Readonly<Record<string, string>> = {
 const CLAVES_CAMBIO = [
   "institucion", "producto", "tiempoCon", "saldoActual", "motivos", "grieta", "conoce", "noPerder",
   "depende", "edad", "meta", "horizonte", "aporte", "perfil", "reaccion", "emergencia", "objecion",
+  "ingresoRango", "gastos",
 ];
 const CLAVES_NUEVO = [
-  "ahorroHoy", "porque", "depende", "edad", "meta", "metaMonto", "horizonte", "aporte", "perfil", "reaccion",
-  "emergencia", "costoEvento", "objecion",
+  "ahorroHoy", "porque", "depende", "edad", "meta", "horizonte", "aporte", "perfil", "reaccion",
+  "emergencia", "costoEvento", "objecion", "ingresoRango", "gastos", "tipoIngreso",
 ];
 
 function usdCampo(p: Prospecto, k: string): string {
@@ -78,7 +80,7 @@ export function aniosHorizonte(p: Prospecto): number | null {
 export function perfilIncoherente(p: Prospecto): boolean {
   const pf = txt(p, "perfil");
   const r = txt(p, "reaccion");
-  return (pf === "Arriesgado" || pf === "Moderado") && r === "Retiraría todo";
+  return ((pf === "Arriesgado" || pf === "Moderado") && r === "Retiraría todo") || puntajePerfil(p).diferencia;
 }
 
 export function esMayor(p: Prospecto): boolean {
@@ -98,12 +100,13 @@ export function analisisLocal(p: Prospecto, hoy: string = hoyISO()): AnalisisLoc
   const recs: Recordatorio[] = [];
   const anios = aniosHorizonte(p);
 
-  if (!vacio(p, "meta"))
+  const metas = metasDe(p);
+  for (const m of metas)
     busca.push(
-      "Llegar a su meta: " +
-        txt(p, "meta").toLowerCase() +
-        (!vacio(p, "metaMonto") ? ` (${usdCampo(p, "metaMonto")})` : "") +
-        (!vacio(p, "horizonte") ? `, en ${txt(p, "horizonte").toLowerCase()}` : ""),
+      (m.prioridad === 1 ? "Llegar a su meta: " : `Meta ${m.prioridad}: `) +
+        m.meta.toLowerCase() +
+        (m.monto ? ` (${usd(m.monto)})` : "") +
+        (m.plazo ? `, en ${m.plazo.toLowerCase()}` : ""),
     );
   if (!vacio(p, "porque") && !ck) busca.push("Invertir ahora porque: " + txt(p, "porque"));
   if (!vacio(p, "depende")) busca.push("Dejar respaldo a quienes dependen de él o ella: " + txt(p, "depende"));
@@ -183,11 +186,73 @@ export function analisisLocal(p: Prospecto, hoy: string = hoyISO()): AnalisisLoc
       t: "Tiene deudas",
       d: "Si paga tasas altas (tarjetas), conviene ordenar esa deuda antes de comprometer un aporte grande.",
     });
-  if (perfilIncoherente(p))
+  const pp = puntajePerfil(p);
+  if (pp.diferencia)
+    recs.push({
+      id: "inco",
+      t: "Perfil declarado vs. cuestionario",
+      d: `Se describe ${pp.declarado.toLowerCase()}, pero sus respuestas apuntan a ${pp.sugerido!.toLowerCase()}: usa el más prudente y conversa con él o ella la diferencia.`,
+    });
+  else if (perfilIncoherente(p))
     recs.push({
       id: "inco",
       t: "Perfil declarado vs. reacción",
       d: `Se describe ${txt(p, "perfil").toLowerCase()} pero retiraría todo ante una caída: trátalo como conservador hasta aclararlo.`,
+    });
+  const cap = capacidadDe(p);
+  if (cap && (cap.nivel === "exigente" || cap.nivel === "no_alcanza"))
+    recs.push({
+      id: "capa",
+      t: cap.nivel === "no_alcanza" ? "El aporte no le alcanza" : "Aporte exigente para su flujo",
+      d: `Le quedan ${usd(cap.sobrante)} al mes y el aporte es de ${usd(cap.aporte!)}. Un aporte cómodo sería de hasta ${usd(cap.comodo)}: mejor poco y constante que mucho y cancelado.`,
+    });
+  if (txt(p, "deudaTasa") === "Más de 15 % (como una tarjeta)")
+    recs.push({
+      id: "dcar",
+      t: "Deuda cara primero",
+      d: "Paga más del 15 % en una deuda: pagarla primero le rinde más que cualquier fondo. Proponle un plan para salir de ella y un aporte menor mientras tanto.",
+    });
+  if (txt(p, "seguroVida") === "No" && !vacio(p, "depende"))
+    recs.push({
+      id: "svid",
+      t: "Sin seguro de vida y con dependientes",
+      d: `Muestra la cobertura de vida del plan: protege a ${txt(p, "depende")} si algo le pasa durante el plazo (${VALIDAR} la suma asegurada).`,
+    });
+  if (txt(p, "iess") === "Sí" || txt(p, "iess") === "Voluntario")
+    recs.push({
+      id: "iess",
+      t: "Aporta al IESS",
+      d: "Posiciona el plan como complemento de su jubilación del IESS, no como reemplazo.",
+    });
+  if (txt(p, "tipoIngreso") === "Independiente o profesional" || txt(p, "tipoIngreso") === "Negocio propio" || txt(p, "ingresoEstable") === "Muy variable")
+    recs.push({
+      id: "ivar",
+      t: "Ingreso independiente o variable",
+      d: "Propón un aporte base que pueda sostener en los meses flojos y aportes extra cuando le vaya bien.",
+    });
+  if (txt(p, "malaExp").startsWith("Sí"))
+    recs.push({
+      id: "malx",
+      t: "Tuvo una mala experiencia",
+      d: "Escucha qué pasó y muestra, punto por punto, qué será distinto esta vez antes de hablar del producto.",
+    });
+  if (!vacio(p, "decideCon") && !/^nadie/i.test(txt(p, "decideCon")))
+    recs.push({
+      id: "deci",
+      t: "Decide con alguien más",
+      d: `Invita a ${txt(p, "decideCon")} a la segunda reunión: así nadie decide con información a medias.`,
+    });
+  if (txt(p, "metaFlex") === "Es indispensable: tiene que llegar")
+    recs.push({
+      id: "mind",
+      t: "Meta indispensable",
+      d: "Arma la propuesta con el escenario conservador: si la meta tiene que llegar, no cuentes con el optimista.",
+    });
+  if (txt(p, "fuenteUnico") && !vacio(p, "capital"))
+    recs.push({
+      id: "orig",
+      t: "Origen del aporte único",
+      d: `Viene de: ${txt(p, "fuenteUnico").toLowerCase()}. Pide el respaldo para el KYC (origen de fondos) desde ya.`,
     });
   if (anios !== null && anios < 5)
     recs.push({
@@ -219,7 +284,7 @@ export function analisisLocal(p: Prospecto, hoy: string = hoyISO()): AnalisisLoc
       t: "Objeción: desconfianza",
       d: "Muestra quién emite el plan, cómo está regulado en Ecuador y cómo consultará su estado de cuenta.",
     });
-  const meta = num(p, "metaMonto");
+  const meta = montoMeta(p);
   const ap = num(p, "aporte");
   if (meta !== null && ap !== null && anios !== null && ap > 0) {
     const sinRend = ap * 12 * anios;
@@ -396,6 +461,12 @@ export function diagLocal(p: Prospecto, hoy: string = hoyISO()): Diagnostico {
       nivel: "condiciones",
       titulo: "Viable, pero primero un fondo de emergencia",
       razon: "Sin colchón para imprevistos, cualquier gasto lo obliga a rescatar con penalidad. Arma primero ese fondo o un aporte menor que no lo deje sin liquidez.",
+    };
+  } else if (capacidadDe(p)?.nivel === "no_alcanza") {
+    veredicto = {
+      nivel: "condiciones",
+      titulo: "Viable, con un aporte que sí le alcance",
+      razon: "Con su ingreso, gastos y deudas, el aporte que planteó no le alcanza. Ajusta el monto a lo que puede sostener sin apretar su presupuesto.",
     };
   } else if (anios !== null && anios < 5) {
     veredicto = {

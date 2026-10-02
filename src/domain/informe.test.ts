@@ -60,12 +60,25 @@ describe("informe post reunión", () => {
 describe("informe 1: situación financiera hoy", () => {
   it("nivel con lo que contó", () => {
     const i = informe(
-      ficha("nuevo", { emergencia: "Sí", meta: "Retiro o jubilación", metaMonto: "100000", horizonte: "Más de 20 años", aporte: "200", perfil: "Moderado" }),
+      ficha("nuevo", {
+        emergencia: "Sí",
+        meta: "Retiro o jubilación",
+        metaMonto: "100000",
+        horizonte: "Más de 20 años",
+        aporte: "200",
+        perfil: "Moderado",
+        ingreso: "2500",
+        gastos: "1200",
+        deudaCuota: "100",
+        deudaTasa: "Menos de 10 %",
+        seguroVida: "Sí, propio",
+      }),
       perfil,
       HOY,
     );
     expect(i.proteccion.every((x) => x.estado === "si")).toBe(true);
     expect(i.nivel).toBe(100);
+    expect(i.resumen).toContainEqual({ l: "Le queda al mes", v: "$1.200" });
     expect(informe(ficha("nuevo", { emergencia: "No" }), perfil, HOY).proteccion[0].estado).toBe("no");
     expect(informe(ficha("nuevo"), perfil, HOY).riesgos).toBeNull();
   });

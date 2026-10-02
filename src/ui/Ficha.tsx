@@ -9,6 +9,7 @@ import { conEtapa, objetivoMes } from "../domain/objetivos";
 import { hoyISO } from "../domain/fechas";
 import { store, useFicha } from "../store/store";
 import { PlanRecomendado } from "./Recomendacion";
+import { ResumenFlujo, ResumenMetas, ResumenPerfil } from "./Finanzas";
 import { Analisis } from "./Analisis";
 import { useAviso } from "./hooks";
 import { Campo, Motivos, type Cambiar } from "./Campo";
@@ -554,7 +555,7 @@ function seccionesDeEtapa(p: Prospecto): string[] {
     case "Cuadrar cita":
       return ["datos"];
     case "Primera reunión":
-      return ["desc"];
+      return ["desc", "fin", "riesgo"];
     case "Segunda reunión":
       return momentoReferidos(p) === "listos" ? [] : ["referidos"];
     case ETAPA_PRECIERRE:
@@ -590,7 +591,14 @@ function SeccionMision({
   if (m.custom) {
     cuerpo = <Escaner p={p} actualizar={actualizar} alCompletar={alCompletarPre} />;
   } else {
-    cuerpo = <Campos lista={activos} p={p} cambiar={cambiar} actualizar={actualizar} />;
+    cuerpo = (
+      <>
+        <Campos lista={activos} p={p} cambiar={cambiar} actualizar={actualizar} />
+        {m.id === "desc" && <ResumenMetas p={p} />}
+        {m.id === "fin" && <ResumenFlujo p={p} />}
+        {m.id === "riesgo" && <ResumenPerfil p={p} />}
+      </>
+    );
   }
   return (
     <section className={"miss" + (done ? " done" : "") + plegado.clase} id={"mision-" + m.id} aria-labelledby={"t-" + m.id}>
@@ -623,11 +631,11 @@ function Campos({
   cambiar: Cambiar;
   actualizar: (fn: (p: Prospecto) => Prospecto) => void;
 }) {
-  const bloques: { motivo?: string; campos: CampoT[] }[] = [];
+  const bloques: { motivo?: string; grupo?: string; campos: CampoT[] }[] = [];
   for (const c of lista) {
     const ult = bloques[bloques.length - 1];
-    if (ult && ult.motivo === c.motivo) ult.campos.push(c);
-    else bloques.push({ motivo: c.motivo, campos: [c] });
+    if (ult && ult.motivo === c.motivo && (c.motivo || ult.grupo === c.grupo)) ult.campos.push(c);
+    else bloques.push({ motivo: c.motivo, grupo: c.motivo ? undefined : c.grupo, campos: [c] });
   }
   const render = (c: CampoT) => {
     if (c.t === "motivos") return <Motivos key={c.k} c={c} p={p} cambiar={cambiar} />;
@@ -642,6 +650,11 @@ function Campos({
             <h4>
               <span aria-hidden="true">{MOTIVO_BY[b.motivo].ic}</span> {MOTIVO_BY[b.motivo].l}
             </h4>
+            {b.campos.map(render)}
+          </div>
+        ) : b.grupo ? (
+          <div key={b.grupo + i}>
+            <p className="sub2 grupo-campos">{b.grupo}</p>
             {b.campos.map(render)}
           </div>
         ) : (

@@ -129,7 +129,7 @@ export function contactosDe(p: Prospecto): number {
 export function campoActivo(c: Campo, p: Prospecto): boolean {
   if (c.solo && c.solo !== tipoDe(p)) return false;
   if (c.motivo && !tieneMotivo(p, c.motivo)) return false;
-  if (c.cuando && txt(p, c.cuando.k) !== c.cuando.v) return false;
+  if (c.cuando && (c.cuando.v === "*" ? !txt(p, c.cuando.k) : txt(p, c.cuando.k) !== c.cuando.v)) return false;
   return true;
 }
 

@@ -1,6 +1,7 @@
 /** Proyección del plan: cuánto podría acumular con su aporte y plazo, en tres escenarios. */
 import { ESCENARIOS_INICIALES, HITOS_ANIOS, type Escenarios } from "../config/proyeccion";
 import { num, txt } from "./ficha";
+import { montoMeta } from "./finanzas";
 import type { Prospecto } from "./tipos";
 
 export interface PuntoProyeccion {
@@ -91,5 +92,5 @@ export function proyeccionDe(p: Prospecto, tasas?: Partial<Escenarios>): Proyecc
   let unico = 0;
   if (plan === "Contribución única") unico = precio ?? num(p, "capital") ?? 0;
   else mensual = precio ?? num(p, "aporte") ?? 0;
-  return proyectar(mensual, unico, anios, normalizarEscenarios(tasas), num(p, "metaMonto"));
+  return proyectar(mensual, unico, anios, normalizarEscenarios(tasas), montoMeta(p));
 }

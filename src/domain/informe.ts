@@ -16,6 +16,7 @@ import { firma } from "./herramientas";
 import { fmtFecha, hoyISO } from "./fechas";
 import { esCambio, motivosDe, num, tipoDe, txt } from "./ficha";
 import { aniosHorizonte, perfilIncoherente } from "./analisis";
+import { capacidadDe, metasDe, montoMeta, perfilEfectivo } from "./finanzas";
 import { reunionDe } from "./mensajes";
 import { fmtUSD, ofertaInforme, planDeOferta, type OfertaInforme } from "./oferta";
 import type { Argumento, Plan } from "./biblioteca";
@@ -71,11 +72,19 @@ export function proteccionHoy(p: Prospecto): { l: string; estado: EstadoCobertur
     !x ? "?" : si.includes(x) ? "si" : parcial.includes(x) ? "parcial" : "no";
   return [
     { l: "Fondo de emergencia", estado: sn(v("emergencia"), ["Sí"], ["Parcial"]) },
-    { l: "Meta definida", estado: v("meta") ? (v("metaMonto") ? "si" : "parcial") : "?" },
+    { l: "Meta definida", estado: v("meta") ? (montoMeta(p) ? "si" : "parcial") : "?" },
     { l: "Plazo claro", estado: v("horizonte") ? "si" : "?" },
-    { l: "Aporte que puede sostener", estado: num(p, "aporte") || num(p, "capital") ? "si" : "?" },
-    { l: "Perfil de riesgo", estado: sn(v("perfil"), ["Conservador", "Moderado", "Arriesgado"], ["No sabe"]) },
+    { l: "Aporte que puede sostener", estado: aporteSostenible(p) },
+    { l: "Deudas bajo control", estado: !v("deudaCuota") ? "?" : v("deudaTasa") === "Más de 15 % (como una tarjeta)" ? "no" : "si" },
+    { l: "Protección para su familia", estado: sn(v("seguroVida"), ["Sí, propio"], ["Solo el de su trabajo"]) },
+    { l: "Perfil de riesgo", estado: perfilEfectivo(p) ? "si" : v("perfil") === "No sabe" ? "parcial" : "?" },
   ];
+}
+
+function aporteSostenible(p: Prospecto): EstadoCobertura {
+  const c = capacidadDe(p);
+  if (c && c.nivel !== "sin_aporte") return c.nivel === "comodo" ? "si" : c.nivel === "exigente" ? "parcial" : "no";
+  return num(p, "aporte") || num(p, "capital") ? "parcial" : "?";
 }
 
 export function nivelProteccion(xs: readonly { estado: EstadoCobertura }[]): number {
@@ -112,16 +121,24 @@ export function estrategia(p: Prospecto): Estrategia {
   }
   if (v("meta")) porque.push(`Pensado para su meta: ${v("meta").toLowerCase()}${v("horizonte") ? `, en ${v("horizonte").toLowerCase()}` : ""}.`);
 
-  const pf = v("perfil");
+  const pf = perfilEfectivo(p) ?? v("perfil");
   if (pf === "Conservador" || v("reaccion") === "Retiraría todo")
     complementos.push("Fondos conservadores, para que las subidas y bajadas no le quiten el sueño.");
   else if (pf === "Moderado") complementos.push("Una mezcla de fondos que equilibra crecimiento y estabilidad.");
   else if (pf === "Arriesgado") complementos.push("Fondos de mayor crecimiento, aceptando más variación en el camino.");
-  if (v("depende")) complementos.push(`Beneficiarios definidos y una suma asegurada que respalde a ${v("depende")}.`);
+  if (v("depende"))
+    complementos.push(
+      v("seguroVida") === "No" || v("seguroVida") === "Solo el de su trabajo"
+        ? `La cobertura de vida del plan respalda a ${v("depende")}: hoy no tiene un seguro de vida propio.`
+        : `Beneficiarios definidos y una suma asegurada que respalde a ${v("depende")}.`,
+    );
+  if (metasDe(p).length > 1) porque.push(`Ordena sus ${metasDe(p).length} metas por prioridad: primero la que no puede esperar.`);
   if (edad !== null && edad >= EDAD_MAYOR) complementos.push("A medida que se acerque la meta, mover el dinero a fondos más estables.");
   if (v("emergencia") === "No") complementos.push("Primero, un fondo de emergencia: así no tendrá que retirar antes de tiempo.");
 
   costoBeneficio.push("Un aporte que pueda sostener sin apretar su presupuesto: la constancia vale más que el monto.");
+  const cap = capacidadDe(p);
+  if (cap && cap.sobrante > 0) costoBeneficio.push(`Con lo que le queda al mes (${fmtUSD(cap.sobrante)}), un aporte cómodo sería de hasta ${fmtUSD(cap.comodo)}.`);
   if (aporte) costoBeneficio.push(`Partimos de lo que nos dijo que puede aportar: ${fmtUSD(aporte)} al mes.`);
   costoBeneficio.push(`Le explico todos los costos y la tabla de rescates antes de firmar (${VALIDAR}).`);
   if (esCambio(p)) costoBeneficio.push("Calculamos el costo de salir de su inversión actual antes de mover nada.");
@@ -149,8 +166,13 @@ export function informe(
     const sa = num(p, "saldoActual");
     add("Saldo acumulado", sa ? fmtUSD(sa) : "");
   } else add("Dónde guarda hoy su dinero", v("ahorroHoy"));
-  add("Su meta", v("meta"));
+  const ms = metasDe(p);
+  add("Su meta", ms[0] ? ms[0].meta + (ms[0].monto ? ` · ${fmtUSD(ms[0].monto)}` : "") : "");
   add("Plazo", v("horizonte"));
+  if (ms.length > 1) add("Otras metas", ms.slice(1).map((m) => m.meta).join(" · "));
+  const cap = capacidadDe(p);
+  if (cap) add("Le queda al mes", fmtUSD(cap.sobrante));
+  add("Perfil", perfilEfectivo(p) ?? "");
 
   const dijo: string[] = [];
   if (v("porque")) dijo.push(`Por qué ahora: “${v("porque")}”`);

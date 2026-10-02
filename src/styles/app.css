@@ -921,3 +921,8 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px))}
 .proy-tabla th:first-child { text-align: left; }
 @media (max-width: 420px) { .proy-esc { grid-template-columns: 1fr; } }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Foto financiera en la ficha */
+.grupo-campos { margin: 16px 0 4px; color: var(--violet); }
+.resumen-fin p { margin: 4px 0; }
+.resumen-fin ol { margin: 6px 0 0; padding-left: 20px; }
