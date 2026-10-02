@@ -1,4 +1,4 @@
-import { capacidadDe, metaRetiroDe, metasDe, montoMeta, perfilEfectivo, puntajePerfil } from "./finanzas";
+import { capacidadDe, deudaTarjeta, pesoDeudas, metaRetiroDe, metasDe, montoMeta, perfilEfectivo, puntajePerfil } from "./finanzas";
 import { ficha } from "./test-utils";
 
 describe("capacidad de ahorro", () => {
@@ -8,6 +8,14 @@ describe("capacidad de ahorro", () => {
     expect(capacidadDe(ficha("nuevo", { ingreso: "2000", gastos: "1500", aporte: "300" }))).toMatchObject({ estimado: false, nivel: "exigente" });
     expect(capacidadDe(ficha("nuevo", { ingreso: "1000", gastos: "950", aporte: "100" }))?.nivel).toBe("no_alcanza");
     expect(capacidadDe(ficha("nuevo", { ingreso: "1000" }))).toBeNull();
+  });
+});
+
+describe("deudas (sin preguntar la tasa)", () => {
+  it("peso de las cuotas sobre el ingreso y deudas de tarjeta", () => {
+    expect(pesoDeudas(ficha("nuevo", { ingreso: "1000", deudaCuota: "350" }))).toBe(35);
+    expect(pesoDeudas(ficha("nuevo", { deudaCuota: "350" }))).toBeNull();
+    expect(deudaTarjeta(ficha("nuevo", { deudas: "Tarjeta y préstamo" }))).toBe(true);
   });
 });
 

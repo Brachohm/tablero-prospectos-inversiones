@@ -76,7 +76,7 @@ describe("análisis local", () => {
         ingreso: "1200",
         gastos: "1000",
         deudaCuota: "100",
-        deudaTasa: "Más de 15 % (como una tarjeta)",
+        deudas: "Tarjeta de crédito",
         aporte: "90",
         seguroVida: "No",
         depende: "2 hijos",

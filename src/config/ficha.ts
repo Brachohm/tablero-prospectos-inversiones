@@ -360,15 +360,6 @@ export const MISIONES: readonly Mision[] = [
       { k: "deudaCuota", l: "Cuotas de deudas que paga al mes (USD)", t: "number", xp: 10, min: 0, ph: "0 si no tiene", grupo: "Flujo del mes" },
       { k: "deudas", l: "¿Qué deudas son?", t: "text", xp: 5, ph: "Tarjeta, préstamo de auto, hipoteca…", cuando: { k: "deudaCuota", v: "*" }, grupo: "Flujo del mes" },
       {
-        k: "deudaTasa",
-        l: "Tasa de interés de su deuda más cara",
-        t: "select",
-        o: ["Menos de 10 %", "10 a 15 %", "Más de 15 % (como una tarjeta)", "No sabe"],
-        xp: 5,
-        cuando: { k: "deudaCuota", v: "*" },
-        grupo: "Flujo del mes",
-      },
-      {
         k: "emergencia",
         l: "¿Tiene un fondo de emergencia de 3 a 6 meses de gastos?",
         t: "select",

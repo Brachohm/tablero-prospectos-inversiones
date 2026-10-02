@@ -1,5 +1,5 @@
 /** Resúmenes calculados dentro de la ficha: metas, flujo del mes y perfil de riesgo. */
-import { APORTE_COMODO_PCT, capacidadDe, metaRetiroDe, metasDe, puntajePerfil } from "../domain/finanzas";
+import { APORTE_COMODO_PCT, capacidadDe, DEUDA_ALTA_PCT, metaRetiroDe, metasDe, pesoDeudas, puntajePerfil } from "../domain/finanzas";
 import { usd } from "../domain/fechas";
 import { txt } from "../domain/ficha";
 import type { Prospecto } from "../domain/tipos";
@@ -54,8 +54,8 @@ export function ResumenFlujo({ p }: { p: Prospecto }) {
           {c.pctDelSobrante !== null ? ` = ${c.pctDelSobrante} % de lo que le sobra` : ""}. {NIVEL[c.nivel]}
         </p>
       )}
-      {txt(p, "deudaTasa") === "Más de 15 % (como una tarjeta)" && (
-        <p>💳 Paga una deuda cara: pagarla primero le "rinde" más que cualquier inversión.</p>
+      {(pesoDeudas(p) ?? 0) > DEUDA_ALTA_PCT && (
+        <p>💳 Las cuotas de deudas se llevan el {pesoDeudas(p)} % de su ingreso: conviene ordenarlas antes de un aporte grande.</p>
       )}
     </div>
   );

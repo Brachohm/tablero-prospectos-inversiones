@@ -59,6 +59,22 @@ export function capacidadDe(p: Prospecto): Capacidad | null {
   return { ingreso: ing.v, estimado: ing.estimado, gastos, deudas, sobrante, comodo, aporte, pctDelSobrante: pct, nivel };
 }
 
+/** Cuotas de deuda sobre el ingreso que se consideran altas. */
+export const DEUDA_ALTA_PCT = 30;
+
+/** Qué parte del ingreso se va en cuotas de deudas (%), o null si falta el dato. */
+export function pesoDeudas(p: Prospecto): number | null {
+  const ing = ingresoDe(p);
+  const cuota = num(p, "deudaCuota");
+  if (!ing || cuota === null || ing.v <= 0) return null;
+  return Math.round((cuota / ing.v) * 100);
+}
+
+/** Tiene deudas de tarjeta (según lo que contó). */
+export function deudaTarjeta(p: Prospecto): boolean {
+  return /tarjeta/i.test(txt(p, "deudas"));
+}
+
 export interface MetaRetiro {
   renta: number;
   anios: number;

@@ -87,9 +87,9 @@ e2e/                Flujos completos en el navegador
 
 - **Datos del prospecto:** estado civil, edades de los hijos, cómo genera sus ingresos, si son estables, IESS (y años de aportes) y qué días cobra.
 - **Descubrimiento:** hasta tres metas con prioridad; para el retiro, edad y renta deseada (la meta se calcula sola); qué pasa si la meta llega tarde; de dónde sale el aporte único; quién más decide, qué le daría confianza y si tuvo una mala experiencia.
-- **Flujo y patrimonio** (sección nueva): ingreso por rangos (o exacto), gastos, cuotas y tasa de deudas, fondo de emergencia, ahorros, vivienda y seguro de vida. Calcula lo que le queda al mes y un aporte cómodo (hasta el 30 % de eso).
+- **Flujo y patrimonio** (sección nueva): ingreso por rangos (o exacto), gastos, cuotas de deudas y cuáles son (sin preguntar la tasa), fondo de emergencia, ahorros, vivienda y seguro de vida. Calcula lo que le queda al mes y un aporte cómodo (hasta el 30 % de eso).
 - **Perfil de riesgo** (sección nueva): cuestionario con puntaje que sugiere conservador, moderado o arriesgado. Si lo que dice es más arriesgado que sus respuestas, la estrategia usa el más prudente.
-- El análisis, la estrategia, el informe de la primera reunión y la proyección usan todo esto (aporte exigente, deuda cara, sin seguro de vida, IESS, ingreso variable, meta indispensable, quién decide…).
+- El análisis, la estrategia, el informe de la primera reunión y la proyección usan todo esto (aporte exigente, deudas que pasan del 30 % del ingreso o de tarjeta, sin seguro de vida, IESS, ingreso variable, meta indispensable, quién decide…).
 
 ## Pendiente
 

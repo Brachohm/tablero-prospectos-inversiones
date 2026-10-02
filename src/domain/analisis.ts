@@ -9,7 +9,7 @@ import { VALIDAR } from "../config/saludsa";
 import { CAMPO, campoActivo, esCambio, num, tieneMotivo, tipoDe, txt, vacio } from "./ficha";
 import { diasHasta, fmtFecha, hoyISO, usd } from "./fechas";
 import { contarDatos } from "./datos";
-import { capacidadDe, metasDe, montoMeta, puntajePerfil } from "./finanzas";
+import { capacidadDe, DEUDA_ALTA_PCT, deudaTarjeta, metasDe, montoMeta, pesoDeudas, puntajePerfil } from "./finanzas";
 import type { Causa, NivelVeredicto, Prospecto, TipoCausa, Veredicto } from "./tipos";
 
 export interface Recordatorio {
@@ -206,11 +206,12 @@ export function analisisLocal(p: Prospecto, hoy: string = hoyISO()): AnalisisLoc
       t: cap.nivel === "no_alcanza" ? "El aporte no le alcanza" : "Aporte exigente para su flujo",
       d: `Le quedan ${usd(cap.sobrante)} al mes y el aporte es de ${usd(cap.aporte!)}. Un aporte cómodo sería de hasta ${usd(cap.comodo)}: mejor poco y constante que mucho y cancelado.`,
     });
-  if (txt(p, "deudaTasa") === "Más de 15 % (como una tarjeta)")
+  const pd = pesoDeudas(p);
+  if ((pd !== null && pd > DEUDA_ALTA_PCT) || deudaTarjeta(p))
     recs.push({
       id: "dcar",
-      t: "Deuda cara primero",
-      d: "Paga más del 15 % en una deuda: pagarla primero le rinde más que cualquier fondo. Proponle un plan para salir de ella y un aporte menor mientras tanto.",
+      t: pd !== null && pd > DEUDA_ALTA_PCT ? `Las deudas se llevan el ${pd} % de su ingreso` : "Tiene deudas de tarjeta",
+      d: "Ordenar esas deudas primero suele rendirle más que cualquier fondo. Proponle un plan para bajarlas y un aporte menor mientras tanto.",
     });
   if (txt(p, "seguroVida") === "No" && !vacio(p, "depende"))
     recs.push({

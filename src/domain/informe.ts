@@ -16,7 +16,7 @@ import { firma } from "./herramientas";
 import { fmtFecha, hoyISO } from "./fechas";
 import { esCambio, motivosDe, num, tipoDe, txt } from "./ficha";
 import { aniosHorizonte, perfilIncoherente } from "./analisis";
-import { capacidadDe, metasDe, montoMeta, perfilEfectivo } from "./finanzas";
+import { capacidadDe, DEUDA_ALTA_PCT, deudaTarjeta, metasDe, montoMeta, pesoDeudas, perfilEfectivo } from "./finanzas";
 import { reunionDe } from "./mensajes";
 import { fmtUSD, ofertaInforme, planDeOferta, type OfertaInforme } from "./oferta";
 import type { Argumento, Plan } from "./biblioteca";
@@ -75,10 +75,16 @@ export function proteccionHoy(p: Prospecto): { l: string; estado: EstadoCobertur
     { l: "Meta definida", estado: v("meta") ? (montoMeta(p) ? "si" : "parcial") : "?" },
     { l: "Plazo claro", estado: v("horizonte") ? "si" : "?" },
     { l: "Aporte que puede sostener", estado: aporteSostenible(p) },
-    { l: "Deudas bajo control", estado: !v("deudaCuota") ? "?" : v("deudaTasa") === "Más de 15 % (como una tarjeta)" ? "no" : "si" },
+    { l: "Deudas bajo control", estado: deudasBajoControl(p) },
     { l: "Protección para su familia", estado: sn(v("seguroVida"), ["Sí, propio"], ["Solo el de su trabajo"]) },
     { l: "Perfil de riesgo", estado: perfilEfectivo(p) ? "si" : v("perfil") === "No sabe" ? "parcial" : "?" },
   ];
+}
+
+function deudasBajoControl(p: Prospecto): EstadoCobertura {
+  const pd = pesoDeudas(p);
+  if (pd === null) return "?";
+  return pd > DEUDA_ALTA_PCT ? "no" : pd > DEUDA_ALTA_PCT / 2 || deudaTarjeta(p) ? "parcial" : "si";
 }
 
 function aporteSostenible(p: Prospecto): EstadoCobertura {

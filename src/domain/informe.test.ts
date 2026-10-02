@@ -70,7 +70,6 @@ describe("informe 1: situación financiera hoy", () => {
         ingreso: "2500",
         gastos: "1200",
         deudaCuota: "100",
-        deudaTasa: "Menos de 10 %",
         seguroVida: "Sí, propio",
       }),
       perfil,
