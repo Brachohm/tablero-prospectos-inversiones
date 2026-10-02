@@ -1,0 +1,63 @@
+/* Tokens de diseño (paleta del prototipo). Modo claro y oscuro automático,
+   con `data-theme="light" | "dark"` en <html> para forzarlo. */
+:root {
+  --bg: #F1F3FB;
+  --card: #FFFFFF;
+  --ink: #1B1F45;
+  --muted: #69709A;
+  --line: #E0E4F3;
+  --violet: #5B3DF5;
+  --violet-soft: #ECE8FF;
+  --coral: #FF6B57;
+  --coral-soft: #FFE9E5;
+  --mint: #12B886;
+  --mint-soft: #DDF6EC;
+  --sun: #FFB020;
+  --sun-soft: #FFF1D4;
+  --shadow: 0 1px 0 rgba(27, 31, 69, .04), 0 8px 24px -12px rgba(27, 31, 69, .25);
+
+  --display: 'Sora', system-ui, sans-serif;
+  --body: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  --tap: 44px;        /* área táctil mínima */
+  --max: 720px;       /* ancho máximo en escritorio */
+  --gutter: 16px;
+  --radius: 18px;
+  --radius-sm: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12142B;
+    --card: #1C2042;
+    --ink: #EEF0FF;
+    --muted: #9BA2CE;
+    --line: #2C3160;
+    --violet: #8B74FF;
+    --violet-soft: #2A2760;
+    --coral: #FF8272;
+    --coral-soft: #4A2A34;
+    --mint: #3DDBA9;
+    --mint-soft: #163F3B;
+    --sun: #FFC44D;
+    --sun-soft: #4A3A1B;
+    --shadow: 0 8px 24px -12px rgba(0, 0, 0, .6);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #12142B;
+  --card: #1C2042;
+  --ink: #EEF0FF;
+  --muted: #9BA2CE;
+  --line: #2C3160;
+  --violet: #8B74FF;
+  --violet-soft: #2A2760;
+  --coral: #FF8272;
+  --coral-soft: #4A2A34;
+  --mint: #3DDBA9;
+  --mint-soft: #163F3B;
+  --sun: #FFC44D;
+  --sun-soft: #4A3A1B;
+  --shadow: 0 8px 24px -12px rgba(0, 0, 0, .6);
+}

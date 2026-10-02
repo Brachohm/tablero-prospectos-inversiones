@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ficha de prospectos SaludSA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#F1F3FB; --card:#FFFFFF; --ink:#1B1F45; --muted:#69709A; --line:#E0E4F3;
+  --violet:#5B3DF5; --violet-soft:#ECE8FF; --coral:#FF6B57; --coral-soft:#FFE9E5;
+  --mint:#12B886; --mint-soft:#DDF6EC; --sun:#FFB020; --sun-soft:#FFF1D4;
+  --shadow:0 1px 0 rgba(27,31,69,.04),0 8px 24px -12px rgba(27,31,69,.25);
+  --display:'Sora',system-ui,sans-serif; --body:'Plus Jakarta Sans',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#12142B; --card:#1C2042; --ink:#EEF0FF; --muted:#9BA2CE; --line:#2C3160;
+    --violet:#8B74FF; --violet-soft:#2A2760; --coral:#FF8272; --coral-soft:#4A2A34;
+    --mint:#3DDBA9; --mint-soft:#163F3B; --sun:#FFC44D; --sun-soft:#4A3A1B;
+    --shadow:0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12142B; --card:#1C2042; --ink:#EEF0FF; --muted:#9BA2CE; --line:#2C3160;
+  --violet:#8B74FF; --violet-soft:#2A2760; --coral:#FF8272; --coral-soft:#4A2A34;
+  --mint:#3DDBA9; --mint-soft:#163F3B; --sun:#FFC44D; --sun-soft:#4A3A1B;
+  --shadow:0 8px 24px -12px rgba(0,0,0,.6);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--violet);outline-offset:2px}
+.wrap{max-width:720px;margin:0 auto;padding:18px 16px 96px}
+
+/* Jugador */
+.hero{background:var(--violet);color:#fff;border-radius:28px;padding:20px 20px 18px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.12)}
+.hero h1{font-family:var(--display);font-weight:800;font-size:26px;line-height:1.15;margin:0 0 2px;letter-spacing:-.02em}
+.hero .sub{margin:0;opacity:.85;font-size:14px}
+.lvl{display:flex;align-items:center;gap:12px;margin:16px 0 8px}
+.lvl-badge{font-family:var(--display);font-weight:800;background:var(--sun);color:#3B2A00;border-radius:14px;padding:6px 12px;font-size:14px;white-space:nowrap}
+.xpbar{flex:1;height:14px;background:rgba(255,255,255,.25);border-radius:99px;overflow:hidden}
+.xpbar i{display:block;height:100%;background:var(--sun);border-radius:99px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.xpnote{font-size:13px;opacity:.9;margin:0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.stat{background:rgba(255,255,255,.14);border-radius:16px;padding:10px 12px}
+.stat b{display:block;font-family:var(--display);font-size:22px;font-weight:800;line-height:1.1}
+.stat span{font-size:12px;opacity:.85}
+
+/* Menú de misión */
+.sec{font-family:var(--display);font-size:17px;font-weight:800;margin:22px 0 10px;letter-spacing:-.01em}
+.menu{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.menu{grid-template-columns:1fr}}
+.mode{border:0;text-align:left;border-radius:26px;padding:18px 18px 16px;display:flex;flex-direction:column;gap:6px;box-shadow:0 8px 0 -3px rgba(0,0,0,.18);transition:transform .08s,box-shadow .08s;min-height:168px;position:relative;overflow:hidden;width:100%}
+.mode:active{transform:translateY(4px);box-shadow:none}
+.mode.n{background:var(--coral);color:#fff}
+.mode.c{background:var(--ink);color:var(--bg)}
+.mode .ico{font-size:30px;line-height:1}
+.mode h2{margin:4px 0 0;font-family:var(--display);font-size:20px;font-weight:800;letter-spacing:-.01em;line-height:1.2}
+.mode p{margin:0;font-size:13px;opacity:.9}
+.mode .go{margin-top:auto;padding-top:10px;display:flex;justify-content:space-between;align-items:center;font-family:var(--display);font-weight:700;font-size:13px}
+.mode .cnt{background:rgba(255,255,255,.22);border-radius:99px;padding:3px 10px}
+.mode.c .cnt{background:rgba(128,128,160,.28)}
+.full{grid-column:1/-1}
+.tag.t-nuevo{background:var(--coral-soft);color:var(--coral)}
+.tag.t-cambio{background:var(--violet-soft);color:var(--violet)}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px}
+
+.pre-q{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg);border-radius:16px;padding:10px 14px;margin-bottom:10px}
+.pre-q b{font-family:var(--display);font-size:14px}
+.stepper{display:inline-flex;align-items:center;gap:12px}
+.stepper button{width:44px;height:44px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-family:var(--display);font-weight:800;font-size:20px;line-height:1}
+.stepper span{font-family:var(--display);font-weight:800;font-size:22px;min-width:26px;text-align:center}
+.pst{font-style:normal;font-size:12px;margin-left:8px;opacity:.85}
+.gate{background:var(--violet-soft);border-radius:18px;padding:14px;margin-top:12px}
+.gate h3{margin:0 0 4px;font-family:var(--display);font-size:16px}
+.gate-b{display:flex;gap:8px;margin-top:10px}
+.gate-b .btn{flex:1}
+.gate.ok{background:var(--mint-soft);display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:600}
+.gate.si{background:transparent;padding:6px 2px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted)}
+.zp-rest{margin-top:10px}
+.zp-rest .btn{width:100%}
+/* Escáner de preexistencias */
+.pchips{display:flex;flex-wrap:wrap;gap:8px}
+.pchip{border:2px solid var(--line);background:var(--bg);border-radius:99px;padding:8px 14px;font-weight:700;font-size:14px;min-height:40px}
+.pchip.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.pchip.add{border-style:dashed;color:var(--muted)}
+.pedit{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:10px;align-items:end}
+.pedit .f{margin:0}
+.pre-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}
+@media (min-width:640px){.pre-grid{grid-template-columns:240px 1fr}.pre-map{position:sticky;top:76px;align-self:start}}
+.scan{background:#0D1130;border:1px solid #2A3488;border-radius:24px;padding:10px 8px 12px;position:relative;overflow:hidden}
+.scan::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(126,224,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(126,224,255,.07) 1px,transparent 1px);background-size:22px 22px}
+.scan-top{display:flex;justify-content:space-between;align-items:baseline;color:#CFE3FF;font-family:var(--display);font-weight:700;font-size:13px;padding:2px 8px 6px;position:relative}
+.scan-top b{color:#7EE0FF;font-size:13px}
+.scan svg{display:block;margin:0 auto;height:min(56vh,520px);width:auto;max-width:100%;position:relative}
+.sil .b{fill:#121845;stroke:#5AD1FF;stroke-opacity:.55;stroke-width:1.3}
+.sil .o{fill:none;stroke:#5AD1FF;stroke-opacity:.55;stroke-linecap:round}
+.sil .f{fill:none;stroke:#121845;stroke-linecap:round}
+.tl{font-family:var(--body);font-size:9.5px;fill:#7EE0FF;fill-opacity:.75;pointer-events:none}
+.zone{cursor:pointer;outline:none;--zc:#7EE0FF}
+.zone.st-clear{--zc:#34E0A1}
+.zone.st-hit{--zc:#FF7A66}
+.zone .zs{fill:var(--zc);fill-opacity:.1;stroke:var(--zc);stroke-width:1.4;stroke-dasharray:3 3;stroke-opacity:.9;transition:fill-opacity .2s}
+.zone.ln .zs{fill:none;stroke-width:14;stroke-opacity:.22;stroke-dasharray:none;stroke-linecap:round;stroke-linejoin:round}
+.zone.sp .zs{stroke-dasharray:7 3;stroke-width:12}
+.zone.frame .zs{fill:none;stroke-width:10;stroke-opacity:.16;stroke-dasharray:none;pointer-events:stroke}
+.zone.st-clear .zs{fill-opacity:.28}
+.zone.st-hit .zs{fill-opacity:.42}
+.zone.ln.st-clear .zs,.zone.ln.st-hit .zs{stroke-opacity:.5}
+.zone.frame.st-clear .zs,.zone.frame.st-hit .zs{stroke-opacity:.5}
+.zone:hover .zs,.zone:focus-visible .zs{fill-opacity:.38}
+.zone.on .zs{stroke-width:2.6;stroke-dasharray:none;fill-opacity:.5;filter:drop-shadow(0 0 4px var(--zc))}
+.zone.ln.on .zs{stroke-width:16;stroke-opacity:.75}
+.zone.frame.on .zs{stroke-width:10;stroke-opacity:.7;fill-opacity:0}
+.zone:focus-visible .zs{stroke:#fff}
+.scanline{animation:sweep 2.4s ease-in-out 1 both}
+@keyframes sweep{from{transform:translateY(-40px);opacity:1}to{transform:translateY(610px);opacity:0}}
+.scan-leg{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;font-size:11.5px;color:#9FB2FF;position:relative;margin-top:8px}
+.scan-leg span{display:inline-flex;align-items:center;gap:5px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;background:var(--line);flex:0 0 auto}
+.zc.st-clear .dot{background:var(--mint)}
+.zc.st-hit .dot{background:var(--coral)}
+.scan .dot{background:#7EE0FF;opacity:.6}
+.scan .dot.st-clear{background:#34E0A1;opacity:1}
+.scan .dot.st-hit{background:#FF7A66;opacity:1}
+.zchips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.zc{border:1.5px solid var(--line);background:var(--bg);border-radius:99px;padding:6px 11px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;min-height:38px}
+.zc.on{border-color:var(--violet);background:var(--violet-soft);color:var(--violet)}
+.zc b{background:var(--coral);color:#fff;border-radius:99px;padding:0 7px;font-size:12px}
+.zp{background:var(--bg);border-radius:18px;padding:14px}
+.zp-head{display:flex;gap:12px;align-items:center;margin-bottom:6px}
+.zp-ic{font-size:28px}
+.zp-head h3{margin:0;font-family:var(--display);font-size:16px}
+.zp-head p{margin:0;font-size:13px;color:var(--muted)}
+.gt{font-family:var(--display);font-size:13px;margin:14px 0 6px}
+.zp .ck{background:var(--card)}
+.cond-d{display:grid;grid-template-columns:96px 1fr;gap:8px;margin:6px 0 4px 10px;padding-left:12px;border-left:3px solid var(--violet)}
+.cond-d .w{grid-column:1/-1}
+.cond-d small{display:block;font-size:12px;color:var(--muted);font-weight:600;margin-bottom:2px}
+.cond-d input,.cond-d select{width:100%;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:9px 10px;min-height:42px}
+.zp-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.zp-actions .btn{flex:1;min-width:110px}
+.psum{margin-top:16px}
+.psum h3{font-family:var(--display);font-size:15px;margin:0 0 8px}
+.psum-p{background:var(--bg);border-radius:16px;padding:12px;margin-bottom:8px}
+.psum-p small{display:block;color:var(--muted);margin:2px 0 8px}
+.pz{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:5px 11px;font-size:12px;font-weight:600;margin:2px}
+
+/* Motivos */
+.mchips{display:flex;flex-wrap:wrap;gap:8px}
+.mc{border:2px solid var(--line);background:var(--bg);border-radius:14px;padding:10px 12px;font-weight:600;font-size:14px;min-height:44px}
+.mc[aria-pressed="true"]{background:var(--violet-soft);border-color:var(--violet);color:var(--violet)}
+.mblock{border-left:4px solid var(--violet);background:var(--bg);border-radius:0 16px 16px 0;padding:12px 12px 2px 14px;margin:2px 0 14px}
+.mblock h4{margin:0 0 10px;font-family:var(--display);font-size:14px}
+.mblock .f input:not([type=checkbox]),.mblock .f select,.mblock .f textarea{background:var(--card)}
+
+/* Análisis */
+.btn.an{background:var(--violet);flex:1;padding:16px 18px;font-size:15px}
+.an-card{background:var(--card);border-radius:24px;padding:18px;margin-top:14px;box-shadow:var(--shadow);border:2px solid var(--violet)}
+.an-card .mnum{background:var(--violet)}
+.an-sec{margin-top:18px}
+.an-sec h3{font-family:var(--display);font-size:15px;font-weight:700;margin:0 0 8px;display:flex;align-items:center;gap:8px}
+.an-sec h3 i{width:12px;height:12px;border-radius:50%;display:inline-block;flex:0 0 auto}
+.an-sec h3 small{margin-left:auto;font-family:var(--body);font-weight:600;font-size:12px;color:var(--muted)}
+.an-sec.busca h3 i{background:var(--mint)}
+.an-sec.evita h3 i{background:var(--coral)}
+.an-sec.puntos h3 i{background:var(--violet)}
+.an-sec.rec h3 i{background:var(--sun)}
+.an-sec.falta h3 i,.an-sec.preg h3 i{background:var(--muted)}
+.an-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.an-list li{background:var(--bg);border-radius:12px;padding:9px 12px;font-size:14px}
+.an-list li.none{background:transparent;color:var(--muted);padding:2px 0;font-size:13px}
+.an-note{font-size:12px;color:var(--muted);margin:2px 0 0}
+.an-status{margin:0 0 4px;font-size:13px;font-weight:600;color:var(--violet);background:var(--violet-soft);border-radius:12px;padding:8px 12px}
+.an-status.warn{color:#8A5A00;background:var(--sun-soft)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .an-status.warn{color:var(--sun)}}
+:root[data-theme="dark"] .an-status.warn{color:var(--sun)}
+.ck small{display:block;color:var(--muted);font-size:12.5px;line-height:1.4;margin-top:2px}
+.an-actions{display:flex;gap:8px;margin-top:18px}
+.an-actions .btn{flex:1}
+
+.an-verdict{border-radius:18px;padding:14px 16px;border:2px solid var(--line);background:var(--bg)}
+.an-verdict .vl{display:inline-block;font-family:var(--display);font-weight:800;font-size:12px;border-radius:99px;padding:3px 10px;margin-bottom:6px;background:var(--line)}
+.an-verdict b{display:block;font-family:var(--display);font-size:16px;line-height:1.3;margin-bottom:4px}
+.an-verdict p{margin:0;font-size:14px}
+.an-verdict.v-viable{background:var(--mint-soft);border-color:var(--mint)}
+.an-verdict.v-viable .vl{background:var(--mint);color:#fff}
+.an-verdict.v-condiciones{background:var(--sun-soft);border-color:var(--sun)}
+.an-verdict.v-condiciones .vl{background:var(--sun);color:#3B2A00}
+.an-verdict.v-no_recomendable{background:var(--coral-soft);border-color:var(--coral)}
+.an-verdict.v-no_recomendable .vl{background:var(--coral);color:#fff}
+.pill-causa{display:inline-block;background:var(--violet);color:#fff;font-family:var(--display);font-weight:800;border-radius:99px;padding:6px 16px;font-size:14px;margin-bottom:6px}
+.an-p{margin:4px 0 0;font-size:14px}
+.an-sec.sinc h3 i{background:var(--violet)}
+.an-sec.causa h3 i{background:var(--violet)}
+.an-sec.costo h3 i{background:var(--coral)}
+.an-sec.noc h3 i{background:var(--sun)}
+.an-sec.cmp h3 i{background:var(--violet)}
+.cmp-row{background:var(--bg);border-radius:12px;padding:10px 12px;display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:14px;margin-bottom:6px}
+.cmp-row b{grid-column:1/-1;font-family:var(--display);font-size:13px}
+.cmp-row small{display:block;color:var(--muted);font-size:11.5px;font-weight:600}
+@media (max-width:380px){.cmp-row{grid-template-columns:1fr}}
+
+/* Insignias */
+.badges{display:flex;gap:8px;overflow-x:auto;padding:14px 2px 4px;margin:0 -2px;scrollbar-width:none}
+.badges::-webkit-scrollbar{display:none}
+.badge{flex:0 0 auto;display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:8px 12px 8px 8px;font-size:13px;font-weight:600;color:var(--muted)}
+.badge .ic{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:var(--line);font-size:15px;filter:grayscale(1);opacity:.7}
+.badge.on{color:var(--ink);border-color:var(--sun)}
+.badge.on .ic{background:var(--sun-soft);filter:none;opacity:1}
+
+/* Barra de acciones */
+.bar{display:flex;gap:8px;align-items:center;margin:16px 0 10px}
+.chips{display:flex;gap:6px;overflow-x:auto;flex:1;scrollbar-width:none;padding:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.btn{border:0;border-radius:16px;padding:12px 18px;font-weight:700;font-family:var(--display);font-size:14px;background:var(--coral);color:#fff;box-shadow:0 6px 0 -2px rgba(0,0,0,.18);transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:none}
+.btn.ghost{background:var(--card);color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
+.btn.small{padding:8px 12px;font-size:13px;border-radius:12px}
+
+/* Lista */
+.list{display:grid;gap:10px}
+.pcard{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:var(--card);border-radius:22px;padding:14px 16px;box-shadow:var(--shadow);text-align:left;border:0;width:100%}
+.ring{--p:0;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--violet) calc(var(--p)*1%),var(--line) 0);position:relative}
+.ring::before{content:"";position:absolute;inset:6px;background:var(--card);border-radius:50%}
+.ring b{position:relative;font-family:var(--display);font-size:13px;font-weight:800}
+.pcard h3{margin:0;font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:-.01em}
+.pcard p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.tag{display:inline-block;border-radius:99px;padding:3px 10px;font-size:12px;font-weight:700;background:var(--violet-soft);color:var(--violet)}
+.tag.Cerrado{background:var(--mint-soft);color:var(--mint)}
+.tag.Perdido{background:var(--line);color:var(--muted)}
+.tag.Objeción{background:var(--coral-soft);color:var(--coral)}
+.tag.Seguimiento{background:var(--sun-soft);color:#9A6300}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tag.Seguimiento{color:var(--sun)}}
+:root[data-theme="dark"] .tag.Seguimiento{color:var(--sun)}
+.xp{font-family:var(--display);font-weight:800;font-size:13px;color:var(--violet);white-space:nowrap}
+.due{color:var(--coral);font-weight:700}
+.empty{background:var(--card);border:2px dashed var(--line);border-radius:22px;padding:28px 20px;text-align:center;color:var(--muted)}
+.empty b{display:block;font-family:var(--display);color:var(--ink);font-size:17px;margin-bottom:4px}
+
+/* Panel de detalle */
+.sheet{position:fixed;inset:0;background:var(--bg);z-index:20;overflow-y:auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.sheet[hidden]{display:none}
+.sheet .wrap{padding-top:10px}
+.top{position:sticky;top:0;z-index:2;background:var(--bg);display:flex;align-items:center;gap:10px;padding:10px 0}
+.top .back{border:0;background:var(--card);width:44px;height:44px;border-radius:14px;font-size:18px;box-shadow:var(--shadow)}
+.top .who{flex:1;min-width:0}
+.top .who b{display:block;font-family:var(--display);font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .who small{color:var(--muted)}
+.miss{background:var(--card);border-radius:24px;padding:18px 18px 16px;margin-top:14px;box-shadow:var(--shadow)}
+.mh{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.mnum{width:34px;height:34px;border-radius:12px;background:var(--violet);color:#fff;font-family:var(--display);font-weight:800;display:grid;place-items:center;flex:0 0 auto}
+.miss.done .mnum{background:var(--mint)}
+.mh h2{margin:0;font-family:var(--display);font-size:17px;font-weight:700;flex:1}
+.mh .mp{font-size:12px;font-weight:700;color:var(--muted)}
+.mbar{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin:-4px 0 14px}
+.mbar i{display:block;height:100%;background:var(--violet);border-radius:99px;transition:width .4s}
+.miss.done .mbar i{background:var(--mint)}
+.f{display:block;margin-bottom:12px}
+.f>span{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:4px}
+.f input:not([type=checkbox]),.f select,.f textarea{width:100%;border:1.5px solid var(--line);background:var(--bg);border-radius:14px;padding:11px 12px;min-height:44px}
+.f textarea{min-height:90px;resize:vertical}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--violet);outline:none;box-shadow:0 0 0 3px var(--violet-soft)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:420px){.two{grid-template-columns:1fr}}
+.checks{display:grid;gap:8px}
+.ck{display:flex;gap:12px;align-items:center;border:1.5px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--bg);cursor:pointer;min-height:48px}
+.ck input{appearance:none;-webkit-appearance:none;width:26px;height:26px;border-radius:9px;border:2px solid var(--line);background:var(--card);display:grid;place-items:center;flex:0 0 auto;margin:0}
+.ck input:checked{background:var(--mint);border-color:var(--mint)}
+.ck input:checked::after{content:"✓";color:#fff;font-weight:800;font-size:15px}
+.ck.on{border-color:var(--mint);background:var(--mint-soft)}
+.ck span{flex:1;font-size:14px}
+.ck em{font-style:normal;font-size:12px;font-weight:800;color:var(--violet);font-family:var(--display)}
+.sub2{font-family:var(--display);font-size:13px;font-weight:700;margin:14px 0 8px;color:var(--ink)}
+.contacts{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
+.ct{border:2px solid var(--line);background:var(--bg);border-radius:14px;height:52px;font-family:var(--display);font-weight:800;font-size:16px;color:var(--muted)}
+.ct[aria-pressed="true"]{background:var(--sun);border-color:var(--sun);color:#3B2A00}
+.actions{display:flex;gap:10px;margin-top:18px}
+.actions .btn{flex:1}
+.btn.del{background:transparent;color:var(--coral);border:1.5px solid var(--coral);box-shadow:none;flex:0 0 auto}
+
+/* Aviso */
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:16px;font-family:var(--display);font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.3s;z-index:40;white-space:nowrap}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.foot{text-align:center;color:var(--muted);font-size:12px;margin-top:22px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<main class="wrap" id="home">
+  <section class="hero" aria-label="Tu progreso">
+    <h1>Tablero de prospectos</h1>
+    <p class="sub">Elige una misión, completa la ficha y suma XP. Cada cierre suma más.</p>
+    <div class="lvl">
+      <span class="lvl-badge" id="lvlName">Aprendiz</span>
+      <div class="xpbar" role="progressbar" aria-label="Experiencia" aria-valuemin="0" aria-valuemax="100" id="xpbar"><i id="xpfill" style="width:0%"></i></div>
+    </div>
+    <p class="xpnote" id="xpnote">0 XP</p>
+    <div class="stats">
+      <div class="stat"><b id="sPros">0</b><span>Prospectos</span></div>
+      <div class="stat"><b id="sCierres">0</b><span>Cierres</span></div>
+      <div class="stat"><b id="sTasa">0%</b><span>Tasa de cierre</span></div>
+    </div>
+  </section>
+
+  <h2 class="sec">Elige tu misión</h2>
+  <div class="menu">
+    <button class="mode n" id="mNuevo">
+      <span class="ico" aria-hidden="true">🚀</span>
+      <h2>Nuevo prospecto</h2>
+      <p>Quiere contratar su seguro de salud.</p>
+      <span class="go"><span>Abrir ficha</span><span class="cnt" id="cNuevo">0 fichas</span></span>
+    </button>
+    <button class="mode c" id="mCambio">
+      <span class="ico" aria-hidden="true">🔄</span>
+      <h2>Persona asegurada</h2>
+      <p>Está inconforme con su seguro actual y quiere cambiarse.</p>
+      <span class="go"><span>Abrir ficha</span><span class="cnt" id="cCambio">0 fichas</span></span>
+    </button>
+  </div>
+
+  <div class="badges" id="badges" aria-label="Insignias"></div>
+
+  <h2 class="sec">Mis prospectos</h2>
+  <div class="bar"><div class="chips" id="tchips" role="group" aria-label="Filtrar por tipo"></div></div>
+  <div class="bar" style="margin-top:0"><div class="chips" id="chips" role="group" aria-label="Filtrar por etapa"></div></div>
+  <div class="bar" style="margin-top:0"><button class="btn ghost small" id="exportar">Exportar CSV</button></div>
+
+  <div class="list" id="list"></div>
+  <p class="foot" id="foot">Tus datos se guardan solo para ti.</p>
+</main>
+
+<section class="sheet" id="sheet" hidden aria-label="Ficha de prospecto">
+  <div class="wrap">
+    <div class="top">
+      <button class="back" id="volver" aria-label="Volver al tablero">←</button>
+      <div class="who"><b id="dNombre">Nuevo prospecto</b><small id="dXp">0 XP</small></div>
+      <div class="ring" id="dRing"><b id="dPct">0%</b></div>
+    </div>
+    <div id="form"></div>
+  </div>
+</section>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Definición de la ficha ---------- */
+var ETAPAS=["Nuevo","Descubrimiento","Presentado","Objeción","Seguimiento","Cerrado","Perdido"];
+var NIVELES=[
+  {n:"Aprendiz",xp:0},{n:"Explorador",xp:150},{n:"Cazador",xp:500},
+  {n:"Estratega",xp:1200},{n:"Leyenda",xp:2500}
+];
+var SITUACION_CAMBIO="Tiene seguro y quiere cambiarse"; // solo para fichas antiguas
+var TIPOS={nuevo:{n:"Nuevo prospecto",ic:"🚀"},cambio:{n:"Persona asegurada",ic:"🔄"}};
+
+var MOTIVOS=[
+ {id:"cobertura",ic:"🛡️",l:"Cobertura"},
+ {id:"reembolsos",ic:"🧾",l:"Reembolsos"},
+ {id:"precio",ic:"💲",l:"Precio o alzas"},
+ {id:"deducibles",ic:"📉",l:"Deducibles y copagos"},
+ {id:"red",ic:"🏥",l:"Red de médicos y clínicas"},
+ {id:"atencion",ic:"📞",l:"Atención y servicio"},
+ {id:"otro",ic:"💬",l:"Otro"}
+];
+var MOTIVO_BY={};MOTIVOS.forEach(function(m){MOTIVO_BY[m.id]=m});
+var MOTIVO_OLD={"Alza de tarifa":"precio","Reembolsos lentos":"reembolsos","Red limitada":"red","Mala atención":"atencion","Otro":"otro"};
+
+var MISIONES=[
+ {id:"datos",titulo:"Datos del prospecto",campos:[
+   {k:"nombre",l:"Nombre",t:"text",xp:10},
+   {k:"whatsapp",l:"WhatsApp",t:"tel",xp:10},
+   {k:"edad",l:"Rango de edad",t:"select",o:["18-35","36-55","56+"],xp:5},
+   {k:"origen",l:"¿De dónde llegó?",t:"select",o:["Referido","Redes sociales","Contacto en frío","Evento","Otro"],xp:5},
+   {k:"depende",l:"¿Quién depende de esta persona?",t:"text",xp:10,ph:"Hijos, pareja, padres…"}
+ ]},
+ {id:"desc",titulo:"Descubrimiento",campos:[
+   {k:"cobertura",l:"¿Qué cobertura tiene hoy, si alguna?",t:"text",xp:10,solo:"nuevo",ph:"IESS, ninguna…"},
+   {k:"porque",l:"¿Qué lo hizo pensar en contratar ahora?",t:"text",xp:15,solo:"nuevo",ph:"Con sus palabras"},
+   {k:"aseguradora",l:"Aseguradora actual",t:"text",xp:10,solo:"cambio"},
+   {k:"tiempoCon",l:"¿Cuánto tiempo lleva con ella?",t:"text",xp:5,solo:"cambio"},
+   {k:"primaActual",l:"Lo que paga hoy (USD al mes)",t:"number",xp:10,solo:"cambio"},
+   {k:"motivos",l:"Motivos de inconformidad",t:"motivos",xp:10,solo:"cambio"},
+   {k:"cob_que",l:"¿Qué le faltó o no le cubrieron?",t:"select",o:["Una cirugía o procedimiento","Medicamentos","Maternidad o pediatría","Exámenes y diagnóstico por imagen","Tratamiento crónico","Otro"],xp:5,solo:"cambio",motivo:"cobertura"},
+   {k:"cob_porque",l:"¿Por qué no se lo cubrieron?",t:"select",o:["Exclusión de la póliza","Preexistencia","Período de carencia","Tope o límite agotado","Nunca supo si estaba cubierto","Otro"],xp:10,solo:"cambio",motivo:"cobertura"},
+   {k:"cob_monto",l:"¿Cuánto pagó de su bolsillo? (USD)",t:"number",xp:5,solo:"cambio",motivo:"cobertura"},
+   {k:"cob_pendiente",l:"¿Tiene un procedimiento o tratamiento pendiente?",t:"select",o:["No","Sí"],xp:10,solo:"cambio",motivo:"cobertura"},
+   {k:"reem_dias",l:"¿Cuánto tarda en recibir un reembolso?",t:"select",o:["Menos de 15 días","15 a 30 días","30 a 60 días","Más de 60 días"],xp:5,solo:"cambio",motivo:"reembolsos"},
+   {k:"reem_rech",l:"¿Le han rechazado reembolsos?",t:"select",o:["Nunca","A veces","Seguido"],xp:5,solo:"cambio",motivo:"reembolsos"},
+   {k:"reem_porque",l:"¿Por qué suelen rechazarlos o demorarlos?",t:"select",o:["Falta de documentos","Exclusión o no cobertura","Monto menor al esperado","Sin explicación clara","No sabe"],xp:10,solo:"cambio",motivo:"reembolsos"},
+   {k:"reem_proceso",l:"¿Conoce el proceso y qué documentos pedir?",t:"select",o:["Sí","Más o menos","No"],xp:5,solo:"cambio",motivo:"reembolsos"},
+   {k:"pre_alza",l:"Alza en su última renovación (%)",t:"number",xp:5,solo:"cambio",motivo:"precio"},
+   {k:"pre_freq",l:"¿Con qué frecuencia sube?",t:"select",o:["Cada año","Solo al cambiar de rango de edad","De forma imprevista","No sabe"],xp:5,solo:"cambio",motivo:"precio"},
+   {k:"pre_expl",l:"¿Le explicaron por qué sube?",t:"select",o:["Sí","Parcialmente","No"],xp:10,solo:"cambio",motivo:"precio"},
+   {k:"pre_limite",l:"Máximo que podría pagar al mes (USD)",t:"number",xp:10,solo:"cambio",motivo:"precio"},
+   {k:"ded_monto",l:"Deducible que paga por evento (USD)",t:"number",xp:5,solo:"cambio",motivo:"deducibles"},
+   {k:"ded_copago",l:"Copago (porcentaje o monto)",t:"text",xp:5,solo:"cambio",motivo:"deducibles"},
+   {k:"ded_sorpresa",l:"¿Sabía de deducibles y copagos al contratar?",t:"select",o:["Sí","No","No recuerda"],xp:10,solo:"cambio",motivo:"deducibles"},
+   {k:"ded_tope",l:"¿Se le han agotado topes anuales o por evento?",t:"select",o:["Nunca","Una vez","Varias veces"],xp:5,solo:"cambio",motivo:"deducibles"},
+   {k:"ded_anual",l:"Pagado en deducibles y copagos el último año (USD)",t:"number",xp:10,solo:"cambio",motivo:"deducibles"},
+   {k:"red_falta",l:"Médicos, clínicas o especialidades que no encuentra",t:"text",xp:10,solo:"cambio",motivo:"red"},
+   {k:"red_medico",l:"¿Tiene un médico o clínica de confianza que no quiere dejar?",t:"select",o:["Sí","No"],xp:10,solo:"cambio",motivo:"red"},
+   {k:"red_fuera",l:"¿Ha tenido que pagar fuera de la red?",t:"select",o:["Nunca","A veces","Seguido"],xp:5,solo:"cambio",motivo:"red"},
+   {k:"ate_canal",l:"¿Dónde falla la atención?",t:"select",o:["Autorizaciones","Línea de atención","Emergencias","Su asesor","Trámites administrativos","Otro"],xp:10,solo:"cambio",motivo:"atencion"},
+   {k:"ate_frec",l:"¿Con qué frecuencia?",t:"select",o:["Una vez","A veces","Siempre"],xp:5,solo:"cambio",motivo:"atencion"},
+   {k:"ate_asesor",l:"¿Su asesor actual lo acompaña?",t:"select",o:["Sí, me acompaña","Responde poco","No tengo uno"],xp:10,solo:"cambio",motivo:"atencion"},
+   {k:"ate_ejemplo",l:"Último caso concreto",t:"text",xp:5,solo:"cambio",motivo:"atencion"},
+   {k:"otro_desc",l:"Descríbelo con sus palabras",t:"text",xp:10,solo:"cambio",motivo:"otro"},
+   {k:"grieta",l:"¿Qué le falla, con sus palabras?",t:"text",xp:15,solo:"cambio"},
+   {k:"renovacion",l:"Fecha de renovación o vencimiento de su póliza",t:"date",xp:10,solo:"cambio"},
+   {k:"exclus",l:"Exclusiones, carencias y preexistencias de su póliza actual",t:"textarea",xp:15,solo:"cambio"},
+   {k:"criterio",l:"¿Con qué criterio piensa elegir su seguro?",t:"select",o:["Precio","Cobertura","Red de médicos","Recomendación","Aún no sabe"],xp:10,solo:"nuevo"},
+   {k:"contrato",l:"¿Cómo lo eligió cuando lo contrató?",t:"select",o:["Por precio","Por recomendación de un asesor","Por su empresa","Por cobertura, comparando opciones","No recuerda"],xp:10,solo:"cambio"},
+   {k:"uso",l:"¿Cómo lo ha usado?",t:"select",o:["Casi no lo usa","Lo usa seguido y le responde","Lo usa seguido y le falla","Lo usó en un evento grande"],xp:10,solo:"cambio"},
+   {k:"conoce",l:"¿Conoce su cobertura y su proceso de reembolso?",t:"select",o:["Sí","Más o menos","No"],xp:10,solo:"cambio"},
+   {k:"declaro",l:"¿Declaró sus condiciones médicas al contratar?",t:"select",o:["Sí","No estoy seguro","No"],xp:10,solo:"cambio"},
+   {k:"noPerder",l:"¿Qué no querría perder si cambia?",t:"text",xp:15,solo:"cambio",ph:"Antigüedad, un tratamiento, su médico…"},
+   {k:"ultimavez",l:"¿Qué pasó la última vez que usó un médico?",t:"text",xp:10},
+   {k:"emergencia",l:"¿Qué haría si mañana hay una cirugía o emergencia?",t:"text",xp:15},
+   {k:"costoEvento",l:"Si hoy hubiera una hospitalización o cirugía, ¿cuánto estima que costaría y quién lo pagaría?",t:"text",xp:15},
+   {k:"objecion",l:"Objeción principal",t:"select",o:["Ninguna","Precio","Ya tengo seguro","Lo tengo que pensar","Perder antigüedad o carencias","Otra"],xp:10}
+ ]},
+ {id:"pre",titulo:"Declaración de preexistencias",solo:"nuevo",custom:true,campos:[]},
+ {id:"pres",titulo:"Presentación",campos:[
+   {k:"c_permiso",l:"Abrí pidiendo permiso y marcando el rumbo",t:"check",xp:10},
+   {k:"c_desc",l:"El cliente dijo su problema con sus palabras",t:"check",xp:10},
+   {k:"c_amarre",l:"Resumí y obtuve micro-acuerdos (“¿cierto?”)",t:"check",xp:10},
+   {k:"c_valor",l:"Presenté el plan como respuesta a lo que dijo",t:"check",xp:15},
+   {k:"c_ancla",l:"Mostré el costo de no tenerlo antes del precio",t:"check",xp:10},
+   {k:"c_riesgo",l:"Nombré garantías y exclusiones que sí puedo sostener",t:"check",xp:10},
+   {k:"c_cierre",l:"Cerré con alternativa (individual o familiar)",t:"check",xp:15},
+   {k:"cambio1",l:"Revisé exclusiones, preexistencias y carencias de su póliza actual",t:"check",xp:10,solo:"cambio"},
+   {k:"cambio2",l:"Acordamos no cancelar la actual hasta que la nueva esté vigente",t:"check",xp:10,solo:"cambio"},
+   {k:"cambio3",l:"Validé con SaludSA cómo se tratan preexistencias y antigüedad",t:"check",xp:10,solo:"cambio"},
+   {k:"gana",l:"¿Qué gana frente a su póliza actual?",t:"text",xp:15,solo:"cambio",w:true},
+   {k:"plan",l:"Plan propuesto",t:"select",o:["Individual","Familiar","Otro"],xp:5},
+   {k:"precio",l:"Precio mensual (USD)",t:"number",xp:5}
+ ]},
+ {id:"seg",titulo:"Seguimiento y cierre",campos:[
+   {k:"etapa",l:"Etapa",t:"select",o:ETAPAS,xp:0,noCount:true},
+   {k:"contactos",l:"Contactos realizados (mínimo 5 antes de dar por perdido)",t:"contactos",xp:10},
+   {k:"prox",l:"Próximo contacto",t:"date",xp:10},
+   {k:"proxTxt",l:"¿Qué le aportas en ese contacto?",t:"text",xp:10,ph:"Un dato, un caso real, una novedad"},
+   {k:"notas",l:"Notas",t:"textarea",xp:5}
+ ]}
+];
+
+var CAMPO={};MISIONES.forEach(function(m){m.campos.forEach(function(c){CAMPO[c.k]=c})});
+
+/* ---------- Estado y almacenamiento ---------- */
+var LS_KEY="saludsa_prospectos_v1";
+var items=[]; var current=null; var filter="Todos", tfilter="Todos";
+var db=null, uid=null, col=null, useDb=false;
+var timers={};
+
+function uuid(){return "p"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function lsLoad(){try{var r=localStorage.getItem(LS_KEY);return r?JSON.parse(r):[]}catch(e){return []}}
+function lsSave(){try{localStorage.setItem(LS_KEY,JSON.stringify(items))}catch(e){}}
+var deleted={};
+function pushDb(p){
+  delete timers[p.id];
+  if(!useDb||!col)return;
+  try{col.doc(p.id).set(JSON.parse(JSON.stringify(p))).catch(function(){})}catch(e){}
+}
+function persist(p){
+  p.mod=Date.now();lsSave();
+  if(!useDb||!col)return;
+  clearTimeout(timers[p.id]);
+  timers[p.id]=setTimeout(function(){pushDb(p)},500);
+}
+function flush(p){clearTimeout(timers[p.id]);pushDb(p)}
+function removeItem(p){
+  clearTimeout(timers[p.id]);deleted[p.id]=true;
+  items=items.filter(function(x){return x.id!==p.id});
+  lsSave();
+  if(useDb&&col){try{col.doc(p.id).delete().catch(function(){})}catch(e){}}
+}
+function initDb(){
+  if(!window.claude||!window.claude.use)return;
+  Promise.all([window.claude.use("db"),window.claude.use("user")]).then(function(r){
+    db=r[0]; var user=r[1];
+    if(!db||!user||!user.id)return null;
+    return user.id().then(function(id){
+      if(!id)return;
+      uid=id; col=db.collection("data/users/"+uid); useDb=true;
+      var first=true,synced={};
+      col.onSnapshot(function(snap){
+        var remote=snap.docs.map(function(d){return d.data()}).filter(function(r){return r&&r.id&&!deleted[r.id]});
+        if(first){
+          first=false;
+          if(!remote.length&&items.length){items.forEach(flush);return;}
+        }
+        var local={};items.forEach(function(x){local[x.id]=x});
+        var out=[],seen={};
+        remote.forEach(function(r){
+          seen[r.id]=true;synced[r.id]=true;
+          var l=local[r.id];
+          if(l&&(timers[l.id]||(l.mod||0)>=(r.mod||0)))out.push(l);else out.push(r);
+        });
+        items.forEach(function(l){
+          if(seen[l.id])return;
+          if(!synced[l.id]){out.push(l);if(!timers[l.id])flush(l);}
+        });
+        items=out;lsSave();renderHome();
+      },function(){});
+      document.getElementById("foot").textContent="Guardado en tu cuenta. Solo tú ves estas fichas.";
+    });
+  }).catch(function(){});
+}
+
+/* ---------- Cálculos de XP ---------- */
+function tipoDe(p){return p.tipo||(p.situacion===SITUACION_CAMBIO?"cambio":"nuevo")}
+function esCambio(p){return tipoDe(p)==="cambio"}
+function motivosDe(p){
+  if(Array.isArray(p.motivos))return p.motivos;
+  return (p.motivoTipo&&MOTIVO_OLD[p.motivoTipo])?[MOTIVO_OLD[p.motivoTipo]]:[];
+}
+function campoActivo(c,p){
+  if(c.solo&&c.solo!==tipoDe(p))return false;
+  if(c.motivo&&motivosDe(p).indexOf(c.motivo)<0)return false;
+  return true;
+}
+function valorLleno(c,p){
+  var v=p[c.k];
+  if(c.t==="motivos")return motivosDe(p).length>0;
+  if(c.t==="contactos")return (p.contactos||0)>0;
+  if(c.t==="check")return !!v;
+  return v!==undefined&&v!==null&&String(v).trim()!=="";
+}
+function xpCampo(c,p){
+  if(c.t==="contactos")return (p.contactos||0)*c.xp;
+  return valorLleno(c,p)?c.xp:0;
+}
+function misionStats(m,p){
+  if(m.solo&&m.solo!==tipoDe(p))return {pct:0,xp:0};
+  if(m.custom){var ps=preStats(p);return {pct:ps.pct,xp:ps.xp}}
+  var total=0,llenos=0,xp=0;
+  m.campos.forEach(function(c){
+    if(!campoActivo(c,p)||c.noCount)return;
+    if(c.t==="contactos"){total+=1;if((p.contactos||0)>=5)llenos+=1;}
+    else{total+=1;if(valorLleno(c,p))llenos+=1;}
+    xp+=xpCampo(c,p);
+  });
+  return {pct:total?Math.round(llenos/total*100):0,xp:xp};
+}
+function fichaXp(p){
+  var xp=0;MISIONES.forEach(function(m){xp+=misionStats(m,p).xp});
+  if(p.etapa==="Cerrado")xp+=100;
+  return xp;
+}
+function fichaPct(p){
+  var t=0,l=0;
+  MISIONES.forEach(function(m){if(m.solo&&m.solo!==tipoDe(p))return;var s=misionStats(m,p);t+=100;l+=s.pct});
+  return Math.round(l/t*100);
+}
+function nivelDe(xp){
+  var i=0;for(var k=0;k<NIVELES.length;k++){if(xp>=NIVELES[k].xp)i=k}
+  return i;
+}
+function checklistPerfecta(p){
+  var ks=["c_permiso","c_desc","c_amarre","c_valor","c_ancla","c_riesgo","c_cierre"];
+  return ks.every(function(k){return p[k]});
+}
+
+/* ---------- Render tablero ---------- */
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function fmtFecha(s){
+  if(!s)return"";var d=new Date(s+"T00:00:00");
+  return d.toLocaleDateString("es-EC",{day:"numeric",month:"short"});
+}
+function hoyISO(){var d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
+
+function renderHome(){
+  var total=items.reduce(function(a,p){return a+fichaXp(p)},0);
+  var li=nivelDe(total),cur=NIVELES[li],nxt=NIVELES[li+1];
+  $("lvlName").textContent="Nv. "+(li+1)+" · "+cur.n;
+  var pct=nxt?Math.round((total-cur.xp)/(nxt.xp-cur.xp)*100):100;
+  $("xpfill").style.width=pct+"%";
+  $("xpbar").setAttribute("aria-valuenow",pct);
+  $("xpnote").textContent=nxt?(total+" XP · te faltan "+(nxt.xp-total)+" para "+nxt.n):(total+" XP · nivel máximo");
+  var cierres=items.filter(function(p){return p.etapa==="Cerrado"}).length;
+  $("sPros").textContent=items.length;
+  $("sCierres").textContent=cierres;
+  $("sTasa").textContent=items.length?Math.round(cierres/items.length*100)+"%":"0%";
+
+  var cN=items.filter(function(p){return tipoDe(p)==="nuevo"}).length;
+  var cC=items.length-cN;
+  $("cNuevo").textContent=cN===1?"1 ficha":cN+" fichas";
+  $("cCambio").textContent=cC===1?"1 ficha":cC+" fichas";
+
+  var B=[
+    {ic:"🏆",t:"Primer cierre",on:cierres>=1},
+    {ic:"🚀",t:"Cierre de nuevo afiliado",on:items.some(function(p){return p.etapa==="Cerrado"&&tipoDe(p)==="nuevo"})},
+    {ic:"🔄",t:"Cierre de cambio de seguro",on:items.some(function(p){return p.etapa==="Cerrado"&&esCambio(p)})},
+    {ic:"🔁",t:"5 contactos en un prospecto",on:items.some(function(p){return (p.contactos||0)>=5})},
+    {ic:"🎯",t:"Presentación completa",on:items.some(checklistPerfecta)},
+    {ic:"🧬",t:"Escaneo de cuerpo completo",on:items.some(function(p){return tipoDe(p)==="nuevo"&&preStats(p).comp>0})},
+    {ic:"📇",t:"10 prospectos",on:items.length>=10}
+  ];
+  $("badges").innerHTML=B.map(function(b){return '<div class="badge'+(b.on?' on':'')+'"><span class="ic" aria-hidden="true">'+b.ic+'</span>'+b.t+'</div>'}).join("");
+
+  var TF=[["Todos","Todos"],["nuevo","Contratar"],["cambio","Cambio de seguro"]];
+  $("tchips").innerHTML=TF.map(function(f){
+    var n=f[0]==="Todos"?items.length:items.filter(function(p){return tipoDe(p)===f[0]}).length;
+    return '<button class="chip" data-t="'+f[0]+'" aria-pressed="'+(tfilter===f[0])+'">'+f[1]+' '+n+'</button>';
+  }).join("");
+  var base=items.filter(function(p){return tfilter==="Todos"||tipoDe(p)===tfilter});
+
+  var fl=["Todos"].concat(ETAPAS);
+  $("chips").innerHTML=fl.map(function(f){
+    var n=f==="Todos"?base.length:base.filter(function(p){return (p.etapa||"Nuevo")===f}).length;
+    return '<button class="chip" data-f="'+f+'" aria-pressed="'+(filter===f)+'">'+f+' '+n+'</button>';
+  }).join("");
+
+  var vis=base.filter(function(p){return filter==="Todos"||(p.etapa||"Nuevo")===filter});
+  vis.sort(function(a,b){
+    var ad=a.prox||"9999",bd=b.prox||"9999";
+    if(ad!==bd)return ad<bd?-1:1;
+    return (b.creado||0)-(a.creado||0);
+  });
+  if(!vis.length){
+    $("list").innerHTML='<div class="empty"><b>'+(items.length?"Nada con este filtro":"Tu primera ficha te espera")+'</b>'+(items.length?"Cambia el filtro o abre una misión nueva.":"Elige una misión arriba y completa la misión 1.")+'</div>';
+    return;
+  }
+  var hoy=hoyISO();
+  $("list").innerHTML=vis.map(function(p){
+    var et=p.etapa||"Nuevo",t=tipoDe(p);
+    var vence=p.prox&&p.prox<=hoy&&et!=="Cerrado"&&et!=="Perdido";
+    var prox=p.prox?('<span class="'+(vence?"due":"")+'">Contactar '+fmtFecha(p.prox)+'</span>'):"Sin próximo contacto";
+    return '<button class="pcard" data-id="'+p.id+'">'
+      +'<div class="ring" style="--p:'+fichaPct(p)+'"><b>'+fichaPct(p)+'%</b></div>'
+      +'<div><h3>'+esc(p.nombre||"Sin nombre")+'</h3><div class="tags"><span class="tag t-'+t+'">'+TIPOS[t].n+'</span><span class="tag '+et+'">'+et+'</span></div><p>'+prox+'</p></div>'
+      +'<div class="xp">'+fichaXp(p)+' XP</div></button>';
+  }).join("");
+}
+
+/* ---------- Render ficha ---------- */
+function fieldHtml(c,p){
+  var v=p[c.k];
+  if(c.t==="motivos"){
+    var sel=motivosDe(p);
+    return '<div class="f"><span>'+esc(c.l)+'</span><div class="mchips">'+MOTIVOS.map(function(m){
+      return '<button type="button" class="mc" data-mid="'+m.id+'" aria-pressed="'+(sel.indexOf(m.id)>=0)+'">'+m.ic+' '+m.l+'</button>';
+    }).join("")+'</div><p class="an-note" style="margin-top:6px">Elige todos los que apliquen: abajo aparecen solo los campos de cada uno.</p></div>';
+  }
+  if(c.t==="check"){
+    return '<label class="ck'+(v?' on':'')+'"><input type="checkbox" data-k="'+c.k+'"'+(v?' checked':'')+'><span>'+esc(c.l)+'</span><em>+'+c.xp+'</em></label>';
+  }
+  if(c.t==="contactos"){
+    var n=p.contactos||0,b="";
+    for(var i=1;i<=5;i++)b+='<button type="button" class="ct" data-n="'+i+'" aria-pressed="'+(n>=i)+'" aria-label="Contacto '+i+'">'+i+'</button>';
+    return '<div class="f"><span>'+esc(c.l)+'</span><div class="contacts">'+b+'</div></div>';
+  }
+  var inner="";
+  if(c.t==="select"){
+    inner='<select data-k="'+c.k+'"><option value="">Elegir…</option>'+c.o.map(function(o){return '<option'+(v===o?' selected':'')+'>'+esc(o)+'</option>'}).join("")+'</select>';
+  }else if(c.t==="textarea"){
+    inner='<textarea data-k="'+c.k+'">'+esc(v||"")+'</textarea>';
+  }else{
+    inner='<input data-k="'+c.k+'" type="'+c.t+'"'+(c.t==="number"?' inputmode="decimal" min="0" step="0.01"':'')+(c.t==="tel"?' inputmode="tel"':'')+' value="'+esc(v||"")+'"'+(c.ph?' placeholder="'+esc(c.ph)+'"':'')+'>';
+  }
+  return '<label class="f'+(c.w?' full':'')+'"><span>'+esc(c.l)+'</span>'+inner+'</label>';
+}
+function camposHtml(list,p){
+  var out="",open=null;
+  list.forEach(function(c){
+    var mid=c.motivo||null;
+    if(mid!==open){
+      if(open)out+='</div>';
+      if(mid){var m=MOTIVO_BY[mid];out+='<div class="mblock"><h4><span aria-hidden="true">'+m.ic+'</span> '+m.l+'</h4>';}
+      open=mid;
+    }
+    out+=fieldHtml(c,p);
+  });
+  if(open)out+='</div>';
+  return out;
+}
+function renderForm(){
+  var p=items.find(function(x){return x.id===current});
+  if(!p)return;
+  var html="";
+  var num=0;
+  MISIONES.forEach(function(m){
+    if(m.solo&&m.solo!==tipoDe(p))return;
+    var i=num++;
+    var s=misionStats(m,p);
+    var checks=m.campos.filter(function(c){return c.t==="check"&&campoActivo(c,p)});
+    var rest=m.campos.filter(function(c){return c.t!=="check"&&campoActivo(c,p)});
+    var cambioChecks=checks.filter(function(c){return c.solo});
+    var baseChecks=checks.filter(function(c){return !c.solo});
+    html+='<section class="miss'+(s.pct===100?' done':'')+'" data-m="'+m.id+'"><div class="mh"><span class="mnum">'+(s.pct===100?'✓':(i+1))+'</span><h2>'+m.titulo+'</h2><span class="mp">'+s.xp+' XP</span></div><div class="mbar"><i style="width:'+s.pct+'%"></i></div>';
+    if(m.custom){html+=preShell(p);}
+    else if(m.id==="pres"){
+      html+='<div class="checks">'+baseChecks.map(function(c){return fieldHtml(c,p)}).join("")+'</div>';
+      if(cambioChecks.length){
+        html+='<p class="sub2">Extra para quien se cambia de seguro</p><div class="checks">'+cambioChecks.map(function(c){return fieldHtml(c,p)}).join("")+'</div>';
+      }
+      html+='<div class="two" style="margin-top:14px">'+rest.map(function(c){return fieldHtml(c,p)}).join("")+'</div>';
+    }else{
+      html+=camposHtml(rest,p);
+    }
+    html+='</section>';
+  });
+  html+='<div class="actions"><button class="btn an" id="analizar">🔍 Analizar ficha</button></div>';
+  html+='<div id="anBox">'+((showAn[p.id]||p.analisis)?anHtml(p):'')+'</div>';
+  html+='<div class="actions"><button class="btn ghost" id="guardar">Guardar y volver</button><button class="btn del" id="borrar">Eliminar</button></div>';
+  $("form").innerHTML=html;
+  updateTop(p);
+  if(tipoDe(p)==="nuevo")preMount(p);
+}
+function updateTop(p){
+  $("dNombre").textContent=p.nombre||"Nuevo prospecto";
+  var tp=TIPOS[tipoDe(p)];$("dXp").textContent=tp.ic+" "+tp.n+" · "+fichaXp(p)+" XP";
+  $("dRing").style.setProperty("--p",fichaPct(p));
+  $("dPct").textContent=fichaPct(p)+"%";
+}
+function refreshProgress(p){
+  // Actualiza barras y XP sin perder el foco de los campos
+  var num=0;
+  MISIONES.forEach(function(m){
+    if(m.solo&&m.solo!==tipoDe(p))return;
+    num++;
+    var el=document.querySelector('.miss[data-m="'+m.id+'"]');if(!el)return;
+    var s=misionStats(m,p);
+    el.classList.toggle("done",s.pct===100);
+    el.querySelector(".mbar i").style.width=s.pct+"%";
+    el.querySelector(".mp").textContent=s.xp+" XP";
+    el.querySelector(".mnum").textContent=s.pct===100?"✓":num;
+  });
+  updateTop(p);
+}
+
+/* ---------- Análisis ---------- */
+var showAn={},aiState={};
+var MAP_MOTIVO={"Alza de tarifa":"Alzas de prima sin explicación ni control","Reembolsos lentos":"Trámites y reembolsos que tardan semanas","Red limitada":"Quedarse con pocos médicos o clínicas para elegir","Mala atención":"Mala atención justo cuando más la necesita"};
+var MAP_OBJ={"Precio":"Pagar más sin ver el valor con claridad","Ya tengo seguro":"Duplicar cobertura sin necesidad","Lo tengo que pensar":"Decidir con prisa o sin toda la información","Perder antigüedad o carencias":"Perder antigüedad o volver a esperar carencias"};
+function vacio(p,k){if(k==="motivos")return !motivosDe(p).length;return !String(p[k]==null?"":p[k]).trim()}
+function diasHasta(iso){var d=new Date(iso+"T00:00:00"),h=new Date(hoyISO()+"T00:00:00");return Math.round((d-h)/86400000)}
+
+function analisisLocal(p){
+  var ck=tipoDe(p)==="cambio";
+  var claves=ck?["aseguradora","tiempoCon","primaActual","motivos","grieta","renovacion","exclus","contrato","uso","conoce","declaro","noPerder","depende","edad","ultimavez","emergencia","costoEvento","objecion","plan"]
+               :["cobertura","porque","criterio","depende","edad","ultimavez","emergencia","costoEvento","objecion","plan"];
+  if(ck)MISIONES.forEach(function(m){m.campos.forEach(function(c){if(c.motivo&&campoActivo(c,p))claves.push(c.k)})});
+  var vacios=claves.filter(function(k){return vacio(p,k)}).map(function(k){return CAMPO[k].l});
+  var busca=[],evita=[],recs=[];
+  if(!vacio(p,"porque"))busca.push("Contratar ahora porque: "+p.porque);
+  if(!vacio(p,"depende"))busca.push("Respaldo para quienes dependen de él o ella: "+p.depende);
+  if(!vacio(p,"emergencia"))busca.push("Tener resuelto qué hacer ante una emergencia: "+p.emergencia);
+  if(ck&&!vacio(p,"grieta"))busca.push("Resolver lo que hoy le falla: "+p.grieta);
+  if(p.edad==="56+")busca.push("Cobertura clara en la etapa donde más se usa el sistema de salud");
+  if(ck){
+    var mo=motivosDe(p);
+    if(mo.indexOf("precio")>=0){
+      evita.push("Alzas de prima sin explicación ni control"+(!vacio(p,"pre_alza")?" (la última fue de "+p.pre_alza+"%)":""));
+      if(!vacio(p,"pre_limite"))busca.push("Un costo que no pase de "+usdS(p.pre_limite)+" al mes");
+    }
+    if(mo.indexOf("deducibles")>=0)evita.push("Pagar deducibles o copagos que no esperaba"+(!vacio(p,"ded_anual")?" (el último año pagó "+usdS(p.ded_anual)+")":""));
+    if(mo.indexOf("cobertura")>=0)evita.push("Quedarse sin cobertura en "+(vacio(p,"cob_que")?"lo que necesita":p.cob_que.toLowerCase())+(!vacio(p,"cob_porque")?" (motivo: "+p.cob_porque.toLowerCase()+")":""));
+    if(mo.indexOf("reembolsos")>=0)evita.push("Reembolsos que tardan"+(!vacio(p,"reem_dias")?" "+p.reem_dias.toLowerCase():" semanas")+(p.reem_rech&&p.reem_rech!=="Nunca"?" o que se rechazan":""));
+    if(mo.indexOf("red")>=0){
+      evita.push("Quedarse con pocos médicos o clínicas para elegir"+(!vacio(p,"red_falta")?": "+p.red_falta:""));
+      if(p.red_medico==="Sí")busca.push("Conservar a su médico o clínica de confianza");
+    }
+    if(mo.indexOf("atencion")>=0)evita.push("Mala atención cuando más la necesita"+(!vacio(p,"ate_canal")?" ("+p.ate_canal.toLowerCase()+")":""));
+  }
+  if(ck&&!vacio(p,"grieta"))evita.push("Repetir lo que hoy le falla: "+p.grieta);
+  if(MAP_OBJ[p.objecion])evita.push(MAP_OBJ[p.objecion]);
+  if(ck){
+    evita.push("Quedarse sin cobertura durante el cambio");
+    if(!vacio(p,"exclus"))evita.push("Que lo que hoy tiene cubierto quede excluido en la nueva póliza");
+  }
+  // Recordatorios fijos
+  recs.push({id:"pre",t:"Preexistencias",d:"Pregunta por condiciones médicas previas de cada persona a asegurar y valida con SaludSA cómo se tratan (cobertura, carencia o exclusión) antes de prometer nada."});
+  if(ck){
+    recs.push({id:"cont",t:"Beneficios de continuidad",d:"Pregunta si SaludSA reconoce antigüedad, carencias ya cumplidas y condiciones ya cubiertas en su póliza actual. No lo asumas: confírmalo por escrito."});
+    recs.push({id:"vig",t:"Sin hueco de cobertura",d:"No cancelar la póliza actual hasta que la nueva esté aprobada y vigente."});
+    if(p.declaro==="No"||p.declaro==="No estoy seguro")recs.push({id:"decl",t:"Declaración de condiciones",d:"Aclara qué declaró al contratar su póliza actual: condiciones no declaradas pueden generar problemas de cobertura. Conviene tenerlo claro antes de decidir."});
+    recs.push({id:"trat",t:"Tratamientos en curso o cirugías pendientes",d:"Identifica si hay algo en curso o programado que pueda quedar sin cobertura al cambiar."});
+  }
+  recs.push({id:"car",t:"Carencias y tiempos de espera",d:"Confirma desde cuándo se puede usar cada cobertura."});
+  recs.push({id:"exc",t:"Exclusiones y límites",d:"Revisa deducibles, copagos, topes anuales y exclusiones; explícalos antes de la firma."});
+  recs.push({id:"tar",t:"Tarifa por edad y reajustes",d:"Cotiza con la edad de cada persona y explica cómo cambia la tarifa con el tiempo."});
+  recs.push({id:"red",t:"Red de prestadores",d:"Verifica que sus médicos y clínicas de confianza estén en la red, o dónde se atendería."});
+  recs.push({id:"reem",t:"Reembolsos y atención",d:"Aclara el proceso y los tiempos de reembolso, y cómo accede a DrSalud y HomeService."});
+  if(ck)recs.push({id:"comp",t:"Comparativo lado a lado",d:"Arma su póliza actual frente a tu propuesta: coberturas, límites, red y precio."});
+  else recs.push({id:"ini",t:"Inicio de vigencia",d:"Define desde cuándo cubre y qué queda en periodo de espera."});
+  if(ck){
+    var m2=motivosDe(p);
+    if(m2.indexOf("precio")>=0)recs.push({id:"mpre",t:"Mira el costo total, no solo la prima",d:"Suma prima más deducibles y copagos de un año de uso real. Una prima menor con deducibles altos puede costarle más."});
+    if(m2.indexOf("deducibles")>=0)recs.push({id:"mded",t:"Deducibles, copagos y topes",d:"Compara deducible, copago y topes lado a lado con su póliza actual y confirma que entienda cómo funcionan antes de firmar."});
+    if(m2.indexOf("cobertura")>=0)recs.push({id:"mcob",t:"Lo que no le cubrieron",d:"Confirma por escrito que eso sí quedaría cubierto en la propuesta, y desde cuándo (carencias y preexistencias)."});
+    if(p.cob_pendiente==="Sí")recs.push({id:"mpen",t:"Procedimiento o tratamiento pendiente",d:"Antes de cualquier cambio, valida con SaludSA si quedaría cubierto y desde cuándo. Sin esa confirmación, no se mueve nada."});
+    if(m2.indexOf("reembolsos")>=0)recs.push({id:"mrem",t:"Proceso de reembolsos",d:"Pregunta por tiempos, documentos y porcentaje de reembolso, y explícale el proceso paso a paso."});
+    if(m2.indexOf("red")>=0&&p.red_medico==="Sí")recs.push({id:"mred",t:"Su médico o clínica de confianza",d:"Verifica que estén en la red de SaludSA antes de presentar el plan."});
+    if(m2.indexOf("atencion")>=0)recs.push({id:"mate",t:"Acompañamiento después de la venta",d:"Explica quién lo atiende y cómo lo acompañas en autorizaciones y reembolsos."});
+    var lim=parseFloat(p.pre_limite),pr=parseFloat(p.precio);
+    if(!isNaN(lim)&&!isNaN(pr)&&pr>lim)recs.push({id:"mlim",t:"La propuesta supera su presupuesto",d:"Dijo que podría pagar hasta "+usd(lim)+" al mes y la propuesta es de "+usd(pr)+". Ajusta el plan o sé honesto con el valor que justifica la diferencia."});
+  }
+  if(!ck){
+    var prs=preResumen(p),nc=0,zH=[],enTx=0,pendT=0;
+    prs.forEach(function(x){
+      x.con.forEach(function(z){zH.push(z.zona);z.items.forEach(function(it){nc++;if(it.e==="En tratamiento"||it.e==="En estudio")enTx++})});
+      pendT+=x.pend.length;
+    });
+    if(nc>0){
+      recs.push({id:"pdec",t:"Preexistencias declaradas ("+nc+")",d:"Declaró condiciones en: "+uniq(zH).join(", ")+". Valida con SaludSA cómo se trata cada una (cobertura, carencia o exclusión) antes de prometer nada, y cuida que la declaración sea completa y verídica."});
+      evita.push("Que una preexistencia quede excluida sin haberlo sabido");
+    }
+    if(enTx>0)recs.push({id:"ptx",t:"Condiciones en tratamiento o en estudio",d:"Hay "+enTx+" en tratamiento o en estudio. Pregunta qué documentación pide SaludSA (informes, exámenes) y advierte que puede haber exclusiones o periodos de espera."});
+    if(pendT>0)vacios.push("Declaración de preexistencias: faltan "+pendT+" zonas por revisar");
+  }
+  // Condicionales
+  if(p.edad==="56+")recs.push({id:"e56",t:"Edad 56+",d:"Preexistencias y tarifa pesan más en este rango: llega con ambos puntos claros y documentados."});
+  if(!vacio(p,"depende"))recs.push({id:"dep",t:"Hay dependientes",d:"Cotiza esquema familiar y pide la edad y condiciones de cada persona incluida."});
+  if(p.objecion==="Precio")recs.push({id:"opr",t:"Objeción de precio",d:"Prepara el costo de no tenerlo (una hospitalización) y compara valor por dólar, no solo precio."});
+  if(p.objecion==="Perder antigüedad o carencias")recs.push({id:"oan",t:"Le preocupa perder antigüedad",d:"Valida la continuidad antes de presentar. Si hay pérdida real, díselo y muestra qué gana a cambio."});
+  if(!vacio(p,"cobertura")&&/iess/i.test(p.cobertura))recs.push({id:"iess",t:"Tiene IESS",d:"Posiciónalo como complemento: aclara qué le cubre y dónde queda expuesto."});
+  if(ck&&!vacio(p,"renovacion")){
+    var n=diasHasta(p.renovacion);
+    if(n<0)recs.push({id:"ren",t:"Renovación ya vencida",d:"La fecha de renovación pasó hace "+(-n)+" días: confirma en qué estado está su póliza hoy."});
+    else if(n<=45)recs.push({id:"ren",t:"Renovación en "+n+" días",d:"Ventana corta: define pronto el inicio de vigencia para empalmar bien y no dejar hueco."});
+    else recs.push({id:"ren",t:"Renovación en "+n+" días",d:"Hay margen para comparar con calma y elegir bien la fecha de inicio."});
+  }
+  return {vacios:vacios,busca:busca,evita:evita,recs:recs};
+}
+
+function usdS(x){var n=parseFloat(x);return isNaN(n)?String(x):usd(n)}
+function usd(n){return "$"+(Math.round(n*100)/100).toFixed(2).replace(/\.00$/,"")}
+var NIVEL_INFO={viable:{ic:"✅",l:"Viable"},condiciones:{ic:"⚠️",l:"Viable con condiciones"},no_recomendable:{ic:"⛔",l:"Aún no conviene"},falta_informacion:{ic:"❔",l:"Falta información"}};
+var CAUSA_L={producto:"El producto",uso:"El uso",contratacion:"La contratación",mixta:"Una mezcla",indeterminada:"Aún sin definir"};
+
+function diagLocal(p){
+  var ck=tipoDe(p)==="cambio";
+  var nDatos=Object.keys(fichaParaIA(p).datos).length;
+  var out={veredicto:null,causa:null,costo:[],nocambiar:[]};
+  var precio=parseFloat(p.precio),actual=parseFloat(p.primaActual);
+  if(ck){
+    var sc={producto:0,uso:0,contratacion:0},sg={producto:[],uso:[],contratacion:[]};
+    var add=function(t,n,txt){sc[t]+=n;sg[t].push(txt)};
+    if(p.uso==="Lo usa seguido y le falla")add("producto",2,"lo usa seguido y le falla");
+    var mo=motivosDe(p),has=function(x){return mo.indexOf(x)>=0};
+    if(has("red"))add("producto",1,"su queja incluye la red de médicos");
+    if(has("atencion"))add("producto",1,"su queja incluye la atención y el servicio");
+    if(has("precio")){
+      add("producto",1,"su queja incluye el precio o las alzas");
+      if(p.pre_expl==="No")add("contratacion",1,"nadie le explicó cómo se reajusta la prima");
+    }
+    if(has("reembolsos")){
+      add("producto",1,"su queja incluye los reembolsos");
+      if(p.reem_porque==="Falta de documentos"||p.reem_proceso==="No"||p.reem_proceso==="Más o menos")add("uso",2,"los reembolsos se traban por documentos o por no conocer el proceso");
+      if(p.reem_porque==="Exclusión o no cobertura")add("contratacion",1,"le rechazan reembolsos por exclusiones que no tenía claras");
+      if(p.reem_porque==="Sin explicación clara"||p.reem_dias==="Más de 60 días"||p.reem_dias==="30 a 60 días")add("producto",1,"los reembolsos tardan mucho o no se explican");
+    }
+    if(has("deducibles")){
+      if(p.ded_sorpresa==="No"||p.ded_sorpresa==="No recuerda")add("contratacion",2,"no sabía de los deducibles o copagos al contratar");
+      if(p.ded_tope==="Una vez"||p.ded_tope==="Varias veces")add("contratacion",1,"se le han agotado topes: el plan puede estar corto para su uso");
+      else add("producto",1,"su queja incluye deducibles y copagos");
+    }
+    if(has("cobertura")){
+      if(p.cob_porque==="Exclusión de la póliza"||p.cob_porque==="Preexistencia"||p.cob_porque==="Período de carencia")add("contratacion",2,"lo que no le cubrieron caía en "+p.cob_porque.toLowerCase()+" y no lo tenía claro");
+      else if(p.cob_porque==="Tope o límite agotado")add("contratacion",1,"se le agotó un tope: plan corto para su necesidad");
+      else if(p.cob_porque==="Nunca supo si estaba cubierto")add("uso",1,"no sabía qué estaba cubierto");
+      else add("producto",1,"su queja incluye la cobertura");
+    }
+    if(p.ate_asesor==="Responde poco"||p.ate_asesor==="No tengo uno")add("contratacion",1,"no tiene un asesor que lo acompañe");
+    if(p.uso==="Casi no lo usa")add("uso",2,"casi no lo usa");
+    if(p.conoce==="No"||p.conoce==="Más o menos")add("uso",1,"no domina su cobertura ni su proceso de reembolso");
+    if(p.contrato==="Por precio")add("contratacion",2,"lo eligió por precio");
+    if(p.contrato==="No recuerda")add("contratacion",2,"no recuerda con qué criterio lo eligió");
+    if(p.contrato==="Por su empresa")add("contratacion",1,"lo recibió por su empresa, sin elegirlo");
+    if(p.declaro==="No"||p.declaro==="No estoy seguro")add("contratacion",1,"no tiene claro qué declaró al contratar");
+    if(p.conoce==="No")add("contratacion",1,"no conoce lo que contrató");
+    var ord=Object.keys(sc).sort(function(a,b){return sc[b]-sc[a]});
+    var top=ord[0],sec=ord[1];
+    if(sc[top]===0){
+      out.causa={tipo:"indeterminada",explicacion:"Aún no hay datos para distinguir si el problema es del producto, del uso o de cómo se contrató. Completa cómo lo usa, cómo lo eligió y qué le falla."};
+    }else if(sc[sec]>=2&&sc[top]===sc[sec]){
+      out.causa={tipo:"mixta",explicacion:"Hay señales de más de un origen: "+ord.filter(function(t){return sc[t]>0}).map(function(t){return CAUSA_L[t].toLowerCase()+" ("+sg[t].join(", ")+")"}).join("; ")+"."};
+    }else{
+      out.causa={tipo:top,explicacion:"Señales en la ficha: "+sg[top].join("; ")+"."};
+    }
+    var t=out.causa.tipo;
+    if(nDatos<4){
+      out.veredicto={nivel:"falta_informacion",titulo:"Aún no hay base para opinar",razon:"Completa el motivo de inconformidad, cómo lo usa y cómo lo contrató. Sin eso, cualquier recomendación sería una suposición."};
+    }else if((t==="uso"||t==="contratacion")&&sc.producto===0){
+      out.veredicto={nivel:"no_recomendable",titulo:"Aún no conviene cambiar",razon:"Con lo que hay en la ficha, el problema apunta más a "+(t==="uso"?"cómo lo está usando":"cómo se contrató")+" que al producto. Cambiar de aseguradora sin corregir eso puede repetir el mismo problema. Aclara esto primero con la persona."};
+    }else if(t==="mixta"){
+      out.veredicto={nivel:"condiciones",titulo:"Antes de cambiar, corrige lo que no es del producto",razon:"Hay señales del producto, pero también del uso y de la contratación. Cambiar sin corregir esas dos puede repetir el problema. Si cambia, que sea con continuidad y preexistencias confirmadas por escrito."};
+    }else if(t==="producto"){
+      out.veredicto={nivel:"condiciones",titulo:"Cambio viable si se validan continuidad y preexistencias",razon:"Hay señales de que el producto no le responde. El cambio tiene sentido solo si SaludSA confirma por escrito que no pierde antigüedad, carencias cumplidas ni cobertura de condiciones actuales."};
+    }else if(t==="uso"||t==="contratacion"){
+      out.veredicto={nivel:"condiciones",titulo:"Antes de cambiar, aclara "+(t==="uso"?"cómo lo usa":"cómo se contrató"),razon:"El problema apunta sobre todo a "+(t==="uso"?"el uso":"la contratación")+", con algo de producto. Cambiar sin corregirlo puede repetir el problema. Si cambia, que sea con continuidad y preexistencias confirmadas por escrito."};
+    }else{
+      out.veredicto={nivel:"condiciones",titulo:"Aún hay que definir el origen del problema",razon:"No es claro si la queja viene del producto, del uso o de la contratación. Define eso antes de proponer un cambio."};
+    }
+    out.costo.push("Si no se ajusta: sigue con lo que hoy le falla"+(!vacio(p,"grieta")?" ("+p.grieta+")":"")+", y el costo se acumula cada mes.");
+    if(!vacio(p,"noPerder"))out.costo.push("En riesgo si cambia sin validar: "+p.noPerder+".");
+    else out.costo.push("Si cambia solo por precio, podría perder antigüedad, carencias ya cumplidas o cobertura de condiciones actuales (validar con SaludSA).");
+    if(!isNaN(precio)&&!isNaN(actual)&&precio>0&&actual>0){
+      var d=precio-actual;
+      if(d>0)out.costo.push("La propuesta cuesta "+usd(d)+" más al mes ("+usd(d*12)+" al año): que el argumento sea lo que deja de perder, no el precio.");
+      else if(d<0)out.costo.push("La propuesta cuesta "+usd(-d)+" menos al mes, pero el ahorro no debe ser la razón principal: primero que no pierda cobertura.");
+    }
+    if(!vacio(p,"ded_anual"))out.costo.push("En deducibles y copagos pagó "+usdS(p.ded_anual)+" el último año: compáralo con la propuesta, no solo la prima.");
+    if(!vacio(p,"cob_monto"))out.costo.push("De su bolsillo ya pagó "+usdS(p.cob_monto)+" por algo que esperaba cubierto.");
+    if(!vacio(p,"pre_alza"))out.costo.push("Su última alza fue de "+p.pre_alza+"%: si se repite, el costo se acumula año tras año.");
+    if(!isNaN(parseFloat(p.pre_limite))&&!isNaN(precio)&&precio>parseFloat(p.pre_limite))out.costo.push("La propuesta supera el máximo que dijo poder pagar ("+usdS(p.pre_limite)+" al mes).");
+    if(!vacio(p,"costoEvento"))out.costo.push("Su propia estimación de un evento grave: "+p.costoEvento+". Eso queda expuesto si el seguro no responde.");
+    if(!vacio(p,"renovacion")){var n=diasHasta(p.renovacion);if(n>=0&&n<=45)out.costo.push("Renueva en "+n+" días: decidir tarde puede obligarlo a renovar sin ajustar nada.")}
+    out.nocambiar=[
+      "Su problema es más de uso o de contratación que del producto.",
+      "SaludSA no confirma por escrito continuidad de antigüedad y carencias, y hay una condición o tratamiento en curso.",
+      "La diferencia de precio es el único argumento a favor del cambio.",
+      "No se puede empalmar la vigencia sin quedar un tiempo sin cobertura."
+    ];
+    if(p.cob_pendiente==="Sí")out.nocambiar.unshift("Tiene un procedimiento o tratamiento pendiente y SaludSA no ha confirmado que quede cubierto.");
+    if(!isNaN(parseFloat(p.pre_limite))&&!isNaN(precio)&&precio>parseFloat(p.pre_limite))out.nocambiar.push("La propuesta supera lo máximo que puede pagar al mes.");
+  }else{
+    if(nDatos<3){
+      out.veredicto={nivel:"falta_informacion",titulo:"Aún no hay base para opinar",razon:"Completa quién depende de la persona, qué cobertura tiene y con qué criterio piensa elegir."};
+    }else if(p.criterio==="Precio"){
+      out.veredicto={nivel:"condiciones",titulo:"Viable, pero elige por cobertura y no solo por precio",razon:"Contratar hoy tiene menor costo de oportunidad que esperar. El riesgo es elegir un plan barato que no responda cuando lo necesite: en la práctica, eso también es no tener seguro."};
+    }else{
+      out.veredicto={nivel:"viable",titulo:"Contratar es viable y conviene no postergarlo",razon:"Con lo que hay en la ficha, tener el seguro correcto hoy cuesta menos que asumir un evento sin respaldo. Falta validar preexistencias y carencias con SaludSA."};
+    }
+    out.costo.push("Cada año que espera, la tarifa de entrada suele subir con la edad y una condición nueva puede quedar como preexistencia (validar con SaludSA).");
+    var prr=preResumen(p),ncc=0;
+    prr.forEach(function(x){x.con.forEach(function(z){ncc+=z.items.length})});
+    if(ncc>0){
+      if(out.veredicto&&out.veredicto.nivel==="viable")out.veredicto={nivel:"condiciones",titulo:"Viable, con preexistencias por validar",razon:"Hay "+ncc+" condiciones declaradas: el plan puede aceptarlas con exclusiones o periodos de espera. Valida con SaludSA antes de prometer cobertura; declarar todo con transparencia sigue siendo mejor que esperar."};
+      out.costo.push("Declarar todo desde el inicio evita problemas de cobertura más adelante (validar con SaludSA).");
+    }
+    if(!vacio(p,"costoEvento"))out.costo.push("Su propia estimación de un evento grave: "+p.costoEvento+". Sin seguro, lo asume directamente.");
+    else out.costo.push("Un evento grave sin cobertura lo asume la persona directamente, sin respaldo.");
+    if(!vacio(p,"depende"))out.costo.push("También quedan expuestos quienes dependen de él o ella: "+p.depende+".");
+    if(p.criterio==="Precio")out.costo.push("Elegir solo por precio puede salir más caro: un plan que no responde cuando se usa cuesta lo mismo que no tener plan.");
+  }
+  return out;
+}
+
+function comparativo(p){
+  var precio=parseFloat(p.precio),actual=parseFloat(p.primaActual),mo=motivosDe(p),has=function(x){return mo.indexOf(x)>=0};
+  function j(a){return a.filter(Boolean).join(" · ")}
+  var rows=[
+    ["Prima mensual",isNaN(actual)?"":usd(actual),isNaN(precio)?"Definir con la cotización":usd(precio)],
+    ["Plan",p.aseguradora||"","SaludSA · "+(p.plan||"por definir")],
+    ["Lo que le falla y cómo lo resuelve la propuesta",p.grieta||"",p.gana||"Por definir"]
+  ];
+  if(has("precio"))rows.push(["Precio y alzas",j([!vacio(p,"pre_alza")?"Última alza "+p.pre_alza+"%":"",p.pre_freq||"",!vacio(p,"pre_limite")?"Máximo que puede pagar "+usdS(p.pre_limite):""]),"Validar esquema de reajustes con SaludSA"]);
+  if(has("deducibles"))rows.push(["Deducibles y copagos",j([!vacio(p,"ded_monto")?"Deducible "+usdS(p.ded_monto):"",!vacio(p,"ded_copago")?"Copago "+p.ded_copago:"",!vacio(p,"ded_anual")?"Pagó "+usdS(p.ded_anual)+" el último año":""]),"Validar deducible, copago y topes con SaludSA"]);
+  if(has("cobertura"))rows.push(["Cobertura que le faltó",j([p.cob_que||"",p.cob_porque||"",!vacio(p,"cob_monto")?"Pagó "+usdS(p.cob_monto):""]),"Validar si quedaría cubierta y desde cuándo"]);
+  if(has("reembolsos"))rows.push(["Reembolsos",j([p.reem_dias?"Tarda "+p.reem_dias.toLowerCase():"",p.reem_rech?"Rechazos: "+p.reem_rech.toLowerCase():"",p.reem_porque||""]),"Validar tiempos, documentos y proceso"]);
+  if(has("red"))rows.push(["Red de médicos y clínicas",p.red_falta||"","Validar red, incluido su médico de confianza"]);
+  if(has("atencion"))rows.push(["Atención y servicio",j([p.ate_canal||"",p.ate_frec||"",p.ate_asesor||""]),"Validar canales y acompañamiento"]);
+  rows.push(["Exclusiones, carencias y preexistencias",p.exclus||"","Validar con SaludSA"]);
+  rows.push(["Antigüedad y continuidad",p.tiempoCon?p.tiempoCon+" con su aseguradora":"","Validar si SaludSA la reconoce"]);
+  rows.push(["Vigencia",p.renovacion?"Renueva el "+fmtFecha(p.renovacion):"","Definir inicio para empalmar sin hueco"]);
+  return rows;
+}
+
+function vista(p){
+  var L=analisisLocal(p),D=diagLocal(p),ia=p.analisis&&p.analisis.ia;
+  function pick(a,b){return a&&a.length?a:b}
+  return {L:L,ia:ia,
+    veredicto:(ia&&ia.veredicto)||D.veredicto,
+    causa:(ia&&ia.causa)||D.causa,
+    costo:pick(ia&&ia.costo,D.costo),
+    nocambiar:pick(ia&&ia.nocambiar,D.nocambiar),
+    busca:ia?ia.busca:L.busca,evita:ia?ia.evita:L.evita,
+    puntos:ia?ia.puntos:[],preguntas:ia?ia.preguntas:[]};
+}
+
+function lista(arr,vacioTxt){
+  if(!arr||!arr.length)return '<ul class="an-list"><li class="none">'+vacioTxt+'</li></ul>';
+  return '<ul class="an-list">'+arr.map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ul>';
+}
+function anHtml(p){
+  var v=vista(p),st=aiState[p.id]||"",pct=fichaPct(p),ia=v.ia,ck=tipoDe(p)==="cambio";
+  var status="";
+  if(st==="cargando")status='<p class="an-status">Analizando con IA… puede tardar unos segundos.</p>';
+  else if(st==="denegado")status='<p class="an-status warn">No se autorizó el análisis con IA. Estás viendo el análisis básico.</p>';
+  else if(st==="poco")status='<p class="an-status warn">Completa al menos 3 datos para activar el análisis con IA. Mientras tanto, esto es el análisis básico.</p>';
+  else if(st==="error"||st==="sin")status='<p class="an-status warn">El análisis con IA no está disponible ahora. Estás viendo el análisis básico.</p>';
+  else if(ia&&p.analisis.ts)status='<p class="an-status">Análisis con IA · '+new Date(p.analisis.ts).toLocaleTimeString("es-EC",{hour:"2-digit",minute:"2-digit"})+'. Si cambiaste la ficha, vuelve a analizar.</p>';
+  else status='<p class="an-status warn">Análisis básico con las reglas de la ficha. Usa “Volver a analizar” para sumar la lectura con IA.</p>';
+
+  var recsHtml=v.L.recs.map(function(r){
+    var on=p.rec&&p.rec[r.id];
+    return '<label class="ck'+(on?' on':'')+'"><input type="checkbox" data-rec="'+r.id+'"'+(on?' checked':'')+'><span><b>'+esc(r.t)+'</b><small>'+esc(r.d)+'</small></span></label>';
+  }).join("");
+  var hechos=v.L.recs.filter(function(r){return p.rec&&p.rec[r.id]}).length;
+
+  var ver="";
+  if(v.veredicto){
+    var ni=NIVEL_INFO[v.veredicto.nivel]||NIVEL_INFO.falta_informacion;
+    ver='<div class="an-verdict v-'+v.veredicto.nivel+'"><span class="vl">'+ni.ic+' '+ni.l+'</span><b>'+esc(v.veredicto.titulo)+'</b><p>'+esc(v.veredicto.razon)+'</p></div>';
+  }
+  var causa="";
+  if(v.causa&&v.causa.tipo!=="no_aplica"&&(ck||ia)){
+    causa='<div class="an-sec causa"><h3><i></i>¿De qué se trata realmente?</h3><div class="pill-causa">'+esc(CAUSA_L[v.causa.tipo]||"Aún sin definir")+'</div><p class="an-p">'+esc(v.causa.explicacion)+'</p>'
+      +'<p class="an-note">Producto = coberturas, tarifa o servicio. Uso = cómo lo usa o si conoce su proceso. Contratación = plan mal dimensionado o mal explicado al inicio.</p></div>';
+  }
+  var costoTitulo=ck?"Costo de oportunidad: lo que está en juego":"Costo de oportunidad: no tenerlo";
+  var costo='<div class="an-sec costo"><h3><i></i>'+costoTitulo+'</h3>'+lista(v.costo,"Completa la ficha para ver lo que está en juego.")+'</div>';
+  var noc=ck?'<div class="an-sec noc"><h3><i></i>Señales para no cambiar</h3>'+lista(v.nocambiar,"")+'</div>':'';
+  var cmp="";
+  if(ck){
+    cmp='<div class="an-sec cmp"><h3><i></i>Comparativo (borrador): hoy vs propuesta</h3>'+comparativo(p).map(function(r){
+      return '<div class="cmp-row"><b>'+esc(r[0])+'</b><div><small>Hoy</small>'+esc(r[1]||"—")+'</div><div><small>SaludSA</small>'+esc(r[2])+'</div></div>';
+    }).join("")+'<p class="an-note">Las celdas “validar” se completan con el material oficial de SaludSA.</p></div>';
+  }
+  return '<section class="an-card" aria-label="Análisis para la propuesta">'
+   +'<div class="mh"><span class="mnum" aria-hidden="true">🔍</span><h2>Análisis para la propuesta</h2><span class="mp">'+pct+'% recabado</span></div>'
+   +'<div class="mbar"><i style="width:'+pct+'%"></i></div>'+status
+   +'<div class="an-sec sinc"><h3><i></i>Recomendación sincera</h3>'+ver+'</div>'
+   +causa+costo+noc
+   +'<div class="an-sec busca"><h3><i></i>Lo que busca</h3>'+lista(v.busca,"Aún no hay datos suficientes en la ficha.")+'</div>'
+   +'<div class="an-sec evita"><h3><i></i>Lo que quiere evitar</h3>'+lista(v.evita,"Aún no hay datos suficientes en la ficha.")+'</div>'
+   +(v.puntos.length?'<div class="an-sec puntos"><h3><i></i>Puntos para armar la propuesta</h3>'+lista(v.puntos,"")+'</div>':'')
+   +cmp
+   +'<div class="an-sec rec"><h3><i></i>No olvides considerar<small id="recCount">'+hechos+'/'+v.L.recs.length+' revisados</small></h3><div class="checks">'+recsHtml+'</div></div>'
+   +'<div class="an-sec falta"><h3><i></i>Información que falta</h3>'+lista(v.L.vacios,"Lo esencial está completo.")+'<p class="an-note">Pregúntalo en tu próximo contacto.</p></div>'
+   +(v.preguntas.length?'<div class="an-sec preg"><h3><i></i>Preguntas para tu próximo contacto</h3>'+lista(v.preguntas,"")+'</div>':'')
+   +'<div class="an-actions"><button type="button" class="btn ghost small" id="reanalizar">Volver a analizar</button><button type="button" class="btn ghost small" id="copiar">Copiar resumen</button></div>'
+   +'<p class="an-note" style="margin-top:12px">Al analizar con IA se envía la ficha sin nombre ni WhatsApp; las preexistencias solo si activaste esa opción. Esto es una lectura de apoyo, no una decisión: todo lo que dependa de SaludSA (preexistencias, continuidad, carencias, garantías) valídalo con el material oficial.</p>'
+   +'</section>';
+}
+
+function renderAn(p){
+  if(current!==p.id)return;
+  var box=$("anBox");if(box)box.innerHTML=anHtml(p);
+}
+function fichaParaIA(p){
+  var o={tipo:TIPOS[tipoDe(p)].n,datos:{},pasos_de_venta_hechos:[]};
+  MISIONES.forEach(function(m){m.campos.forEach(function(c){
+    if(!campoActivo(c,p)||c.k==="nombre"||c.k==="whatsapp")return;
+    if(c.t==="motivos"){var mm=motivosDe(p).map(function(id){return MOTIVO_BY[id]?MOTIVO_BY[id].l:id});if(mm.length)o.datos[c.l]=mm;return;}
+    if(c.t==="check"){if(p[c.k])o.pasos_de_venta_hechos.push(c.l);return;}
+    if(c.t==="contactos"){if(p.contactos)o.datos[c.l]=p.contactos;return;}
+    var lab=c.motivo?MOTIVO_BY[c.motivo].l+" · "+c.l:c.l;
+    if(valorLleno(c,p))o.datos[lab]=p[c.k];
+  })});
+  if(tipoDe(p)==="nuevo"&&p.preIA){
+    var pr2=preResumen(p);
+    if(pr2.some(function(x){return x.con.length})){
+      o.preexistencias=pr2.map(function(x){return {persona:x.persona,con_antecedentes:x.con.map(function(z){return {zona:z.zona,condiciones:z.items}}),zonas_sin_revisar:x.pend}});
+    }
+  }
+  return o;
+}
+function arr(x){return Array.isArray(x)?x.filter(function(s){return typeof s==="string"&&s.trim()}).slice(0,6):[]}
+function analizar(p){
+  showAn[p.id]=true;
+  var datos=fichaParaIA(p);
+  var n=Object.keys(datos.datos).length+datos.pasos_de_venta_hechos.length;
+  var primera=!$("anBox").innerHTML;
+  if(n<3){aiState[p.id]="poco";renderAn(p);if(primera)$("anBox").scrollIntoView({block:"start"});return;}
+  aiState[p.id]="cargando";renderAn(p);
+  $("anBox").scrollIntoView({block:"start"});
+  if(!window.claude||!window.claude.use){aiState[p.id]="sin";renderAn(p);return;}
+  var prompt="Eres el asistente de un asesor comercial de medicina prepagada en Ecuador (SaludSA). Recibes la ficha de un prospecto. "
+   +"Filosofía del asesor: ayudar a elegir un seguro con criterio y no por precio, de modo que el costo de no tener el seguro correcto sea el mínimo. "
+   +"Sé sincero y claro: puedes recomendar NO cambiar o NO contratar todavía si la ficha lo justifica, y no empujes una venta. "
+   +"En las personas aseguradas, la ficha incluye detalles específicos solo de los motivos de inconformidad elegidos (cobertura, reembolsos, precio, deducibles, red, atención): úsalos para afinar el diagnóstico; por ejemplo, deducibles que no conocía sugieren un problema de contratación y reembolsos rechazados por documentos sugieren un problema de uso. "
+   +"Devuelve SOLO un JSON con esta forma exacta: "
+   +"{\"veredicto\":{\"nivel\":\"viable|condiciones|no_recomendable|falta_informacion\",\"titulo\":\"\",\"razon\":\"\"},"
+   +"\"causa\":{\"tipo\":\"producto|uso|contratacion|mixta|indeterminada|no_aplica\",\"explicacion\":\"\"},"
+   +"\"costo_oportunidad\":[],\"no_cambiar_si\":[],\"busca\":[],\"evita\":[],\"puntos\":[],\"preguntas\":[]}. "
+   +"Reglas: máximo 5 elementos por lista; cada elemento es una frase corta en español (máximo 25 palabras); 'titulo' máximo 12 palabras y 'razon' y 'explicacion' máximo 60 palabras. "
+   +"Si la ficha trae 'preexistencias' declaradas por zona del cuerpo: no diagnostiques ni des consejo médico; úsalas solo para recordar qué validar con SaludSA (exclusiones, carencias, periodos de espera), ordenar prioridades y sugerir preguntas, y nunca afirmes que algo quedará cubierto o excluido. "
+   +"Basa todo en los datos de la ficha; no inventes datos del cliente, cifras, precios, garantías ni condiciones de SaludSA; si algo depende de SaludSA, escribe 'validar con SaludSA'. "
+   +"'veredicto' = tu opinión honesta de si el paso (contratar, o cambiarse) es viable ahora, con qué condiciones o por qué aún no conviene. "
+   +"'causa' = solo para personas ya aseguradas: distingue si lo que le molesta es del PRODUCTO (coberturas, tarifa, red, servicio), del USO (cómo lo usa, si conoce su cobertura o su proceso de reembolso) o de la CONTRATACIÓN (plan mal dimensionado, mal explicado o elegido solo por precio, preexistencias o exclusiones no informadas); para un nuevo prospecto usa tipo 'no_aplica'. "
+   +"'costo_oportunidad' = para un nuevo prospecto, lo que arriesga por no contratar o por contratar solo por precio; para una persona asegurada, lo que podría estar en riesgo si no se hace el ajuste y lo que podría perder si cambia solo por precio (antigüedad, carencias cumplidas, cobertura de condiciones actuales, tratamientos en curso). Usa solo lo que dice la ficha. "
+   +"'no_cambiar_si' = condiciones bajo las cuales lo honesto es NO cambiar (solo personas aseguradas; vacío para nuevos prospectos). "
+   +"'busca' = lo que el cliente quiere lograr según lo que dijo. 'evita' = lo que quiere no repetir o teme. "
+   +"'puntos' = prioridades concretas para armar la propuesta (plan, cobertura, cómo presentar el valor, manejo de la objeción, preexistencias y continuidad si aplican). "
+   +"'preguntas' = preguntas que faltan para afinar la propuesta. Si hay muy poca información, dilo con honestidad en el veredicto con nivel 'falta_informacion'.\n\nFICHA:\n"+JSON.stringify(datos);
+  window.claude.use("sample").then(function(sample){
+    if(!sample){aiState[p.id]="sin";renderAn(p);return;}
+    return sample.json(prompt,{cache:false}).then(function(r){
+      r=r||{};
+      var NIV=["viable","condiciones","no_recomendable","falta_informacion"];
+      var CAU=["producto","uso","contratacion","mixta","indeterminada","no_aplica"];
+      function tx(x,m){return typeof x==="string"?x.trim().slice(0,m||400):""}
+      var rv=r.veredicto||{},rc=r.causa||{};
+      var ver=NIV.indexOf(rv.nivel)>=0?{nivel:rv.nivel,titulo:tx(rv.titulo,120),razon:tx(rv.razon,500)}:null;
+      var cau=(CAU.indexOf(rc.tipo)>=0&&rc.tipo!=="no_aplica")?{tipo:rc.tipo,explicacion:tx(rc.explicacion,500)}:null;
+      p.analisis={ts:Date.now(),ia:{veredicto:ver,causa:cau,costo:arr(r.costo_oportunidad),nocambiar:arr(r.no_cambiar_si),busca:arr(r.busca),evita:arr(r.evita),puntos:arr(r.puntos),preguntas:arr(r.preguntas)}};
+      aiState[p.id]="";persist(p);renderAn(p);
+    });
+  }).catch(function(e){
+    aiState[p.id]=(e&&e.code==="not_granted")?"denegado":"error";renderAn(p);
+  });
+}
+function copiar(p){
+  var v=vista(p),ck=tipoDe(p)==="cambio";
+  function bloque(t,a){return a&&a.length?t+"\n"+a.map(function(x){return "- "+x}).join("\n")+"\n\n":""}
+  var ver=v.veredicto?"Recomendación sincera\n"+(NIVEL_INFO[v.veredicto.nivel]||{l:""}).l+": "+v.veredicto.titulo+"\n"+v.veredicto.razon+"\n\n":"";
+  var cau=(ck&&v.causa)?"¿De qué se trata realmente? "+(CAUSA_L[v.causa.tipo]||"")+"\n"+v.causa.explicacion+"\n\n":"";
+  var cmp=ck?bloque("Comparativo (borrador)",comparativo(p).map(function(r){return r[0]+": hoy "+(r[1]||"—")+" | SaludSA "+r[2]})):"";
+  var txt="Análisis para la propuesta · "+(p.nombre||"Prospecto")+" ("+TIPOS[tipoDe(p)].n+")\n\n"
+   +ver+cau+bloque(ck?"Costo de oportunidad: lo que está en juego":"Costo de oportunidad: no tenerlo",v.costo)
+   +(ck?bloque("Señales para no cambiar",v.nocambiar):"")
+   +bloque("Lo que busca",v.busca)+bloque("Lo que quiere evitar",v.evita)+bloque("Puntos para la propuesta",v.puntos)+cmp
+   +bloque("No olvides considerar",v.L.recs.map(function(r){return r.t+": "+r.d}))
+   +bloque("Información que falta",v.L.vacios)+bloque("Preguntas para el próximo contacto",v.preguntas);
+  try{navigator.clipboard.writeText(txt).then(function(){toast("Resumen copiado")},function(){toast("No se pudo copiar")});}
+  catch(e){toast("No se pudo copiar")}
+}
+
+/* ---------- Declaración de preexistencias: zonas del cuerpo ---------- */
+var ZONAS=[
+ {id:"cabeza",n:"Cabeza y mente",ic:"🧠",hint:"Piensa en golpes, convulsiones, migrañas y salud mental.",g:[
+  {t:"Neurológico",c:[["cab_migr","Migrañas o dolores de cabeza crónicos"],["cab_epil","Epilepsia o convulsiones"],["cab_tce","Traumatismo craneoencefálico"],["cab_acv","Derrame o accidente cerebrovascular (ACV)"],["cab_tum","Tumor o quiste cerebral"],["cab_dem","Parkinson, Alzheimer u otra demencia"],["cab_em","Esclerosis múltiple u otra enfermedad desmielinizante"],["cab_aneu","Aneurisma o malformación vascular cerebral"],["cab_vert","Mareos o vértigo crónico"]]},
+  {t:"Salud mental",c:[["men_dep","Depresión"],["men_ans","Ansiedad o ataques de pánico"],["men_bip","Trastorno bipolar"],["men_psi","Esquizofrenia u otro trastorno psicótico"],["men_tdah","TDAH"],["men_tea","Autismo (TEA) u otro trastorno del neurodesarrollo"],["men_tca","Trastorno de la conducta alimentaria"],["men_sust","Consumo problemático de alcohol o sustancias"],["men_ins","Insomnio crónico"]]}
+ ]},
+ {id:"ojos_orl",n:"Ojos, oídos, nariz y boca",ic:"👁️",hint:"Visión, audición, respiración nasal, garganta y dientes.",g:[
+  {t:"Ojos",c:[["oj_ref","Miopía, astigmatismo o hipermetropía altas"],["oj_cat","Cataratas"],["oj_glau","Glaucoma"],["oj_ret","Desprendimiento o enfermedad de retina"],["oj_quer","Queratocono"],["oj_estr","Estrabismo"],["oj_cir","Cirugía refractiva (láser)"]]},
+  {t:"Oídos",c:[["oi_hip","Pérdida de audición"],["oi_otit","Otitis recurrente"],["oi_tin","Zumbidos (tinnitus)"],["oi_cir","Cirugía de oído o tubos de ventilación"]]},
+  {t:"Nariz y garganta",c:[["na_sin","Sinusitis crónica o pólipos"],["na_tab","Desviación de tabique o cirugía nasal"],["na_rin","Rinitis alérgica"],["na_amig","Amigdalitis recurrente"],["na_voz","Problemas de cuerdas vocales"]]},
+  {t:"Boca y dientes",c:[["bo_car","Caries o tratamientos dentales extensos"],["bo_enc","Enfermedad de encías"],["bo_orto","Ortodoncia en curso"],["bo_atm","Problemas de mandíbula (ATM)"],["bo_ter","Cirugía de muelas del juicio"]]}
+ ]},
+ {id:"cuello",n:"Cuello y tiroides",ic:"🦋",hint:"Tiroides, nódulos y dolor cervical.",g:[
+  {t:"",c:[["cu_hipo","Hipotiroidismo"],["cu_hiper","Hipertiroidismo"],["cu_nod","Nódulos o bocio"],["cu_cat","Cáncer de tiroides"],["cu_cerv","Hernia discal o dolor cervical crónico"],["cu_gang","Ganglios inflamados recurrentes"],["cu_para","Enfermedad de paratiroides"]]}
+ ]},
+ {id:"pulmones",n:"Pulmones",ic:"🫁",hint:"Respiración, tos crónica, infecciones y fumar.",g:[
+  {t:"",c:[["pu_asma","Asma"],["pu_epoc","EPOC o enfisema"],["pu_bron","Bronquitis crónica"],["pu_neu","Neumonías recurrentes"],["pu_tb","Tuberculosis (actual o previa)"],["pu_fib","Fibrosis pulmonar"],["pu_bq","Bronquiectasias"],["pu_apn","Apnea del sueño"],["pu_nmt","Neumotórax previo"],["pu_cov","Secuelas de COVID-19"],["pu_ca","Cáncer de pulmón"]]}
+ ]},
+ {id:"corazon",n:"Corazón y circulación",ic:"🫀",hint:"Presión, ritmo, infartos, válvulas y cirugías del corazón.",g:[
+  {t:"",c:[["co_hta","Hipertensión arterial"],["co_arr","Arritmias o palpitaciones"],["co_inf","Infarto o enfermedad coronaria"],["co_ic","Insuficiencia cardíaca"],["co_val","Soplo o enfermedad de válvulas"],["co_cong","Cardiopatía congénita"],["co_dev","Marcapasos, stent o cirugía cardíaca"],["co_mio","Miocardiopatía"],["co_aor","Aneurisma de aorta"]]}
+ ]},
+ {id:"mamas",n:"Mamas",ic:"🎀",hint:"Nódulos, biopsias, cirugías e implantes.",g:[
+  {t:"",c:[["ma_nod","Nódulos, quistes o fibroadenomas"],["ma_ca","Cáncer de mama"],["ma_bio","Mastectomía o biopsia"],["ma_imp","Implantes o cirugía estética de mamas"],["ma_masti","Mastitis recurrente"]]},
+  {t:"Hombres",sx:"H",c:[["ma_gine","Ginecomastia"]]}
+ ]},
+ {id:"abd_sup",n:"Estómago, hígado y vesícula",ic:"🍽️",hint:"Gastritis, reflujo, vesícula, hígado y páncreas.",g:[
+  {t:"",c:[["ab_gas","Gastritis o úlcera"],["ab_erge","Reflujo (ERGE)"],["ab_hp","Infección por H. pylori"],["ab_hh","Hernia hiatal"],["ab_ves","Cálculos de vesícula o colecistectomía"],["ab_hig","Hígado graso"],["ab_hep","Hepatitis (A, B o C)"],["ab_cir","Cirrosis"],["ab_pan","Pancreatitis"],["ab_bar","Cirugía bariátrica"],["ab_ca","Cáncer de estómago, hígado o páncreas"]]}
+ ]},
+ {id:"renal",n:"Riñones y vías urinarias",ic:"💧",hint:"Piedras, infecciones urinarias y función renal.",g:[
+  {t:"",c:[["re_calc","Cálculos renales (piedras)"],["re_itu","Infecciones urinarias recurrentes"],["re_ins","Insuficiencia renal o diálisis"],["re_quis","Quistes renales"],["re_refl","Reflujo vesicoureteral"],["re_inc","Incontinencia urinaria"],["re_hema","Sangre en la orina con estudio pendiente"],["re_ca","Cáncer de riñón o vejiga"],["re_tras","Trasplante renal"]]}
+ ]},
+ {id:"abd_inf",n:"Intestinos y abdomen",ic:"🌀",hint:"Colon, apéndice, hernias y digestivo bajo.",g:[
+  {t:"",c:[["in_col","Colon irritable"],["in_cro","Colitis o enfermedad de Crohn"],["in_div","Divertículos"],["in_apen","Apendicitis (apendicectomía)"],["in_her","Hernias (inguinal, umbilical, etc.)"],["in_hem","Hemorroides o fisuras"],["in_cel","Enfermedad celíaca"],["in_pol","Pólipos de colon"],["in_est","Estreñimiento crónico severo"],["in_ca","Cáncer colorrectal"]]}
+ ]},
+ {id:"pelvis",n:"Pelvis y aparato reproductor",ic:"⚕️",hint:"Ginecológico, próstata, fertilidad y embarazo.",g:[
+  {t:"Mujeres",sx:"M",c:[["pe_endo","Endometriosis"],["pe_ov","Quistes de ovario o síndrome de ovario poliquístico"],["pe_mio","Miomas"],["pe_ces","Cesáreas o partos complicados"],["pe_vph","VPH o displasia cervical"],["pe_ca","Cáncer de útero, cuello uterino u ovario"],["pe_emb","Embarazo actual"],["pe_his","Histerectomía o ligadura de trompas"],["pe_hor","Trastornos hormonales o menopausia"]]},
+  {t:"Hombres",sx:"H",c:[["pe_pros","Próstata agrandada o prostatitis"],["pe_vari","Varicocele"],["pe_cah","Cáncer de próstata o testículo"],["pe_fim","Fimosis o circuncisión"],["pe_vas","Vasectomía"]]},
+  {t:"Ambos",c:[["pe_inf","Infertilidad"],["pe_its","Infecciones de transmisión sexual"],["pe_dis","Disfunción sexual"]]}
+ ]},
+ {id:"columna",n:"Columna y espalda",ic:"🦴",hint:"Dolor de espalda, hernias, escoliosis y cirugías.",g:[
+  {t:"",c:[["cl_hern","Hernia discal (lumbar o dorsal)"],["cl_esc","Escoliosis"],["cl_lumb","Dolor lumbar crónico"],["cl_cif","Cifosis"],["cl_art","Artrosis o espondilitis"],["cl_frac","Fractura vertebral"],["cl_cir","Cirugía de columna"],["cl_est","Estenosis de canal"]]}
+ ]},
+ {id:"brazos",n:"Hombros, brazos y manos",ic:"💪",hint:"Lesiones, tendinitis, fracturas y articulaciones.",g:[
+  {t:"",c:[["br_hom","Lesión de hombro (manguito, luxación)"],["br_ten","Tendinitis o epicondilitis (codo)"],["br_tun","Síndrome del túnel carpiano"],["br_frac","Fracturas de brazo, muñeca o mano"],["br_art","Artritis o artrosis en manos"],["br_amp","Amputación o malformación"]]}
+ ]},
+ {id:"caderas",n:"Caderas",ic:"🔩",hint:"Desgaste, prótesis y fracturas.",g:[
+  {t:"",c:[["ca_art","Artrosis de cadera"],["ca_disp","Displasia de cadera"],["ca_prot","Prótesis de cadera"],["ca_frac","Fractura de cadera o pelvis"],["ca_burs","Bursitis o tendinitis de cadera"]]}
+ ]},
+ {id:"piernas",n:"Rodillas y piernas",ic:"🦵",hint:"Ligamentos, menisco, várices y trombosis.",g:[
+  {t:"",c:[["pi_lig","Lesión de ligamentos o menisco"],["pi_art","Artrosis de rodilla"],["pi_prot","Prótesis de rodilla"],["pi_var","Várices o insuficiencia venosa"],["pi_trom","Trombosis venosa profunda"],["pi_frac","Fracturas de pierna"],["pi_ten","Tendinitis"],["pi_ulc","Úlceras en las piernas"]]}
+ ]},
+ {id:"pies",n:"Tobillos y pies",ic:"🦶",hint:"Esguinces, fascitis, juanetes y pie diabético.",g:[
+  {t:"",c:[["pv_esg","Esguinces recurrentes"],["pv_fas","Fascitis plantar o espolón"],["pv_jun","Juanetes"],["pv_pl","Pie plano o cavo"],["pv_diab","Pie diabético o úlceras"],["pv_frac","Fracturas de tobillo o pie"],["pv_gota","Gota"],["pv_aq","Lesión del tendón de Aquiles"]]}
+ ]},
+ {id:"sistemico",n:"Todo el cuerpo",ic:"🧬",hint:"Lo que no pertenece a una sola zona: metabólico, sangre, inmunidad, piel y cirugías.",g:[
+  {t:"Metabólico y endocrino",c:[["si_dm","Diabetes"],["si_col","Colesterol o triglicéridos altos"],["si_obe","Obesidad"],["si_osteo","Osteoporosis"],["si_hor","Otro trastorno hormonal"]]},
+  {t:"Cáncer y sangre",c:[["si_ca","Cáncer en cualquier localización (actual o previo)"],["si_sang","Trastornos de la sangre (anemia, hemofilia, etc.)"],["si_trom","Trombofilia o uso de anticoagulantes"]]},
+  {t:"Inmunidad e infecciones",c:[["si_auto","Enfermedad autoinmune (lupus, artritis reumatoide, etc.)"],["si_aler","Alergias severas o anafilaxia"],["si_inf","Infecciones crónicas (hepatitis, VIH, tuberculosis)"]]},
+  {t:"Piel",c:[["si_pso","Psoriasis o dermatitis crónica"],["si_lun","Lunares o lesiones en seguimiento"],["si_mel","Cáncer de piel"]]},
+  {t:"General",c:[["si_cir","Cirugías previas no mencionadas"],["si_hosp","Hospitalizaciones en los últimos 5 años"],["si_med","Medicación de uso permanente"],["si_disc","Discapacidad o secuelas"]]}
+ ]}
+];
+var ZONA_BY={},COND={};
+ZONAS.forEach(function(Z){ZONA_BY[Z.id]=Z;Z.g.forEach(function(g){g.c.forEach(function(c){COND[c[0]]={l:c[1],z:Z.id}})})});
+var ESTADOS=["En tratamiento","En estudio","Controlado","Resuelto"];
+var ROLES=["Pareja","Hijo(a)","Padre o madre","Otro"];
+var preSel={pid:"t",zid:"cabeza"};
+/* ---------- Declaración de preexistencias: lógica e interfaz ---------- */
+function uniq(a){return a.filter(function(x,i){return a.indexOf(x)===i})}
+function personasLeer(p){return (Array.isArray(p.personas)&&p.personas.length)?p.personas:[{id:"t",rol:"Titular",nombre:"",edad:"",sexo:""}]}
+function personasMut(p){if(!Array.isArray(p.personas)||!p.personas.length)p.personas=[{id:"t",rol:"Titular",nombre:"",edad:"",sexo:""}];return p.personas}
+function perEtiqueta(p,per,i){return i===0?(p.nombre||"Titular"):(per.nombre||(per.rol+(i>1?" "+i:"")))}
+function perRolEdad(per){return per.rol+(per.edad?" ("+per.edad+" años)":"")}
+function zonaDato(p,pid,zid,mk){
+  if(!p.pre){if(!mk)return null;p.pre={}}
+  if(!p.pre[pid]){if(!mk)return null;p.pre[pid]={}}
+  if(!p.pre[pid][zid]){if(!mk)return null;p.pre[pid][zid]={it:{}}}
+  var d=p.pre[pid][zid];if(!d.it)d.it={};return d;
+}
+function zonaEstado(d){
+  if(!d)return "pend";
+  var n=d.it?Object.keys(d.it).length:0;
+  if(n>0||(d.otra&&String(d.otra).trim()))return "hit";
+  return d.ok?"clear":"pend";
+}
+function grupoVisible(g,per){
+  if(!g.sx||!per.sexo)return true;
+  return (per.sexo==="Mujer"&&g.sx==="M")||(per.sexo==="Hombre"&&g.sx==="H");
+}
+/* Estado de la declaración de cada persona: "no" (sin preexistencias), "si" (declarando/escaneando) o "pend" (sin responder) */
+function hitsPersona(p,pid){
+  var z=(p.pre&&p.pre[pid])||{},n=0;
+  ZONAS.forEach(function(Z){var d=z[Z.id];if(d&&d.it)n+=Object.keys(d.it).length;if(d&&d.otra&&String(d.otra).trim())n++});
+  return n;
+}
+function datosPersona(p,pid){
+  var z=(p.pre&&p.pre[pid])||{},any=false;
+  ZONAS.forEach(function(Z){var d=z[Z.id];if(d&&(d.ok||zonaEstado(d)==="hit"))any=true});
+  return any;
+}
+function perEstado(p,pid){
+  var sn=(p.preSN&&p.preSN[pid])||"";
+  if(sn==="no"&&hitsPersona(p,pid)===0)return "no";
+  if(sn==="si"||datosPersona(p,pid)||hitsPersona(p,pid)>0)return "si";
+  return "pend";
+}
+function pendCount(p,pid){
+  var z=(p.pre&&p.pre[pid])||{},n=0;
+  ZONAS.forEach(function(Z){if(zonaEstado(z[Z.id])==="pend")n++});
+  return n;
+}
+function preStats(p){
+  var pers=personasLeer(p),tot=pers.length*ZONAS.length,revP=0,revX=0,cond=0,comp=0,xpNo=0;
+  pers.forEach(function(per){
+    if(perEstado(p,per.id)==="no"){revP+=ZONAS.length;xpNo+=10;return}
+    var z=(p.pre&&p.pre[per.id])||{},r=0;
+    ZONAS.forEach(function(Z){
+      var d=z[Z.id];
+      if(zonaEstado(d)!=="pend")r++;
+      if(d&&d.it)cond+=Object.keys(d.it).length;
+    });
+    revP+=r;revX+=r;if(r===ZONAS.length)comp++;
+  });
+  return {pct:tot?Math.round(revP/tot*100):0,xp:revX*4+cond*2+comp*30+xpNo,rev:revP,tot:tot,cond:cond,comp:comp};
+}
+function preResumen(p){
+  return personasLeer(p).map(function(per,i){
+    var base={pid:per.id,etiqueta:perEtiqueta(p,per,i),persona:perRolEdad(per)};
+    if(perEstado(p,per.id)==="no"){base.con=[];base.pend=[];base.pendZ=[];base.clear=ZONAS.length;base.sinPre=true;return base}
+    var z=(p.pre&&p.pre[per.id])||{},con=[],pend=[],pendZ=[],clear=0;
+    ZONAS.forEach(function(Z){
+      var d=z[Z.id],st=zonaEstado(d);
+      if(st==="hit"){
+        var its=Object.keys(d.it||{}).map(function(id){var x=d.it[id]||{};return {c:COND[id]?COND[id].l:id,a:x.a||"",e:x.e||"",t:x.t||""}});
+        if(d.otra&&String(d.otra).trim())its.push({c:"Otra: "+String(d.otra).trim(),a:"",e:"",t:""});
+        con.push({zona:Z.n,items:its});
+      }else if(st==="clear")clear++;
+      else{pend.push(Z.n);pendZ.push({id:Z.id,n:Z.n});}
+    });
+    base.con=con;base.pend=pend;base.pendZ=pendZ;base.clear=clear;base.sinPre=false;
+    return base;
+  });
+}
+function preTexto(p){
+  if(tipoDe(p)!=="nuevo")return "";
+  return preResumen(p).map(function(x){
+    if(x.sinPre)return x.etiqueta+": sin preexistencias";
+    if(!x.con.length)return x.pend.length?"":x.etiqueta+": sin antecedentes";
+    return x.etiqueta+": "+x.con.map(function(z){
+      return z.zona+" ("+z.items.map(function(i){return i.c+(i.a?" "+i.a:"")+(i.e?", "+i.e.toLowerCase():"")}).join("; ")+")";
+    }).join("; ");
+  }).filter(Boolean).join(" | ");
+}
+
+/* Silueta y zonas del escáner */
+function bodySvg(){
+  function Z(id,cls,shapes){var z=ZONA_BY[id];return '<g class="zone st-pend'+(cls?' '+cls:'')+'" data-z="'+id+'" tabindex="0" role="button" aria-label="'+z.n+'"><title>'+z.n+'</title>'+shapes+'</g>'}
+  var sil='<g class="sil">'
+   +'<path class="o" d="M68 116 L48 200 L38 288" stroke-width="20"/><path class="o" d="M172 116 L192 200 L202 288" stroke-width="20"/>'
+   +'<path class="f" d="M68 116 L48 200 L38 288" stroke-width="17"/><path class="f" d="M172 116 L192 200 L202 288" stroke-width="17"/>'
+   +'<path class="o" d="M104 352 L99 440 L97 540" stroke-width="27"/><path class="o" d="M136 352 L141 440 L143 540" stroke-width="27"/>'
+   +'<path class="f" d="M104 352 L99 440 L97 540" stroke-width="24"/><path class="f" d="M136 352 L141 440 L143 540" stroke-width="24"/>'
+   +'<ellipse class="b" cx="92" cy="562" rx="19" ry="10"/><ellipse class="b" cx="148" cy="562" rx="19" ry="10"/>'
+   +'<ellipse class="b" cx="120" cy="44" rx="28" ry="34"/><rect class="b" x="108" y="76" width="24" height="26" rx="6"/>'
+   +'<path class="b" d="M70 108 C96 97 144 97 170 108 L174 204 C172 236 162 258 156 278 L84 278 C78 258 68 236 66 204 Z"/>'
+   +'<path class="b" d="M84 276 L156 276 C164 300 162 330 152 352 L88 352 C78 330 76 300 84 276 Z"/>'
+   +'</g>';
+  var zs=''
+   +Z("cabeza","",'<ellipse class="zs" cx="120" cy="34" rx="22" ry="19"/>')
+   +Z("ojos_orl","",'<rect class="zs" x="97" y="54" width="46" height="26" rx="11"/>')
+   +Z("cuello","",'<rect class="zs" x="106" y="80" width="28" height="22" rx="6"/>')
+   +Z("pulmones","",'<ellipse class="zs" cx="97" cy="138" rx="19" ry="30"/><ellipse class="zs" cx="143" cy="138" rx="19" ry="30"/>')
+   +Z("corazon","",'<ellipse class="zs" cx="124" cy="150" rx="12" ry="14" transform="rotate(-12 124 150)"/>')
+   +Z("mamas","",'<ellipse class="zs" cx="99" cy="186" rx="16" ry="10"/><ellipse class="zs" cx="141" cy="186" rx="16" ry="10"/>')
+   +Z("abd_sup","",'<ellipse class="zs" cx="120" cy="216" rx="30" ry="18"/>')
+   +Z("renal","",'<ellipse class="zs" cx="82" cy="238" rx="8" ry="15"/><ellipse class="zs" cx="158" cy="238" rx="8" ry="15"/>')
+   +Z("abd_inf","",'<rect class="zs" x="98" y="238" width="44" height="40" rx="16"/>')
+   +Z("pelvis","",'<ellipse class="zs" cx="120" cy="304" rx="20" ry="16"/>')
+   +Z("caderas","",'<circle class="zs" cx="90" cy="326" r="13"/><circle class="zs" cx="150" cy="326" r="13"/>')
+   +Z("brazos","ln",'<path class="zs" d="M68 116 L48 200 L38 288"/><path class="zs" d="M172 116 L192 200 L202 288"/>')
+   +Z("piernas","ln",'<path class="zs" d="M104 356 L99 440 L97 536"/><path class="zs" d="M136 356 L141 440 L143 536"/>')
+   +Z("pies","",'<ellipse class="zs" cx="92" cy="562" rx="17" ry="9"/><ellipse class="zs" cx="148" cy="562" rx="17" ry="9"/>')
+   +Z("columna","ln sp",'<path class="zs" d="M232 104 L232 322"/>')
+   +Z("sistemico","frame",'<rect class="zs" x="5" y="5" width="250" height="590" rx="18"/>');
+  return '<svg id="preSvg" viewBox="0 0 260 600" role="group" aria-label="Mapa del cuerpo para declarar preexistencias" xmlns="http://www.w3.org/2000/svg">'
+   +'<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7EE0FF" stop-opacity="0"/><stop offset="1" stop-color="#7EE0FF" stop-opacity=".55"/></linearGradient></defs>'
+   +sil+zs
+   +'<text x="232" y="94" text-anchor="middle" class="tl">Columna</text><text x="16" y="26" class="tl">Todo el cuerpo</text>'
+   +'<rect class="scanline" x="0" y="0" width="260" height="34" fill="url(#sg)" pointer-events="none"/></svg>';
+}
+
+function preShell(p){
+  return '<div id="preBox" class="pre">'
+   +'<p class="an-note" style="margin:0 0 10px">Declara persona por persona, antes de cotizar. Si no tiene ninguna condición, responde "No" y seguimos; si la tiene, recorre el cuerpo de cabeza a pies. Cómo se trata cada condición lo define SaludSA: esto es un registro tuyo, no un diagnóstico. Regístralo solo con el consentimiento de la persona.</p>'
+   +'<div class="pre-q"><b>¿Cuántas personas se van a asegurar?</b><div class="stepper"><button type="button" id="nMenos" aria-label="Una persona menos">−</button><span id="nVal" aria-live="polite">1</span><button type="button" id="nMas" aria-label="Una persona más">+</button></div></div>'
+   +'<div class="pchips" id="prePchips"></div><div id="prePedit"></div>'
+   +'<div id="preGate"></div>'
+   +'<div id="preWork"><div class="pre-grid"><div class="pre-map"><div class="scan"><div class="scan-top"><span>Escáner de preexistencias</span><b id="preCnt"></b></div>'+bodySvg()
+   +'<div class="scan-leg"><span><i class="dot st-pend"></i>Sin revisar</span><span><i class="dot st-clear"></i>Sin antecedentes</span><span><i class="dot st-hit"></i>Con antecedentes</span></div></div></div>'
+   +'<div class="pre-side"><div class="zchips" id="preChips"></div><div id="prePanel"></div></div></div></div>'
+   +'<div id="preSum"></div>'
+   +'<label class="ck'+(p.preIA?' on':'')+'" style="margin-top:12px"><input type="checkbox" data-pia'+(p.preIA?' checked':'')+'><span>Incluir las preexistencias en el análisis con IA<small>Se envían sin nombres. Si lo dejas apagado, el análisis básico las usa igual.</small></span></label>'
+   +'</div>';
+}
+function preRenderPChips(p){
+  var pers=personasLeer(p);
+  $("nVal").textContent=pers.length;
+  $("prePchips").innerHTML=pers.map(function(per,i){
+    var est=perEstado(p,per.id),h=hitsPersona(p,per.id);
+    var st=est==="no"?'✓':(est==="si"?(h?h+' cond.':(pendCount(p,per.id)?'…':'✓')):'○');
+    return '<button type="button" class="pchip'+(per.id===preSel.pid?' on':'')+'" data-pid="'+per.id+'">'+esc(perEtiqueta(p,per,i))+'<i class="pst">'+st+'</i></button>';
+  }).join("");
+}
+function preRenderP(p){
+  var pers=personasLeer(p);
+  if(!pers.some(function(x){return x.id===preSel.pid}))preSel.pid=pers[0].id;
+  preRenderPChips(p);
+  var idx=0;pers.forEach(function(x,i){if(x.id===preSel.pid)idx=i});
+  var per=pers[idx];
+  $("prePedit").innerHTML='<div class="pedit">'
+   +(idx>0?'<label class="f"><span>Rol</span><select data-pp="rol">'+ROLES.map(function(r){return '<option'+(per.rol===r?' selected':'')+'>'+r+'</option>'}).join("")+'</select></label>'
+          +'<label class="f"><span>Nombre</span><input data-pp="nombre" type="text" value="'+esc(per.nombre||"")+'"></label>':'')
+   +'<label class="f"><span>Edad</span><input data-pp="edad" type="number" inputmode="numeric" min="0" max="120" value="'+esc(per.edad||"")+'"></label>'
+   +'<label class="f"><span>Sexo</span><select data-pp="sexo"><option value="">—</option><option'+(per.sexo==="Mujer"?' selected':'')+'>Mujer</option><option'+(per.sexo==="Hombre"?' selected':'')+'>Hombre</option></select></label>'
+   +(idx>0?'<button type="button" class="btn ghost small" id="pDel">Quitar persona</button>':'')
+   +'</div>'+(idx===0?'<p class="an-note">El titular es la persona de la ficha. Ajusta el número de arriba según a quiénes va a asegurar.</p>':'');
+}
+function preRenderGate(p){
+  var pers=personasLeer(p),per=pers[0],idx=0;
+  pers.forEach(function(x,i){if(x.id===preSel.pid){per=x;idx=i}});
+  var est=perEstado(p,per.id),lbl=esc(perEtiqueta(p,per,idx)),g=$("preGate"),w=$("preWork");
+  w.hidden=est!=="si";
+  if(est==="pend"){
+    g.innerHTML='<div class="gate"><h3>¿'+lbl+' tiene alguna condición médica previa que declarar?</h3><p class="an-note">Enfermedades, cirugías, tratamientos o estudios pendientes. Si no tiene ninguna, responde "No" y pasamos al siguiente paso.</p><div class="gate-b"><button type="button" class="btn small" id="gNo">No, ninguna</button><button type="button" class="btn ghost small" id="gSi">Sí, declarar</button></div></div>';
+  }else if(est==="no"){
+    g.innerHTML='<div class="gate ok"><span>✓ '+lbl+': sin preexistencias</span><button type="button" class="btn ghost small" id="gSi">Cambiar a Sí</button></div>';
+  }else{
+    g.innerHTML=hitsPersona(p,per.id)===0?'<div class="gate si"><span>Declarando para '+lbl+'</span><button type="button" class="btn ghost small" id="gNo">No tiene ninguna</button></div>':'';
+  }
+}
+function preRenderChips(p){
+  var pid=preSel.pid;
+  $("preChips").innerHTML=ZONAS.map(function(Z){
+    var d=zonaDato(p,pid,Z.id,false),st=zonaEstado(d),n=d&&d.it?Object.keys(d.it).length:0;
+    return '<button type="button" class="zc st-'+st+(Z.id===preSel.zid?' on':'')+'" data-z="'+Z.id+'"><i class="dot" aria-hidden="true"></i>'+Z.ic+' '+esc(Z.n)+(n?' <b>'+n+'</b>':'')+'</button>';
+  }).join("");
+}
+function preMapUpdate(p){
+  var svg=$("preSvg");if(!svg)return;
+  var pid=preSel.pid,rv=0;
+  ZONAS.forEach(function(Z){if(zonaEstado(zonaDato(p,pid,Z.id,false))!=="pend")rv++});
+  svg.querySelectorAll(".zone").forEach(function(g){
+    var zid=g.getAttribute("data-z"),st=zonaEstado(zonaDato(p,pid,zid,false));
+    g.classList.remove("st-pend","st-clear","st-hit","on");g.classList.add("st-"+st);
+    if(zid===preSel.zid)g.classList.add("on");
+  });
+  var c=$("preCnt");if(c)c.textContent=rv+"/"+ZONAS.length+" zonas";
+}
+function preRenderPanel(p){
+  var pers=personasLeer(p),per=pers[0],idx=0;
+  pers.forEach(function(x,i){if(x.id===preSel.pid){per=x;idx=i}});
+  var Z=ZONA_BY[preSel.zid];
+  var d=zonaDato(p,per.id,Z.id,false)||{it:{}};
+  var h='<div class="zp"><div class="zp-head"><span class="zp-ic" aria-hidden="true">'+Z.ic+'</span><div><h3>'+esc(Z.n)+'</h3><p>'+esc(Z.hint)+'</p></div></div>';
+  h+='<p class="an-note">Declarando para: <b>'+esc(perEtiqueta(p,per,idx))+'</b></p>';
+  Z.g.forEach(function(g){
+    if(!grupoVisible(g,per))return;
+    if(g.t)h+='<h4 class="gt">'+esc(g.t)+'</h4>';
+    h+='<div class="checks">'+g.c.map(function(c){
+      var it=d.it&&d.it[c[0]],on=!!it;
+      var row='<label class="ck'+(on?' on':'')+'"><input type="checkbox" data-pc="'+c[0]+'"'+(on?' checked':'')+'><span>'+esc(c[1])+'</span></label>';
+      if(on){
+        row+='<div class="cond-d">'
+         +'<label><small>Año</small><input type="number" inputmode="numeric" min="1930" max="2100" data-pf="a" data-cid="'+c[0]+'" value="'+esc(it.a||"")+'"></label>'
+         +'<label><small>Estado</small><select data-pf="e" data-cid="'+c[0]+'"><option value="">Elegir…</option>'+ESTADOS.map(function(e){return '<option'+(it.e===e?' selected':'')+'>'+e+'</option>'}).join("")+'</select></label>'
+         +'<label class="w"><small>Tratamiento o medicación</small><input type="text" data-pf="t" data-cid="'+c[0]+'" value="'+esc(it.t||"")+'"></label></div>';
+      }
+      return '<div class="cond">'+row+'</div>';
+    }).join("")+'</div>';
+  });
+  h+='<label class="f" style="margin-top:12px"><span>Otra condición o antecedente en esta zona</span><input type="text" data-pz="otra" value="'+esc(d.otra||"")+'" placeholder="Cirugías, estudios pendientes, secuelas…"></label>';
+  var hit=zonaEstado(d)==="hit";
+  h+='<div class="zp-actions"><button type="button" class="btn ghost small" id="zPrev">← Anterior</button>'
+   +(hit?'':'<button type="button" class="btn small'+(d.ok?' ghost':'')+'" id="zClear">'+(d.ok?'Sin antecedentes ✓ (desmarcar)':'Sin antecedentes en esta zona')+'</button>')
+   +'<button type="button" class="btn ghost small" id="zNext">Siguiente →</button></div>';
+  var pc=pendCount(p,per.id);
+  if(hitsPersona(p,per.id)>0&&pc>0)h+='<div class="zp-rest"><button type="button" class="btn ghost small" id="pRest">El resto sin antecedentes ('+pc+' zonas)</button></div>';
+  h+='</div>';
+  $("prePanel").innerHTML=h;
+}
+function preRenderSum(p){
+  var res=preResumen(p),h='<div class="psum"><h3>Resumen de la declaración</h3>';
+  res.forEach(function(x){
+    if(x.sinPre){
+      h+='<div class="psum-p"><b>'+esc(x.etiqueta)+'</b><small>'+esc(x.persona)+' · sin preexistencias ✓</small></div>';
+      return;
+    }
+    h+='<div class="psum-p"><b>'+esc(x.etiqueta)+'</b><small>'+esc(x.persona)+' · '+x.con.length+' con antecedentes · '+x.clear+' sin antecedentes · '+x.pend.length+' pendientes</small>';
+    if(x.con.length)h+='<ul class="an-list">'+x.con.map(function(z){
+      return '<li><b>'+esc(z.zona)+':</b> '+z.items.map(function(it){return esc(it.c)+(it.a?' ('+esc(it.a)+')':'')+(it.e?' · '+esc(it.e.toLowerCase()):'')}).join("; ")+'</li>';
+    }).join("")+'</ul>';
+    if(x.pendZ.length&&(x.con.length||x.clear>0))h+='<p class="an-note" style="margin-top:8px">Por revisar:</p><div>'+x.pendZ.map(function(z){return '<button type="button" class="pz" data-pid="'+x.pid+'" data-z="'+z.id+'">'+esc(z.n)+'</button>'}).join("")+'</div>';
+    else if(x.pendZ.length)h+='<p class="an-note" style="margin-top:8px">Aún sin responder.</p>';
+    else h+='<p class="an-note" style="margin-top:8px">Escaneo completo. ✓</p>';
+    h+='</div>';
+  });
+  $("preSum").innerHTML=h+'</div>';
+}
+function preRefreshLight(p){preRenderPChips(p);preRenderGate(p);preRenderChips(p);preMapUpdate(p);preRenderSum(p)}
+function preRefreshAll(p){preRenderP(p);preRenderGate(p);preRenderChips(p);preRenderPanel(p);preMapUpdate(p);preRenderSum(p)}
+function preMount(p){if(!ZONA_BY[preSel.zid])preSel.zid=ZONAS[0].id;preRefreshAll(p)}
+function preSelectZone(p,zid){
+  preSel.zid=zid;preRefreshLight(p);preRenderPanel(p);
+  var pp=$("prePanel");if(pp&&pp.scrollIntoView)pp.scrollIntoView({block:"nearest"});
+}
+function preGo(p,dir,soloPend){
+  var i=0,n=ZONAS.length;ZONAS.forEach(function(z,k){if(z.id===preSel.zid)i=k});
+  var to=((i+dir)%n+n)%n;
+  if(soloPend){
+    for(var k=1;k<=n;k++){var j=((i+dir*k)%n+n)%n;if(zonaEstado(zonaDato(p,preSel.pid,ZONAS[j].id,false))==="pend"){to=j;break}}
+  }
+  preSelectZone(p,ZONAS[to].id);
+}
+function preSetN(p,n,seleccionar){
+  n=Math.max(1,Math.min(10,n));var pers=personasMut(p);
+  while(pers.length<n)pers.push({id:"x"+Date.now().toString(36)+pers.length,rol:"Hijo(a)",nombre:"",edad:"",sexo:""});
+  while(pers.length>n){var x=pers.pop();if(p.pre)delete p.pre[x.id];if(p.preSN)delete p.preSN[x.id]}
+  if(seleccionar||!pers.some(function(x){return x.id===preSel.pid}))preSel.pid=pers[pers.length-1].id;
+  preSel.zid=ZONAS[0].id;
+  persist(p);preRefreshAll(p);refreshProgress(p);
+}
+/* Siguiente paso: siguiente persona sin responder, luego zonas pendientes, y al final la misión siguiente */
+function preNextStep(p){
+  var pers=personasLeer(p),i=0;
+  pers.forEach(function(x,k){if(x.id===preSel.pid)i=k});
+  for(var k=1;k<=pers.length;k++){
+    var per=pers[(i+k)%pers.length];
+    if(perEstado(p,per.id)==="pend"){
+      preSel.pid=per.id;preSel.zid=ZONAS[0].id;preRefreshAll(p);
+      toast("Sigue: "+perEtiqueta(p,per,pers.indexOf(per)));
+      var g=$("preGate");if(g&&g.scrollIntoView)g.scrollIntoView({block:"nearest"});return;
+    }
+  }
+  for(var k2=1;k2<=pers.length;k2++){
+    var per2=pers[(i+k2)%pers.length];
+    if(perEstado(p,per2.id)==="si"&&pendCount(p,per2.id)>0){
+      preSel.pid=per2.id;preRefreshAll(p);
+      toast("Faltan zonas por revisar de "+perEtiqueta(p,per2,pers.indexOf(per2)));return;
+    }
+  }
+  toast("Declaración completa ✓");
+  var nx=document.querySelector('.miss[data-m="pres"]');if(nx&&nx.scrollIntoView)nx.scrollIntoView({block:"start"});
+}
+function arm(t,label,fn){
+  if(t.getAttribute("data-armado")==="1"){clearTimeout(t._t);fn();return}
+  var old=t.textContent;
+  t.setAttribute("data-armado","1");t.textContent=label;t.style.background="var(--coral)";t.style.color="#fff";
+  t._t=setTimeout(function(){t.removeAttribute("data-armado");t.textContent=old;t.style.background="";t.style.color=""},4000);
+}
+function preClick(e,p){
+  var t=e.target;
+  var z=t.closest&&t.closest(".zone,.zc");
+  if(z){preSelectZone(p,z.getAttribute("data-z"));return}
+  if(t.id==="nMas"){preSetN(p,personasLeer(p).length+1,true);return}
+  if(t.id==="nMenos"){
+    var pers0=personasLeer(p);
+    if(pers0.length<=1){toast("Debe haber al menos una persona");return}
+    var last=pers0[pers0.length-1];
+    if(perEstado(p,last.id)==="pend")preSetN(p,pers0.length-1,false);
+    else arm(t,"¿Quitar?",function(){preSetN(p,pers0.length-1,false);toast("Persona quitada")});
+    return;
+  }
+  var pc=t.closest&&t.closest(".pchip");
+  if(pc){preSel.pid=pc.getAttribute("data-pid");preSel.zid=ZONAS[0].id;preRefreshAll(p);return}
+  var pz=t.closest&&t.closest(".pz");
+  if(pz){preSel.pid=pz.getAttribute("data-pid");preSel.zid=pz.getAttribute("data-z");preRefreshAll(p);var pn=$("prePanel");if(pn&&pn.scrollIntoView)pn.scrollIntoView({block:"nearest"});return}
+  if(t.id==="gNo"){
+    if(hitsPersona(p,preSel.pid)>0){toast("Tiene condiciones declaradas: quítalas primero");return}
+    p.preSN=p.preSN||{};p.preSN[preSel.pid]="no";persist(p);refreshProgress(p);
+    toast("Sin preexistencias · +10 XP");preRefreshAll(p);preNextStep(p);return;
+  }
+  if(t.id==="gSi"){
+    p.preSN=p.preSN||{};p.preSN[preSel.pid]="si";preSel.zid=ZONAS[0].id;persist(p);refreshProgress(p);preRefreshAll(p);
+    var w=$("preWork");if(w&&w.scrollIntoView)w.scrollIntoView({block:"nearest"});return;
+  }
+  if(t.id==="pDel"){
+    arm(t,"Toca otra vez para quitar",function(){
+      var pers=personasMut(p),del=preSel.pid,k=-1;
+      pers.forEach(function(x,i){if(x.id===del)k=i});
+      if(k>0){pers.splice(k,1);if(p.pre)delete p.pre[del];if(p.preSN)delete p.preSN[del];preSel.pid=pers[0].id;persist(p);preRefreshAll(p);refreshProgress(p);toast("Persona quitada")}
+    });
+    return;
+  }
+  if(t.id==="pRest"){
+    arm(t,"Toca otra vez: confirma que el resto no tiene nada",function(){
+      ZONAS.forEach(function(Z){
+        if(zonaEstado(zonaDato(p,preSel.pid,Z.id,false))==="pend"){var d=zonaDato(p,preSel.pid,Z.id,true);d.ok=true}
+      });
+      persist(p);refreshProgress(p);toast("Escaneo completo · +30 XP");preRefreshAll(p);preNextStep(p);
+    });
+    return;
+  }
+  if(t.id==="zClear"){
+    var d=zonaDato(p,preSel.pid,preSel.zid,true);
+    d.ok=!d.ok;persist(p);refreshProgress(p);
+    if(d.ok){
+      if(pendCount(p,preSel.pid)===0){toast("Escaneo completo · +30 XP");preRefreshAll(p);preNextStep(p)}
+      else{toast("Zona sin antecedentes · +4 XP");preGo(p,1,true)}
+    }else{preRefreshAll(p)}
+    return;
+  }
+  if(t.id==="zNext"){preGo(p,1,false);return}
+  if(t.id==="zPrev"){preGo(p,-1,false);return}
+}
+function preInput(el){
+  var p=getCurrent();if(!p)return;
+  var pid=preSel.pid,zid=preSel.zid;
+  if(el.hasAttribute("data-pia")){p.preIA=el.checked;var lb=el.closest(".ck");if(lb)lb.classList.toggle("on",el.checked);persist(p);return}
+  if(el.hasAttribute("data-pp")){
+    var per=null;personasMut(p).forEach(function(x){if(x.id===pid)per=x});if(!per)return;
+    var f=el.getAttribute("data-pp");per[f]=el.value;persist(p);
+    if(f==="sexo")preRenderPanel(p);
+    preRenderPChips(p);preRenderGate(p);preRenderSum(p);return;
+  }
+  if(el.hasAttribute("data-pc")){
+    var d=zonaDato(p,pid,zid,true),cid=el.getAttribute("data-pc");
+    if(el.checked){if(!d.it[cid])d.it[cid]={a:"",e:"",t:""};d.ok=false;toast("+2 XP")}else{delete d.it[cid]}
+    persist(p);preRenderPanel(p);preRefreshLight(p);refreshProgress(p);return;
+  }
+  if(el.hasAttribute("data-pf")){
+    var d2=zonaDato(p,pid,zid,true),it=d2.it[el.getAttribute("data-cid")];
+    if(it)it[el.getAttribute("data-pf")]=el.value;persist(p);preRenderSum(p);return;
+  }
+  if(el.hasAttribute("data-pz")){
+    var d3=zonaDato(p,pid,zid,true);d3.otra=el.value;if(String(el.value).trim())d3.ok=false;
+    persist(p);preRefreshLight(p);refreshProgress(p);
+  }
+}
+
+/* ---------- Avisos ---------- */
+var tt;
+function toast(msg){
+  var t=$("toast");t.textContent=msg;t.classList.add("show");
+  clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("show")},1900);
+}
+
+/* ---------- Eventos ---------- */
+function openSheet(id){
+  current=id;preSel={pid:"t",zid:ZONAS[0].id};$("sheet").hidden=false;$("home").hidden=true;
+  renderForm();window.scrollTo(0,0);$("sheet").scrollTop=0;
+}
+function closeSheet(){
+  var cp=items.find(function(x){return x.id===current});
+  if(cp)flush(cp);
+  $("sheet").hidden=true;$("home").hidden=false;current=null;renderHome();
+}
+
+function crear(tipo){
+  var p={id:uuid(),creado:Date.now(),etapa:"Nuevo",contactos:0,tipo:tipo};
+  items.push(p);persist(p);openSheet(p.id);
+}
+$("mNuevo").addEventListener("click",function(){crear("nuevo")});
+$("mCambio").addEventListener("click",function(){crear("cambio")});
+$("tchips").addEventListener("click",function(e){
+  var b=e.target.closest(".chip");if(!b)return;
+  tfilter=b.getAttribute("data-t");renderHome();
+});
+$("volver").addEventListener("click",closeSheet);
+$("chips").addEventListener("click",function(e){
+  var b=e.target.closest(".chip");if(!b)return;
+  filter=b.getAttribute("data-f");renderHome();
+});
+$("list").addEventListener("click",function(e){
+  var b=e.target.closest(".pcard");if(!b)return;openSheet(b.getAttribute("data-id"));
+});
+
+function getCurrent(){return items.find(function(x){return x.id===current})}
+
+$("form").addEventListener("input",function(e){
+  var el=e.target;
+  if(el.closest&&el.closest("#preBox")){preInput(el);return;}
+  if(el.hasAttribute&&el.hasAttribute("data-rec")){
+    var pr=getCurrent();if(!pr)return;
+    pr.rec=pr.rec||{};pr.rec[el.getAttribute("data-rec")]=el.checked;
+    el.closest(".ck").classList.toggle("on",el.checked);
+    var cc=$("recCount");if(cc)cc.textContent=document.querySelectorAll("[data-rec]:checked").length+"/"+document.querySelectorAll("[data-rec]").length+" revisados";
+    persist(pr);return;
+  }
+  var k=el.getAttribute("data-k");if(!k)return;
+  var p=getCurrent();if(!p)return;
+  if(el.type==="checkbox"){
+    p[k]=el.checked;
+    el.closest(".ck").classList.toggle("on",el.checked);
+    if(el.checked){
+      var c=null;MISIONES.forEach(function(m){m.campos.forEach(function(x){if(x.k===k)c=x})});
+      if(c)toast("+"+c.xp+" XP");
+    }
+  }else{
+    var antes=p[k];
+    p[k]=el.value;
+    if(k==="etapa"&&el.value==="Cerrado"&&antes!=="Cerrado")toast("Cierre logrado · +100 XP");
+  }
+  persist(p);refreshProgress(p);
+  if(k==="nombre"&&$("preBox")){preRenderPChips(p);preRenderGate(p);preRenderSum(p);}
+});
+$("form").addEventListener("keydown",function(e){
+  var t=e.target;
+  if((e.key==="Enter"||e.key===" ")&&t.classList&&t.classList.contains("zone")){
+    e.preventDefault();var p=getCurrent();if(p)preSelectZone(p,t.getAttribute("data-z"));
+  }
+});
+$("form").addEventListener("click",function(e){
+  var p=getCurrent();if(!p)return;
+  if(e.target.closest&&e.target.closest("#preBox")){preClick(e,p);return;}
+  if(e.target.closest("#analizar,#reanalizar")){analizar(p);return;}
+  if(e.target.closest("#copiar")){copiar(p);return;}
+  var mc=e.target.closest(".mc");
+  if(mc){
+    var mid=mc.getAttribute("data-mid"),cur=motivosDe(p).slice(),ix=cur.indexOf(mid);
+    if(ix>=0)cur.splice(ix,1);else cur.push(mid);
+    p.motivos=cur;persist(p);
+    var sh=$("sheet"),st=sh.scrollTop;renderForm();sh.scrollTop=st;return;
+  }
+  var ct=e.target.closest(".ct");
+  if(ct){
+    var n=parseInt(ct.getAttribute("data-n"),10);
+    p.contactos=(p.contactos===n)?n-1:n;
+    if(p.contactos>=5)toast("5 contactos · insignia desbloqueada");
+    else if(p.contactos>0)toast("+10 XP");
+    persist(p);
+    document.querySelectorAll(".ct").forEach(function(b){b.setAttribute("aria-pressed",p.contactos>=parseInt(b.getAttribute("data-n"),10))});
+    refreshProgress(p);return;
+  }
+  if(e.target.id==="guardar"){persist(p);flush(p);toast("Ficha guardada");closeSheet();return;}
+  if(e.target.id==="borrar"){
+    var b=e.target;
+    if(b.getAttribute("data-armado")==="1"){
+      clearTimeout(b._t);removeItem(p);closeSheet();toast("Ficha eliminada");
+    }else{
+      b.setAttribute("data-armado","1");b.textContent="Toca otra vez para eliminar";
+      b.style.background="var(--coral)";b.style.color="#fff";
+      b._t=setTimeout(function(){b.removeAttribute("data-armado");b.textContent="Eliminar";b.style.background="";b.style.color=""},4000);
+    }
+  }
+});
+
+/* Exportar */
+function csvCell(v){v=v==null?"":String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+$("exportar").addEventListener("click",function(){
+  if(!items.length){toast("Aún no hay fichas para exportar");return;}
+  var cols=[];
+  MISIONES.forEach(function(m){m.campos.forEach(function(c){cols.push(c)})});
+  var head=["Tipo"].concat(cols.map(function(c){return csvCell(c.l)})).concat(["Preexistencias declaradas","XP","Avance %"]).join(",");
+  var rows=items.map(function(p){
+    return [csvCell(TIPOS[tipoDe(p)].n)].concat(cols.map(function(c){
+      var v=p[c.k];
+      if(c.t==="motivos")v=motivosDe(p).map(function(id){return MOTIVO_BY[id]?MOTIVO_BY[id].l:id}).join("; ");
+      else if(c.t==="check")v=v?"Sí":"No";
+      if(!campoActivo(c,p))v="";
+      return csvCell(v);
+    })).concat([csvCell(preTexto(p)),fichaXp(p),fichaPct(p)]).join(",");
+  });
+  var csv="\ufeff"+[head].concat(rows).join("\n");
+  if(!window.claude||!window.claude.use){toast("Exportar no está disponible aquí");return;}
+  window.claude.use("downloads").then(function(d){
+    if(!d){toast("Exportar no está disponible aquí");return;}
+    d.save({filename:"prospectos-saludsa.csv",data:csv}).catch(function(){});
+  }).catch(function(){toast("Exportar no está disponible aquí")});
+});
+
+document.addEventListener("visibilitychange",function(){
+  if(document.hidden)items.forEach(function(p){if(timers[p.id])flush(p)});
+});
+
+/* ---------- Inicio ---------- */
+items=lsLoad();
+renderHome();
+initDb();
+})();
+</script>
+</body>
+</html>
