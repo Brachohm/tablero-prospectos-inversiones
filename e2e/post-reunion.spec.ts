@@ -97,7 +97,7 @@ test('Post reunión (cambio de seguro): informe PDF, segunda reunión, pedidos y
       page.evaluate(
         () =>
           new Promise<number>((ok) => {
-            const r = indexedDB.open('tablero-prospectos-saludsa')
+            const r = indexedDB.open('tablero-prospectos-inversiones')
             r.onsuccess = () => {
               const q = r.result.transaction('fichas').objectStore('fichas').getAll()
               q.onsuccess = () => ok((q.result as { calificacion?: { valor: number } }[]).find((f) => f.calificacion)?.calificacion?.valor ?? 0)

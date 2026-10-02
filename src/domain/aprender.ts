@@ -27,16 +27,17 @@ export const ORIGEN_AUTO_L: Record<OrigenAuto, string> = {
 };
 
 const REGLAS_ETIQUETA: [RegExp, string][] = [
-  [/reembols/, "mot:reembolsos"],
-  [/deducible|copago|coaseguro/, "mot:deducibles"],
-  [/precio|tarifa|prima|costo|cuota|ahorr/, "obj:Precio"],
-  [/\bred\b|clinica|prestador|medicos/, "mot:red"],
-  [/maternidad|parto|embaraz|hij|famili|pediatr/, "familia"],
-  [/emergencia|cirugia|hospital|accidente|grave|oncolog|cancer/, "emergencia"],
-  [/preexisten|antiguedad|carencia|espera/, "obj:Perder antigüedad o carencias"],
-  [/telemedicina|24\/7|atencion|asesor|app\b|linea/, "mot:atencion"],
-  [/cobertura|cubre|cubierto|maximo|suma asegurada|ilimitad/, "mot:cobertura"],
-  [/adulto mayor|mayores|tercera edad|65|60 anos/, "mayor"],
+  [/rendimiento|rentabilidad|interes|crec/, "mot:rendimiento"],
+  [/comision|costo|cargo|administracion/, "mot:costos"],
+  [/rescate|retiro|liquidez|penalidad|permanencia/, "mot:liquidez"],
+  [/estado de cuenta|transparen|informe|reporte/, "mot:transparencia"],
+  [/riesgo|volatil|caida|perfil/, "mot:riesgo"],
+  [/aporte|presupuesto|cuota|no me alcanza/, "obj:No tengo dinero ahora"],
+  [/confian|regulad|segur[oa] mi dinero|respaldo/, "obj:Desconfío de las inversiones"],
+  [/hij|famili|educacion|universidad/, "familia"],
+  [/emergencia|imprevist/, "emergencia"],
+  [/asesor|seguimiento|atencion|app\b|linea/, "mot:atencion"],
+  [/retiro|jubilacion|pension/, "mayor"],
 ];
 
 /** Etiquetas de argumento según las palabras del texto. */

@@ -230,13 +230,10 @@ export function etiquetasDeFicha(p: Prospecto): string[] {
   const obj = txt(p, "objecion");
   if (obj && obj !== "Ninguna") e.add("obj:" + obj);
   for (const m of motivosDe(p)) e.add("mot:" + m);
-  if (txt(p, "criterio") === "Precio") e.add("obj:Precio");
   if (txt(p, "depende")) e.add("familia");
-  const poliza = txt(p, "tipoPoliza");
-  if (poliza === "Masivo" || poliza === "Corporativo") e.add("poliza:" + poliza.toLowerCase());
   const edad = num(p, "edad");
   if (edad !== null && edad >= EDAD_MAYOR) e.add("mayor");
-  if (txt(p, "emergencia") || txt(p, "costoEvento")) e.add("emergencia");
+  if (txt(p, "emergencia") === "No" || txt(p, "emergencia") === "Parcial") e.add("emergencia");
   return [...e];
 }
 

@@ -217,7 +217,7 @@ function crear(): AlmacenBiblioteca {
   return almacenBibliotecaMemoria();
 }
 
-export const biblioteca = new Biblioteca(crear(), Date.now, "tablero-biblioteca");
+export const biblioteca = new Biblioteca(crear(), Date.now, "tablero-inversiones-biblioteca");
 
 /** Configuración del asesor (o undefined si aún no la guardó). */
 export function useAjustes(b: Biblioteca = biblioteca): Ajustes | undefined {

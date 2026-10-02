@@ -45,7 +45,7 @@ export class BaseDatos extends Dexie {
 }
 
 /** Clave que usó la Fase 2 (localStorage). Se migra una sola vez. */
-export const CLAVE_LOCALSTORAGE = "tablero-saludsa:fichas:v1";
+export const CLAVE_LOCALSTORAGE = "tablero-inversiones:fichas:v1";
 
 function leerLocalStorage(): Prospecto[] {
   try {
@@ -59,7 +59,7 @@ function leerLocalStorage(): Prospecto[] {
   }
 }
 
-export const NOMBRE_BASE = "tablero-prospectos-saludsa";
+export const NOMBRE_BASE = "tablero-prospectos-inversiones";
 
 export function almacenIndexedDB(nombre = NOMBRE_BASE): Almacen {
   const db = new BaseDatos(nombre);

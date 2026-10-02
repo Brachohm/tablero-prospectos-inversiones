@@ -60,9 +60,9 @@ describe("contactos nuevos", () => {
 describe("saludo para quien no tiene tu número registrado", () => {
   it("agrega la presentación después de la primera frase (y no la repite si ya te nombra)", async () => {
     const { conPresentacion } = await import("./ajustes");
-    const p = "Le saluda Bracho, asesor de SaludSA. Le escribo para presentarme y quedar a sus órdenes.";
+    const p = "Le saluda Bracho, asesor de inversiones. Le escribo para presentarme y quedar a sus órdenes.";
     expect(conPresentacion("Hola Ana, ¡buenos días! Le escribo para saludarle y desearle un excelente día.", p, "Bracho")).toBe(
-      "Hola Ana, ¡buenos días! Le saluda Bracho, asesor de SaludSA. Le escribo para presentarme y quedar a sus órdenes. Le escribo para saludarle y desearle un excelente día.",
+      "Hola Ana, ¡buenos días! Le saluda Bracho, asesor de inversiones. Le escribo para presentarme y quedar a sus órdenes. Le escribo para saludarle y desearle un excelente día.",
     );
     expect(conPresentacion("Hola Ana", p, "Bracho")).toBe(`Hola Ana ${p}`);
     expect(conPresentacion("Hola Ana, soy Bracho. ¿Cómo está?", p, "Bracho")).toBe("Hola Ana, soy Bracho. ¿Cómo está?");

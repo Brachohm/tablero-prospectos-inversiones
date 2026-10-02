@@ -109,11 +109,11 @@ test('migra las fichas que quedaron en localStorage (Fase 2)', async ({ page }) 
   await page.goto('/')
   await page.evaluate(() => {
     localStorage.setItem(
-      'tablero-saludsa:fichas:v1',
+      'tablero-inversiones:fichas:v1',
       JSON.stringify([{ id: 'vieja', creado: 1, mod: 1, tipo: 'nuevo', etapa: 'Nuevo', nombre: 'Ficha de la Fase 2', consentimiento: { ts: 1 } }]),
     )
   })
   await page.reload()
   await expect(page.getByRole('button', { name: /Ficha de la Fase 2/ })).toBeVisible()
-  expect(await page.evaluate(() => localStorage.getItem('tablero-saludsa:fichas:v1'))).toBeNull()
+  expect(await page.evaluate(() => localStorage.getItem('tablero-inversiones:fichas:v1'))).toBeNull()
 })

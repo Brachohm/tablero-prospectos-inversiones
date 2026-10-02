@@ -6,17 +6,17 @@
  *   {asesor}     cómo te gusta que te llamen (Configuración → Perfil)
  *   {rol}        tu rol (Configuración → Perfil)
  *   {referente}  quien lo refirió
- *   {porque}     lo que lo hizo pensar en contratar / lo que le falla hoy
+ *   {porque}     lo que lo hizo pensar en invertir / lo que le falla hoy
  *   {plan}       " (plan Familiar)" o vacío
- *   {precio}     " por $95 al mes" o vacío
+ *   {precio}     " por $150 al mes" o vacío
  *   {aporte}     lo que le aportas en el próximo contacto
  *   {cuando}     "hoy", "mañana" o "el jueves 9 de octubre"
  *   {hora}       "10:30"
  *   {lugar}      " en su oficina" o vacío
- *   {renovacion} fecha de renovación del cliente
+ *   {renovacion} fecha de revisión del plan del cliente
  *   {saludo}     "buenos días", "buenas tardes" o "buenas noches" (según la hora)
  *   {deseo}      "un excelente día", "una excelente tarde" o "una linda noche"
- * Nada de esto promete coberturas: lo que dependa de la aseguradora se valida antes.
+ * Nada de esto promete rendimientos: lo que dependa de la aseguradora se valida antes.
  */
 export interface Plantilla {
   id: string;
@@ -62,20 +62,20 @@ export const MENSAJES_ETAPA: Readonly<Record<string, readonly Plantilla[]>> = {
     {
       id: "n-referido",
       l: "Primer contacto (referido)",
-      t: "Hola {nombre}, {saludo}. Soy {asesor}, {rol}. {referente} me compartió su contacto. Me gustaría conocer qué necesita en salud para ver cómo puedo ayudarle. ¿Cuándo le queda bien conversar 15 minutos?",
+      t: "Hola {nombre}, {saludo}. Soy {asesor}, {rol}. {referente} me compartió su contacto. Me gustaría conocer qué metas tiene con su dinero para ver cómo puedo ayudarle. ¿Cuándo le queda bien conversar 15 minutos?",
       si: "referido",
     },
     {
       id: "n-primero",
       l: "Primer contacto",
-      t: "Hola {nombre}, {saludo}. Soy {asesor}, {rol}. Me gustaría hacerle un par de preguntas para entender qué necesita en salud y ver cómo puedo ayudarle. ¿Cuándo le queda bien conversar 15 minutos?",
+      t: "Hola {nombre}, {saludo}. Soy {asesor}, {rol}. Me gustaría hacerle un par de preguntas para entender sus metas de ahorro e inversión y ver cómo puedo ayudarle. ¿Cuándo le queda bien conversar 15 minutos?",
     },
   ],
   "Cuadrar cita": [
     {
       id: "n-agendar",
       l: "Agendar reunión",
-      t: "Hola {nombre}, {saludo}. ¿Le parece si nos reunimos esta semana para conversar sobre su seguro de salud? Por favor, indíqueme qué día y hora le quedan mejor.",
+      t: "Hola {nombre}, {saludo}. ¿Le parece si nos reunimos esta semana para conversar sobre sus metas y cómo hacer crecer su dinero? Por favor, indíqueme qué día y hora le quedan mejor.",
     },
     {
       id: "c-opciones",
@@ -87,7 +87,7 @@ export const MENSAJES_ETAPA: Readonly<Record<string, readonly Plantilla[]>> = {
     {
       id: "m1-preparar",
       l: "Antes de la primera reunión",
-      t: "Hola {nombre}, {saludo}. Soy {asesor}. En nuestra reunión la idea es conocer bien su situación y la de su familia: todavía no vamos a hablar de productos. Si tiene un seguro actual, le agradecería tener a mano su póliza o su tabla de coberturas.",
+      t: "Hola {nombre}, {saludo}. Soy {asesor}. En nuestra reunión la idea es conocer bien su situación y la de su familia: todavía no vamos a hablar de productos. Si ya tiene alguna inversión, le agradecería tener a mano su último estado de cuenta.",
     },
   ],
   "Segunda reunión": [
@@ -112,7 +112,7 @@ export const MENSAJES_ETAPA: Readonly<Record<string, readonly Plantilla[]>> = {
     {
       id: "p-revisaste",
       l: "¿Revisó la propuesta?",
-      t: "Hola {nombre}, {saludo}. ¿Pudo revisar la propuesta{plan}? Si le queda alguna duda sobre coberturas, carencias o el precio, con gusto se la aclaro.",
+      t: "Hola {nombre}, {saludo}. ¿Pudo revisar la propuesta{plan}? Si le queda alguna duda sobre el aporte, el plazo, los costos o los rescates, con gusto se la aclaro.",
     },
     {
       id: "p-resumen",
@@ -122,15 +122,15 @@ export const MENSAJES_ETAPA: Readonly<Record<string, readonly Plantilla[]>> = {
     },
     {
       id: "o-precio",
-      l: "Objeción: precio",
-      objecion: "Precio",
-      t: "Hola {nombre}, {saludo}. Estuve pensando en lo que me comentó sobre el precio. Si le parece, revisamos juntos otra opción de plan o de deducible para que se ajuste mejor a su presupuesto, sin perder lo que más le importa.",
+      l: "Objeción: no tengo dinero ahora",
+      objecion: "No tengo dinero ahora",
+      t: "Hola {nombre}, {saludo}. Estuve pensando en lo que me comentó sobre su presupuesto. Si le parece, revisamos juntos un aporte más pequeño que pueda sostener cómodamente: lo importante es empezar y ser constante.",
     },
     {
       id: "o-tengo",
-      l: "Objeción: ya tengo seguro",
-      objecion: "Ya tengo seguro",
-      t: "Hola {nombre}, {saludo}. No se trata de cambiar por cambiar. Si me comparte su póliza actual, le preparo una comparación honesta: si la suya le conviene más, se lo voy a decir.",
+      l: "Objeción: ya tengo ahorros",
+      objecion: "Ya tengo ahorros",
+      t: "Hola {nombre}, {saludo}. No se trata de mover por mover. Si me comparte su último estado de cuenta, le preparo una comparación honesta: si lo que tiene le conviene más, se lo voy a decir.",
     },
     {
       id: "o-pensar",
@@ -140,9 +140,9 @@ export const MENSAJES_ETAPA: Readonly<Record<string, readonly Plantilla[]>> = {
     },
     {
       id: "o-antiguedad",
-      l: "Objeción: antigüedad o carencias",
-      objecion: "Perder antigüedad o carencias",
-      t: "Hola {nombre}, {saludo}. Entiendo su preocupación por la antigüedad y las carencias. Antes de que decida lo validamos con la aseguradora para su caso, y su póliza actual se mantiene hasta que la nueva esté vigente.",
+      l: "Objeción: desconfianza",
+      objecion: "Desconfío de las inversiones",
+      t: "Hola {nombre}, {saludo}. Entiendo su desconfianza, es sana. Con gusto le muestro quién emite el plan, cómo está regulado y cómo podrá ver su saldo en todo momento, para que decida con toda la información.",
     },
     {
       id: "o-general",
@@ -158,7 +158,7 @@ export const MENSAJES_ETAPA: Readonly<Record<string, readonly Plantilla[]>> = {
     {
       id: "s-retomar",
       l: "Retomar",
-      t: "Hola {nombre}, {saludo}. ¿Cómo está? Quedamos en retomar el tema de su seguro de salud. ¿Le parece si conversamos esta semana?",
+      t: "Hola {nombre}, {saludo}. ¿Cómo está? Quedamos en retomar el tema de su plan de inversión. ¿Le parece si conversamos esta semana?",
     },
     {
       id: "s-ultimo",
@@ -178,7 +178,7 @@ export const MENSAJES_ETAPA: Readonly<Record<string, readonly Plantilla[]>> = {
     {
       id: "c-bienvenida",
       l: "Bienvenida",
-      t: "Hola {nombre}, {saludo}. Le doy la más cordial bienvenida a SaludSA. Gracias por su confianza. Ante cualquier duda sobre cómo usar su plan o un reembolso, escríbame aquí y con gusto le acompaño.",
+      t: "Hola {nombre}, {saludo}. Bienvenido a su plan de inversión. Gracias por su confianza. Ante cualquier duda sobre su estado de cuenta, sus aportes o sus fondos, escríbame aquí y con gusto le acompaño.",
     },
     {
       id: "c-referidos",
@@ -188,7 +188,7 @@ export const MENSAJES_ETAPA: Readonly<Record<string, readonly Plantilla[]>> = {
     {
       id: "c-renovacion",
       l: "Antes de la renovación",
-      t: "Hola {nombre}, {saludo}. Su plan renueva el {renovacion}. Antes de esa fecha me gustaría revisar con usted si sigue siendo el más adecuado. ¿Cuándo le queda bien?",
+      t: "Hola {nombre}, {saludo}. Se acerca la revisión de su plan ({renovacion}). Me gustaría revisar con usted cómo van sus fondos y si siguen siendo los más adecuados para su meta. ¿Cuándo le queda bien?",
       si: "renovacion",
     },
   ],
@@ -196,7 +196,7 @@ export const MENSAJES_ETAPA: Readonly<Record<string, readonly Plantilla[]>> = {
     {
       id: "x-reactivar",
       l: "Reactivar",
-      t: "Hola {nombre}, {saludo}. ¿Cómo está? Hace un tiempo conversamos sobre su seguro de salud. Si en algún momento desea revisarlo de nuevo, quedo a sus órdenes.",
+      t: "Hola {nombre}, {saludo}. ¿Cómo está? Hace un tiempo conversamos sobre sus metas de inversión. Si en algún momento desea revisarlo de nuevo, quedo a sus órdenes.",
     },
   ],
 };

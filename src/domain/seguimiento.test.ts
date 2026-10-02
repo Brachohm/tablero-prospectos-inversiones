@@ -77,7 +77,7 @@ describe("seguimiento 1-2-3", () => {
 
 describe("configuración", () => {
   it("perfil: valores por defecto y los guardados", () => {
-    expect(perfilDe(undefined)).toEqual({ nombreCompleto: "", apodo: "Bracho", rol: "asesor de SaludSA", celular: "", correo: "", proposito: "" });
+    expect(perfilDe(undefined)).toEqual({ nombreCompleto: "", apodo: "Bracho", rol: "asesor de inversiones", celular: "", correo: "", proposito: "" });
     const a = { ...ajustesIniciales(), perfil: { nombreCompleto: "Bradley H.", apodo: "Brad", rol: "asesor comercial" } };
     expect(perfilDe(a).apodo).toBe("Brad");
   });
@@ -140,9 +140,9 @@ describe("invitación sin reunión agendada", () => {
   it("pregunta qué día y a qué hora puede disponer de 30 minutos", async () => {
     const { textoInvitacion, mensajeDe, ajustesIniciales: ini } = await import("./ajustes");
     const plantilla = mensajeDe(ini(), "invitacion").texto;
-    const v = { nombre: "Ana", asesor: "Bracho", rol: "asesor de SaludSA", fecha: "", hora: "", lugar: "" };
+    const v = { nombre: "Ana", asesor: "Bracho", rol: "asesor de inversiones", fecha: "", hora: "", lugar: "" };
     expect(textoInvitacion(plantilla, v, false)).toBe(
-      "Hola Ana, buenos días. Soy Bracho, asesor de SaludSA. Me gustaría invitarle a una reunión para conocer su situación y lo que es importante para usted. ¿Qué día y a qué hora podría disponer de 30 minutos para tener la reunión?",
+      "Hola Ana, buenos días. Soy Bracho, asesor de inversiones. Me gustaría invitarle a una reunión para conocer su situación y lo que es importante para usted. ¿Qué día y a qué hora podría disponer de 30 minutos para tener la reunión?",
     );
     const con = { ...v, fecha: "el viernes 9 de octubre", hora: "10:30", lugar: " en su oficina" };
     expect(textoInvitacion(plantilla, con, true)).toContain("para usted: el viernes 9 de octubre a las 10:30 en su oficina. ¿Le queda bien?");

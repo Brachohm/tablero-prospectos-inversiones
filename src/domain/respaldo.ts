@@ -9,7 +9,7 @@ import type { ContactoNuevo } from "./contactos";
 import type { Ajustes } from "./ajustes";
 import type { Prospecto } from "./tipos";
 
-export const APP_RESPALDO = "tablero-prospectos-saludsa";
+export const APP_RESPALDO = "tablero-prospectos-inversiones";
 /** 2: agrega planes y argumentos de la Biblioteca (los PDF no viajan en la copia). 3: contactos nuevos. 4: configuración (sin los archivos adjuntos). */
 export const VERSION_RESPALDO = 4;
 

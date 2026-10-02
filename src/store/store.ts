@@ -168,7 +168,7 @@ function crearAlmacen(): Almacen {
   return almacenMemoria();
 }
 
-export const store = new Store(crearAlmacen(), Date.now, "tablero-fichas");
+export const store = new Store(crearAlmacen(), Date.now, "tablero-inversiones-fichas");
 
 export function useFichas(s: Store = store): readonly Prospecto[] {
   return useSyncExternalStore(s.subscribe, s.getItems);

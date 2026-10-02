@@ -49,8 +49,8 @@ describe("herramientas de envío", () => {
   });
 
   it("firma y validación del perfil", () => {
-    expect(firma({ nombreCompleto: "Bradley H.", apodo: "Brad", rol: "asesor de SaludSA", celular: "0991234567", correo: "b@gmail.com" })).toBe(
-      "Bradley H.\nasesor de SaludSA\nWhatsApp: 0991234567\nb@gmail.com",
+    expect(firma({ nombreCompleto: "Bradley H.", apodo: "Brad", rol: "asesor de inversiones", celular: "0991234567", correo: "b@gmail.com" })).toBe(
+      "Bradley H.\nasesor de inversiones\nWhatsApp: 0991234567\nb@gmail.com",
     );
     const base = { nombreCompleto: "", apodo: "Brad", rol: "" };
     expect(errorPerfil({ ...base, celular: "0991" })).toBe("Revisa tu número de celular");

@@ -1,7 +1,7 @@
 /** Frases del día para empezar la gestión (una por día, en orden). Editables. */
 export const FRASES: readonly string[] = [
-  "Cada llamada de hoy es una familia que puede estar más protegida mañana.",
-  "No vendes un seguro: ayudas a alguien a dormir tranquilo.",
+  "Cada llamada de hoy es una familia que puede estar más cerca de su meta mañana.",
+  "No vendes un plan: ayudas a alguien a construir su futuro.",
   "La constancia gana más cierres que el talento. Hoy, un contacto más.",
   "Escucha primero: la mejor propuesta nace de una buena pregunta.",
   "Un 'no' de hoy es información, no un final. Sigue con actitud.",
@@ -19,7 +19,7 @@ export const FRASES: readonly string[] = [
   "La honestidad es tu mejor argumento de venta.",
   "Termina lo que empiezas: cada contacto merece un cierre, sea sí o sea no.",
   "Haz hoy la llamada que estás posponiendo.",
-  "Proteger la salud de una familia es un trabajo que vale la pena hacer bien.",
+  "Ayudar a una familia a hacer crecer su patrimonio es un trabajo que vale la pena hacer bien.",
   "Sé el asesor que tú quisieras tener.",
   "El mejor momento para dar seguimiento era ayer; el segundo mejor es hoy.",
   "Organiza tu día y tu día trabajará para ti.",

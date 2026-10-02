@@ -7,6 +7,7 @@
 import { MAX_OBJETIVOS, OBJETIVOS_INICIALES } from "../config/objetivos";
 import { ETAPA_CERRADO, ETAPA_PRECIERRE } from "../config/ficha";
 import { hoyISO } from "./fechas";
+import { comisionDe } from "./comisiones";
 import { etapaDe, num, txt, vendido } from "./ficha";
 import type { Prospecto } from "./tipos";
 
@@ -73,6 +74,8 @@ export interface Objetivo {
   /** Prima de las fichas en pre-cierre (ya van a contratar): la simulación de la barra. */
   enPrecierre: number;
   diasRestantes: number;
+  /** Comisión estimada de los cierres del mes (según tipo de plan y plazo). */
+  comision: number;
 }
 
 const EN_JUEGO = ["Segunda reunión", ETAPA_PRECIERRE];
@@ -129,6 +132,7 @@ export function objetivoMes(
       .filter((p) => etapaDe(p) === ETAPA_PRECIERRE)
       .reduce((s, p) => s + (prima(p) ?? 0), 0),
     diasRestantes: ultimo - Number(hoy.slice(8, 10)),
+    comision: Math.round(delMes.reduce((a, p) => a + (comisionDe(p)?.monto ?? 0), 0) * 100) / 100,
   };
 }
 

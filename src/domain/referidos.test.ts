@@ -16,7 +16,7 @@ const d = { nombre: "Carla Mena", referidor: "María José Vera", relacion: "Ami
 describe("cadena de referido", () => {
   it("mensaje 1: se presenta, menciona a quien lo refirió y confirma que sea la persona", () => {
     expect(textoPaso(0, d)).toBe(
-      "¡Hola, buenos días! ¿Tengo el gusto de hablar con Carla? Soy Bracho, asesor de SaludSA. María, su amiga, me compartió su contacto y me pidió que le escribiera. ¿Es usted?",
+      "¡Hola, buenos días! ¿Tengo el gusto de hablar con Carla? Soy Bracho, asesor de inversiones. María, su amiga, me compartió su contacto y me pidió que le escribiera. ¿Es usted?",
     );
     expect(fraseRelacion("Cliente mío")).toBe("");
     expect(textoPaso(0, { ...d, relacion: "Otro" })).toContain("María me compartió su contacto");

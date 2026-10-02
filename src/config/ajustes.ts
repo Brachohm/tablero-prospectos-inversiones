@@ -6,7 +6,7 @@
 import type { ClaveMensaje } from "../domain/ajustes";
 import { CADENA_REFERIDO } from "./referidos";
 
-export const PERFIL_INICIAL = { nombreCompleto: "", apodo: "Bracho", rol: "asesor de SaludSA" };
+export const PERFIL_INICIAL = { nombreCompleto: "", apodo: "Bracho", rol: "asesor de inversiones" };
 
 /** Tamaño máximo de un adjunto (30 MB). */
 export const MAX_ADJUNTO = 30 * 1024 * 1024;

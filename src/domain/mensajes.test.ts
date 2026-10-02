@@ -47,7 +47,7 @@ describe("mensajes de seguimiento", () => {
     expect(ids(p, [ref])).toEqual(["n-referido"]);
     expect(mensajesPara(p, HOY, [ref])[0].texto).toContain("Luis me compartió su contacto");
     // "Objeción" de versiones anteriores ahora es Seguimiento: la objeción específica reemplaza a la general.
-    const obj = ids(ficha("nuevo", { etapa: "Objeción", objecion: "Precio" }));
+    const obj = ids(ficha("nuevo", { etapa: "Objeción", objecion: "No tengo dinero ahora" }));
     expect(obj).toContain("o-precio");
     expect(obj).not.toContain("o-general");
     expect(ids(ficha("nuevo", { etapa: "Seguimiento" }))).toContain("o-general");

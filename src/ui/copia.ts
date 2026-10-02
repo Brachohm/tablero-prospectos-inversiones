@@ -8,7 +8,7 @@ import { biblioteca } from "../store/biblioteca";
 import { store } from "../store/store";
 import { hoyISO } from "../domain/fechas";
 
-const CLAVE_ULTIMA = "tablero-saludsa:ultima-copia";
+const CLAVE_ULTIMA = "tablero-inversiones:ultima-copia";
 
 export function leerUltimaCopia(): number | null {
   try {

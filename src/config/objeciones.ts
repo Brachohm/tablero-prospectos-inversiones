@@ -1,7 +1,7 @@
 /**
  * Objeciones que el prospecto puede plantear en la segunda reunión. En el
  * informe no se nombran: salen como preguntas frecuentes pensadas para
- * resolverlas. Honestas: no prometen coberturas (eso se
+ * resolverlas. Honestas: no prometen rendimientos (eso se
  * valida con la aseguradora). Trato de usted. `etiqueta` busca además un argumento de tu
  * Biblioteca para reforzarla. Editables.
  */
@@ -17,19 +17,19 @@ export interface ObjecionReunion {
 
 export const OBJECIONES_REUNION: readonly ObjecionReunion[] = [
   {
-    id: "precio",
-    l: "Está caro / no me alcanza",
-    titulo: "¿Cómo puedo ajustar la cuota a mi presupuesto?",
+    id: "dinero",
+    l: "No tengo dinero ahora / no me alcanza",
+    titulo: "¿Con cuánto puedo empezar?",
     respuesta:
-      "Podemos ajustar el deducible o el plan para cuidar su cuota sin perder lo esencial: hospitalización y cirugía. Vale la pena comparar la cuota con lo que costaría un solo evento sin seguro.",
-    etiqueta: "obj:Precio",
+      "Podemos empezar con un aporte que pueda sostener sin apretar su presupuesto. Lo que más pesa en el resultado es el tiempo y la constancia, no el monto inicial.",
+    etiqueta: "obj:No tengo dinero ahora",
   },
   {
     id: "pensar",
     l: "Lo tengo que pensar",
     titulo: "¿Cuánto tiempo tengo para decidir?",
     respuesta:
-      "Tómese el tiempo que necesite: este resumen es para revisarlo con calma. Tenga en cuenta que los tiempos de espera empiezan a correr desde que contrata.",
+      "Tómese el tiempo que necesite: este resumen es para revisarlo con calma. Tenga en cuenta que cada mes que pasa es un mes menos de interés compuesto a su favor.",
     etiqueta: "obj:Lo tengo que pensar",
   },
   {
@@ -37,47 +37,39 @@ export const OBJECIONES_REUNION: readonly ObjecionReunion[] = [
     l: "Lo consulto con mi pareja o familia",
     titulo: "¿Puede participar mi familia en la decisión?",
     respuesta:
-      "Por supuesto. Podemos hacer una llamada corta con quien decide con usted para resolver sus dudas: la protección es para todos.",
+      "Por supuesto. Podemos hacer una llamada corta con quien decide con usted para resolver sus dudas: la meta suele ser de toda la familia.",
     etiqueta: "familia",
   },
   {
-    id: "tengo",
-    l: "Ya tengo seguro",
-    titulo: "¿Me conviene si ya tengo un seguro?",
+    id: "ahorros",
+    l: "Ya tengo ahorros",
+    titulo: "¿Me conviene si ya tengo ahorros o inversiones?",
     respuesta:
-      "Comparamos línea por línea lo que tiene con lo que le propongo. Si su plan actual le conviene más, se lo digo con total honestidad.",
-    etiqueta: "obj:Ya tengo seguro",
+      "Comparamos lo que tiene con lo que le propongo: rendimiento neto, costos, liquidez y plazo. Si lo suyo le conviene más, se lo digo con total honestidad.",
+    etiqueta: "obj:Ya tengo ahorros",
   },
   {
-    id: "antiguedad",
-    l: "Perder antigüedad o carencias",
-    titulo: "¿Qué pasa con mi antigüedad y mis preexistencias?",
+    id: "desconfianza",
+    l: "Desconfío de las inversiones",
+    titulo: "¿Qué tan seguro está mi dinero?",
     respuesta:
-      "Antes de cambiar validamos con la aseguradora cómo se reconocen su antigüedad y sus preexistencias, y su póliza actual se mantiene hasta que la nueva esté vigente.",
-    etiqueta: "obj:Perder antigüedad o carencias",
+      "Le muestro quién emite el plan, cómo está regulado en Ecuador y cómo consulta su saldo. Los rendimientos no están garantizados: por eso elegimos fondos acordes a su perfil.",
+    etiqueta: "obj:Desconfío de las inversiones",
   },
   {
-    id: "iess",
-    l: "Tengo el IESS",
-    titulo: "¿En qué se diferencia del IESS?",
+    id: "rescate",
+    l: "¿Y si necesito el dinero antes?",
+    titulo: "¿Qué pasa si necesito retirar antes de tiempo?",
     respuesta:
-      "El IESS es una buena base. Un seguro privado lo complementa: atención más rápida, libertad para elegir médico y clínica, y respaldo en eventos de alto costo.",
+      "Le explico la tabla de rescates año por año y cuándo puede retirar sin penalidad. Por eso recomendamos tener primero un fondo de emergencia.",
+    etiqueta: "mot:liquidez",
+  },
+  {
+    id: "banco",
+    l: "Mejor lo dejo en el banco",
+    titulo: "¿En qué se diferencia de una cuenta de ahorros o un plazo fijo?",
+    respuesta:
+      "La cuenta de ahorros da liquidez, pero la inflación le quita poder de compra. Un plan de largo plazo busca hacer crecer su dinero para una meta concreta, con disciplina de aporte.",
     etiqueta: "general",
-  },
-  {
-    id: "necesito",
-    l: "No lo necesito ahora / estoy sano",
-    titulo: "¿Por qué contratar cuando estoy sano?",
-    respuesta:
-      "El mejor momento para contratar es cuando se está sano: hay menos que declarar y los tiempos de espera se cumplen antes. Nadie planifica una emergencia.",
-    etiqueta: "emergencia",
-  },
-  {
-    id: "reembolsos",
-    l: "Desconfío de los reembolsos",
-    titulo: "¿Cómo funcionan los reembolsos?",
-    respuesta:
-      "Le explico el proceso paso a paso, qué documentos guardar, y le acompaño en cada reembolso hasta que se pague.",
-    etiqueta: "mot:reembolsos",
   },
 ];

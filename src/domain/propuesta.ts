@@ -208,9 +208,7 @@ export function propuesta(
     if (!ob) return [];
     const apoyoArg = args.find((a) => a.etiquetas.includes(ob.etiqueta)) ?? argumentos.find((a) => a.etiquetas.includes(ob.etiqueta));
     let respuesta = ob.respuesta;
-    if (id === "precio" && v("costoEvento")) respuesta += ` Como referencia, un evento así lo estimaste en: ${v("costoEvento")}.`;
-    if (id === "precio" && pol) respuesta += ` ${pol.precio}`;
-    if (id === "necesito" && riesgos) respuesta += ` Y por su trabajo: ${riesgos.argumento}`;
+    if (id === "dinero" && v("costoEvento")) respuesta += ` Y si no empieza, su plan B era: ${v("costoEvento")}.`;
     return [{ titulo: ob.titulo, respuesta, apoyo: apoyoArg ? apoyoArg.titulo || apoyoArg.texto : null }];
   });
   const otra = v("objecionOtra");

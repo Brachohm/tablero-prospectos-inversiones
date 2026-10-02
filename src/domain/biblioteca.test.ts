@@ -76,14 +76,14 @@ describe("biblioteca: búsqueda", () => {
 describe("biblioteca: argumentos por ficha", () => {
   it("etiquetas de la ficha: objeción, motivos, familia, edad, emergencia", () => {
     const p = ficha("cambio", {
-      objecion: "Precio",
+      objecion: "No tengo dinero ahora",
       motivos: ["costos"],
       depende: "Dos hijos",
       edad: "60",
-      emergencia: "No sabría",
+      emergencia: "No",
     });
     expect(etiquetasDeFicha(p).sort()).toEqual(
-      ["general", "obj:Precio", "mot:costos", "familia", "mayor", "emergencia"].sort(),
+      ["general", "obj:No tengo dinero ahora", "mot:costos", "familia", "mayor", "emergencia"].sort(),
     );
     expect(etiquetasDeFicha(ficha("nuevo", { objecion: "Ninguna" }))).toEqual(["general"]);
   });

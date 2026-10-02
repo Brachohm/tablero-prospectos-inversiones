@@ -15,7 +15,7 @@ import { compartirCopia, descargarCopia, importarCopia, leerUltimaCopia, puedeCo
 import { useAjustesPerfil, useAviso, useEnLinea } from "./hooks";
 import { ir } from "./router";
 
-const CLAVE_INICIO = "tablero-saludsa:inicio-jornada";
+const CLAVE_INICIO = "tablero-inversiones:inicio-jornada";
 
 function leerInicio(): string | null {
   try {

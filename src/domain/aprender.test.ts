@@ -6,17 +6,17 @@ const plan = (nombre: string, extra: Record<string, unknown> = {}) => ({ ...crea
 
 describe("argumentos del sistema", () => {
   it("etiquetas por palabras", () => {
-    expect(etiquetasDeTexto("Reembolso en 10 días")).toEqual(["mot:reembolsos"]);
-    expect(etiquetasDeTexto("Cubre maternidad y parto")).toEqual(expect.arrayContaining(["familia", "mot:cobertura"]));
+    expect(etiquetasDeTexto("Tabla de rescates sin penalidad")).toEqual(["mot:liquidez"]);
+    expect(etiquetasDeTexto("Educación de los hijos")).toEqual(["familia"]);
     expect(etiquetasDeTexto("Algo cualquiera")).toEqual(["general"]);
   });
 
   it("beneficios exclusivos y el mejor de cada concepto", () => {
-    const a = plan("Plus", { beneficios: "Telemedicina 24/7\nChequeo anual", tabla: { deducible: "$300", maximo: "$100.000" } });
+    const a = plan("Plus", { beneficios: "Asesor personal 24/7\nChequeo anual", tabla: { deducible: "$300", maximo: "$100.000" } });
     const b = plan("Básico", { beneficios: "Chequeo anual", tabla: { deducible: "$800", maximo: "$50.000" } });
     const args = argumentosDelSistema([a, b], [], []);
     const ex = args.filter((x) => x.origen === "exclusivo");
-    expect(ex.map((x) => x.titulo)).toEqual(["Solo Plus incluye: Telemedicina 24/7"]);
+    expect(ex.map((x) => x.titulo)).toEqual(["Solo Plus incluye: Asesor personal 24/7"]);
     expect(ex[0].etiquetas).toContain("mot:atencion");
     const mejor = args.filter((x) => x.origen === "mejor").map((x) => x.texto);
     expect(mejor).toContain("Deducible: $300 con Plus, el más bajo entre los planes que manejo.");

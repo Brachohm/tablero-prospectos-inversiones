@@ -19,18 +19,6 @@ describe("tipo de póliza actual (cambio de seguro)", () => {
     expect(argumentoPoliza(ficha("cambio", { tipoPoliza: "Masivo" }))!.precio).toMatch(/comparar lo que cubre de verdad/);
   });
 
-  it("refuerza la objeción de precio en la propuesta y el análisis del informe", async () => {
-    const { propuesta } = await import("./propuesta");
-    const { informe } = await import("./informe");
-    const { perfilDe } = await import("./ajustes");
-    const p = ficha("cambio", { tipoPoliza: "Corporativo", objeciones2: ["precio"] });
-    const pr = propuesta(p, perfilDe(undefined), "2026-10-07");
-    expect(pr.poliza?.tipo).toBe("Corporativo");
-    expect(pr.objeciones[0].respuesta).toMatch(/le cubre solo mientras siga vinculado/);
-    const inf = informe(p, perfilDe(undefined), "2026-10-07");
-    expect(inf.resumen).toContainEqual({ l: "Tipo de seguro", v: "Corporativo" });
-    expect(inf.analisis.join()).toMatch(/mientras estudie/);
-  });
 });
 
 describe("Vitality", () => {

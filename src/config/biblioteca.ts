@@ -1,16 +1,16 @@
 /**
  * Biblioteca y armador de ofertas: listas editables.
  *
- * Nada de esto es información de SaludSA: son categorías y ayudas del asesor.
- * Lo que dependa de SaludSA (coberturas, carencias, garantías) lo carga el
+ * Nada de esto es información de la aseguradora: son categorías y ayudas del asesor.
+ * Lo que dependa de la aseguradora (fondos, costos, rescates) lo carga el
  * asesor desde el material oficial y la app lo muestra con "validar con la aseguradora".
  */
 import type { TipoDoc } from "../domain/biblioteca";
 
 export const TIPOS_DOC: readonly { id: TipoDoc; l: string }[] = [
   { id: "condiciones", l: "Condiciones generales" },
-  { id: "anexo", l: "Anexo de plan" },
-  { id: "tarifas", l: "Tarifas" },
+  { id: "anexo", l: "Ficha del plan o de los fondos" },
+  { id: "tarifas", l: "Proyecciones y costos" },
   { id: "otro", l: "Otro material" },
 ];
 
@@ -20,32 +20,30 @@ export const TIPOS_DOC: readonly { id: TipoDoc; l: string }[] = [
  * `crit:` = criterio de elección, el resto sale de los datos de la ficha.
  */
 export const ETIQUETAS_ARGUMENTO: readonly { id: string; l: string }[] = [
-  { id: "obj:Precio", l: "Objeción: precio" },
-  { id: "obj:Ya tengo seguro", l: "Objeción: ya tengo seguro" },
+  { id: "obj:No tengo dinero ahora", l: "Objeción: no tengo dinero ahora" },
+  { id: "obj:Ya tengo ahorros", l: "Objeción: ya tengo ahorros" },
   { id: "obj:Lo tengo que pensar", l: "Objeción: lo tengo que pensar" },
-  { id: "obj:Perder antigüedad o carencias", l: "Objeción: perder antigüedad o carencias" },
-  { id: "mot:cobertura", l: "Cobertura" },
-  { id: "mot:reembolsos", l: "Reembolsos" },
-  { id: "mot:precio", l: "Precio o alzas" },
-  { id: "mot:deducibles", l: "Deducibles y copagos" },
-  { id: "mot:red", l: "Red de médicos y clínicas" },
-  { id: "mot:atencion", l: "Atención y servicio" },
-  { id: "poliza:masivo", l: "Su seguro actual es masivo" },
-  { id: "poliza:corporativo", l: "Su seguro actual es corporativo" },
+  { id: "obj:Desconfío de las inversiones", l: "Objeción: desconfianza" },
+  { id: "mot:rendimiento", l: "Rendimiento bajo" },
+  { id: "mot:costos", l: "Comisiones y costos" },
+  { id: "mot:liquidez", l: "Liquidez o penalidades" },
+  { id: "mot:transparencia", l: "Poca transparencia" },
+  { id: "mot:riesgo", l: "Riesgo o volatilidad" },
+  { id: "mot:atencion", l: "Atención y asesoría" },
   { id: "familia", l: "Familia y dependientes" },
-  { id: "mayor", l: "Edad mayor" },
-  { id: "emergencia", l: "Emergencias y cirugías" },
+  { id: "mayor", l: "Cerca del retiro" },
+  { id: "emergencia", l: "Fondo de emergencia" },
   { id: "general", l: "General" },
 ];
 
 /**
- * Bonos que el asesor sí puede cumplir por su cuenta (no dependen de SaludSA).
+ * Bonos que el asesor sí puede cumplir por su cuenta (no dependen de la aseguradora).
  * Se proponen al armar la oferta; el valor en USD lo pone el asesor.
  */
 export const BONOS_ASESOR: readonly string[] = [
-  "Le acompaño en cada reembolso hasta que se pague",
-  "Le ayudo a llenar bien la declaración de salud para evitar rechazos",
-  "Revisión anual de su plan antes de cada renovación",
+  "Revisión semestral de sus fondos y de su avance hacia la meta",
+  "Le ayudo con el KYC y la documentación para que la emisión salga sin rechazos",
+  "Le aviso cuándo conviene reequilibrar o hacer aportes extra",
   "Línea directa conmigo por WhatsApp para cualquier duda",
 ];
 
@@ -60,19 +58,19 @@ export const PALANCAS = [
   {
     id: "prueba",
     l: "Probabilidad de lograrlo",
-    ayuda: "Por qué te puede creer: casos reales, respaldo, lo que sí cubre según el material oficial.",
+    ayuda: "Por qué te puede creer: casos reales, respaldo, historial de los fondos según el material oficial (sin garantizar).",
     sube: true,
   },
   {
     id: "tiempo",
     l: "Tiempo hasta sentirlo",
-    ayuda: "Qué recibe rápido: desde cuándo está protegido, qué puede usar desde el primer día.",
+    ayuda: "Qué recibe rápido: su estado de cuenta desde el primer mes, la cobertura de vida desde la emisión.",
     sube: false,
   },
   {
     id: "esfuerzo",
     l: "Esfuerzo que le quitas",
-    ayuda: "Lo que tú haces por la persona: trámites, reembolsos, declaración, comparar opciones.",
+    ayuda: "Lo que tú haces por la persona: trámites, KYC, elegir fondos, comparar opciones.",
     sube: false,
   },
 ] as const;

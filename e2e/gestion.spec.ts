@@ -99,7 +99,7 @@ test('Base de datos → Centro de Gestión: uno por uno, con resumen obligatorio
       page.evaluate(
         () =>
           new Promise<string>((ok) => {
-            const r = indexedDB.open('tablero-prospectos-saludsa')
+            const r = indexedDB.open('tablero-prospectos-inversiones')
             r.onsuccess = () => {
               const q = r.result.transaction('contactos').objectStore('contactos').getAll()
               q.onsuccess = () => {

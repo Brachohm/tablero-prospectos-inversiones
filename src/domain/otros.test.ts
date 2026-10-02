@@ -94,7 +94,7 @@ describe("CSV", () => {
     const r = celdas(row);
     expect(r).toHaveLength(h.length);
     expect(r[h.indexOf("Penalidad o recargo por retiro anticipado")]).toBe("");
-    expect(r[h.indexOf("Bienvenida: le expliqué cómo usar su plan y a quién llamar")]).toBe("Sí");
+    expect(r[h.indexOf("Bienvenida: le expliqué cómo leer su estado de cuenta y a quién llamar")]).toBe("Sí");
     expect(r[h.indexOf("Nombre")]).toBe("Ana");
     expect(h.at(-3)).toBe("Preexistencias declaradas");
   });

@@ -65,7 +65,7 @@ describe("informe post reunión", () => {
     expect(t).toContain("1. El PDF de la tabla de coberturas de su plan actual.");
     expect(t).toContain("2. La sábana de reclamos (su historial de reclamos): puede solicitarla a su asesor o a su aseguradora.");
     expect(t).toContain("¿Cómo calificaría la asesoría de hoy, del 1 al 5?");
-    expect(t).toMatch(/Bracho, asesor de SaludSA$/);
+    expect(t).toMatch(/Bracho, asesor de inversiones$/);
     const nuevo = textoPostReunion(informe(ficha("nuevo", { nombre: "Ana" }), perfil, HOY), false);
     expect(nuevo).not.toContain("sábana");
     expect(nuevo).not.toMatch(/[⭐📅🙌]/u);
@@ -99,10 +99,10 @@ describe("informe 2: propuesta y objeciones", () => {
       costoEvento: "Unos $8.000",
       productos: [{ id: "a", planId: "pl", nombre: "Plan Plus", deducible: "500", mensual: "95" }],
       oferta: { bonos: [{ id: "b", t: "Le acompaño en cada reembolso", valor: "300" }] },
-      objeciones2: ["precio", "necesito", "no-existe"],
+      objeciones2: ["dinero", "banco", "no-existe"],
       objecionOtra: "¿Y si me mudo?",
     });
-    const arg = { id: "x", titulo: "Una cirugía cuesta más que años de cuotas", texto: "", etiquetas: ["obj:Precio"], fuente: "", creado: 0, mod: 0 };
+    const arg = { id: "x", titulo: "Una cirugía cuesta más que años de cuotas", texto: "", etiquetas: ["obj:No tengo dinero ahora"], fuente: "", creado: 0, mod: 0 };
     const pr = propuesta(p, perfil, HOY, [plan], [arg]);
     expect(pr.busca).toEqual(["Nació mi hija"]);
     expect(pr.productos).toMatchObject([
@@ -116,15 +116,14 @@ describe("informe 2: propuesta y objeciones", () => {
     expect(pr.oferta.inversion).toBe(95);
     expect(pr.gana).toEqual(["Telemedicina"]);
     expect(pr.objeciones.map((o) => o.titulo)).toEqual([
-      "¿Cómo puedo ajustar la cuota a mi presupuesto?",
-      "¿Por qué contratar cuando estoy sano?",
+      "¿Con cuánto puedo empezar?",
+      "¿En qué se diferencia de una cuenta de ahorros o un plazo fijo?",
       "¿Y si tengo otra duda?",
     ]);
     // Como preguntas frecuentes: nunca nombra la objeción con sus palabras
-    expect(JSON.stringify(pr.objeciones)).not.toMatch(/caro|no lo necesito|me mudo/i);
+    expect(JSON.stringify(pr.objeciones)).not.toMatch(/no me alcanza|lo dejo en el banco|me mudo/i);
     expect(pr.objeciones[0].respuesta).toContain("Unos $8.000");
     expect(pr.objeciones[0].apoyo).toBe("Una cirugía cuesta más que años de cuotas");
-    expect(pr.objeciones[1].respuesta).toContain("Pasa muchas horas en la vía");
     expect(pr.pendiente).toBe(false);
     const t = textoPropuesta(pr);
     expect(t).toMatch(/^Hola Ana, buenos días\. Muchas gracias por su tiempo en nuestra segunda reunión/);

@@ -16,9 +16,9 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['icono.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Tablero de prospectos',
-        short_name: 'Prospectos',
-        description: 'Fichas, análisis y seguimiento de prospectos de medicina prepagada.',
+        name: 'Prospectos de inversión',
+        short_name: 'Inversiones',
+        description: 'Fichas, análisis y seguimiento de prospectos de asesoría de inversiones.',
         lang: 'es',
         start_url: './',
         scope: './',

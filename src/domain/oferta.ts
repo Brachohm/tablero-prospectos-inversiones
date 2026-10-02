@@ -10,7 +10,6 @@ import { EDAD_MAYOR } from "../config/ficha";
 import { VALIDAR } from "../config/saludsa";
 import { argumentosPara, lineas, normalizar, type Argumento, type Plan } from "./biblioteca";
 import { productosDe } from "./cierre";
-import { riesgosDe } from "./ocupacion";
 import { fmtFecha } from "./fechas";
 import { esCambio, nuevoId, num, txt } from "./ficha";
 import type { Bono, Oferta, Prospecto } from "./tipos";
@@ -57,50 +56,46 @@ export function sugerencias(p: Prospecto, plan?: Plan, args: readonly Argumento[
   const depende = txt(p, "depende");
   const edad = num(p, "edad");
 
-  const avatar = depende ? "Familia" : edad !== null && edad >= EDAD_MAYOR ? "Tranquilidad 55+" : "Salud";
-  const meta = cambio ? "sin sorpresas" : depende ? "protegida" : "en orden";
+  const avatar = depende ? "Futuro familiar" : edad !== null && edad >= EDAD_MAYOR ? "Retiro tranquilo" : "Patrimonio";
+  const meta = cambio ? "sin sorpresas" : depende ? "asegurado" : "en crecimiento";
   const nombre = [`${avatar} ${meta}`];
   if (plan?.nombre) nombre.push(`${avatar} ${meta} · ${plan.nombre}`);
 
   const sueno: string[] = [];
   if (txt(p, "porque")) sueno.push(txt(p, "porque"));
-  if (depende) sueno.push(`Que ${depende} esté protegido si algo pasa`);
-  if (txt(p, "costoEvento") || txt(p, "emergencia"))
-    sueno.push("Que una cirugía o una emergencia no se lleve sus ahorros");
-  if (txt(p, "noPerder")) sueno.push(`Cambiarse sin perder ${txt(p, "noPerder")}`);
+  if (txt(p, "meta")) sueno.push(`Llegar a su meta: ${txt(p, "meta").toLowerCase()}`);
+  if (depende) sueno.push(`Que ${depende} tenga un futuro respaldado`);
+  if (txt(p, "noPerder")) sueno.push(`Mejorar su inversión sin perder ${txt(p, "noPerder")}`);
   if (txt(p, "grieta")) sueno.push(`Dejar atrás esto: ${txt(p, "grieta")}`);
-  const riesgos = riesgosDe(p);
-  if (riesgos) sueno.push(`Que un accidente o una lesión por su trabajo no le quite ingresos ni ahorros`);
 
   const prueba = [
     ...argumentosPara(p, args)
       .slice(0, 3)
       .map((a) => a.titulo || a.texto),
     ...lineas(plan?.coberturas).slice(0, 3),
-    ...(riesgos ? [riesgos.perfil.argumento] : []),
   ];
 
-  const tiempo = ["Le envío la cotización y la comparación hoy mismo"];
-  if (cambio) tiempo.push("Coordinamos fechas para que no quede ni un día sin cobertura");
+  const tiempo = ["Le envío la proyección y la comparación hoy mismo"];
+  if (cambio) tiempo.push("Planificamos cuándo mover su dinero para no pagar penalidades");
 
   const esfuerzo = [
     "Yo me encargo de los trámites: usted solo firma",
-    "Le ayudo a llenar la declaración de salud",
-    "Le acompaño en cada reembolso",
+    "Le ayudo con la elección de fondos según su perfil",
+    "Revisión semestral de su estado de cuenta, juntos",
   ];
-  if (cambio) esfuerzo.push("Comparo su póliza actual línea por línea por usted");
+  if (cambio) esfuerzo.push("Comparo su inversión actual línea por línea por usted");
 
   const bonos = [...lineas(plan?.beneficios), ...BONOS_ASESOR];
 
   const garantia = [
     ...lineas(plan?.garantias),
-    "Antes de firmar revisamos juntos lo que cubre y lo que no, sin letra chica",
+    "Antes de firmar revisamos juntos costos, rescates y riesgos, sin letra chica",
   ];
 
   const urgencia: string[] = [];
-  if (!cambio) urgencia.push("Las carencias corren desde que contrata: cada mes que espera, se corren un mes más");
-  const ren = txt(p, "renovacion");
-  if (cambio && ren) urgencia.push(`Su póliza actual renueva el ${fmtFecha(ren)}: decidir antes evita otro año igual`);
+  if (!cambio) urgencia.push("El interés compuesto premia el tiempo: cada mes que espera es un mes menos a su favor");
+  const ven = txt(p, "vencimiento");
+  if (cambio && ven) urgencia.push(`Su inversión actual vence el ${fmtFecha(ven)}: decidir antes evita que se renueve igual`);
 
   return { nombre, sueno, prueba, tiempo, esfuerzo, bonos, garantia, urgencia };
 }
@@ -135,9 +130,9 @@ export interface OfertaInforme {
   inversion: number | null;
 }
 
-const SUENO_BASE = "Que un imprevisto de salud no afecte su tranquilidad ni sus ahorros";
-const TIEMPO_BASE = `Desde que su póliza está vigente; algunas coberturas tienen tiempos de espera (${VALIDAR})`;
-const URGENCIA_CAMBIO = "Revisarlo con tiempo le permite decidir con calma, antes de la próxima renovación de su póliza";
+const SUENO_BASE = "Que su dinero trabaje para sus metas y no pierda valor con los años";
+const TIEMPO_BASE = `Desde el primer aporte ve su saldo en su estado de cuenta; los rendimientos no están garantizados (${VALIDAR})`;
+const URGENCIA_CAMBIO = "Revisarlo con tiempo le permite decidir con calma, antes del vencimiento de su inversión actual";
 
 /** Plan de la oferta: el primero del pre-cierre que esté en la Biblioteca o el elegido al comparar coberturas. */
 export function planDeOferta(p: Prospecto, planes: readonly Plan[]): Plan | undefined {

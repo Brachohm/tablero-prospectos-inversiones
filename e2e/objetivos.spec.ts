@@ -93,7 +93,7 @@ test('Contactos nuevos: registrar, saludar cada día y pasar a prospecto', async
       page.evaluate(
         () =>
           new Promise<number>((ok) => {
-            const r = indexedDB.open('tablero-prospectos-saludsa')
+            const r = indexedDB.open('tablero-prospectos-inversiones')
             r.onsuccess = () => {
               const q = r.result.transaction('contactos').objectStore('contactos').getAll()
               q.onsuccess = () => ok((q.result as { ultimoSaludo?: string }[]).filter((c) => c.ultimoSaludo).length)

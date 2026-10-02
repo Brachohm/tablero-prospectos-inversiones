@@ -1,5 +1,4 @@
 import { argumentoOcupacion, perfilOcupacion, riesgosDe, riesgosPrincipales } from "./ocupacion";
-import { sugerencias } from "./oferta";
 import { ficha } from "./test-utils";
 
 describe("ocupación", () => {
@@ -24,7 +23,6 @@ describe("ocupación", () => {
     const a = argumentoOcupacion(p)!;
     expect(a.titulo).toContain("Por su trabajo (Albañil)");
     expect(a.texto).toContain("validar coberturas con la aseguradora");
-    expect(sugerencias(p).prueba.join()).toContain("Su trabajo es físico");
     expect(argumentoOcupacion(ficha("nuevo"))).toBeNull();
   });
 });

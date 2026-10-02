@@ -18,9 +18,10 @@ export function Objetivo({ items, hoy }: { items: readonly Prospecto[]; hoy: str
         <small>{o.diasRestantes === 0 ? "último día" : `${o.diasRestantes} ${o.diasRestantes === 1 ? "día" : "días"} restantes`}</small>
       </h2>
       <p className="obj-cifra">
-        <b>{usd(o.prima)}</b> de {usd(o.meta)} en prima mensual
+        <b>{usd(o.prima)}</b> de {usd(o.meta)} en aportes cerrados
         <span>
           {o.cierres} {o.cierres === 1 ? "contrato cerrado" : "contratos cerrados"}
+          {o.comision > 0 && ` · comisión estimada ${usd(o.comision)}`}
         </span>
       </p>
       {proposito ? (

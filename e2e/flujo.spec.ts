@@ -428,7 +428,7 @@ test('Pre-cierre: identificación de cada asegurado (número, emisión y expirac
       page.evaluate(
         () =>
           new Promise<string>((ok) => {
-            const r = indexedDB.open('tablero-prospectos-saludsa')
+            const r = indexedDB.open('tablero-prospectos-inversiones')
             r.onsuccess = () => {
               const q = r.result.transaction('fichas').objectStore('fichas').getAll()
               q.onsuccess = () => {
