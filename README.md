@@ -25,7 +25,7 @@ src/
   config/           Lo editable sin tocar la lógica
     ficha.ts        Tipos, etapas, motivos, misiones y campos (con su XP)
     juego.ts        Niveles, bonus de cierre, XP de preexistencias
-    comisiones.ts   Tabla de comisiones por tipo de plan y plazo (VALORES DE EJEMPLO: pon los tuyos)
+    comisiones.ts   Forma de la tabla de comisiones (la escribes en Configuración → Perfil → Comisiones)
     saludsa.ts      Texto "validar con la aseguradora" (nombre heredado)
     crm.ts          Canales de contacto, campos de cliente, posventa, agenda
     objetivos.ts    Meta mensual de aportes cerrados y sus escalones
@@ -71,7 +71,7 @@ e2e/                Flujos completos en el navegador
 - **Tipos de ficha:** 🌱 Primera inversión (quiere empezar a invertir) y 🔄 Ya invierte (tiene ahorros o inversiones y no está conforme).
 - **Descubrimiento:** meta y monto, plazo, aporte mensual, capital para aporte único, perfil de riesgo (con la pregunta de qué haría ante una caída), fondo de emergencia y deudas. Para quien ya invierte: dónde, saldo, aporte, vencimiento y motivos (rendimiento, costos, liquidez, transparencia, riesgo, asesoría).
 - **Análisis:** veredicto honesto (por ejemplo, "primero un fondo de emergencia", "horizonte corto: un plan de largo plazo aún no conviene", "aún no conviene mover su dinero"), costo de oportunidad, comparativo y recordatorios (perfil de riesgo, rendimientos no garantizados, costos, rescates y KYC).
-- **Pre-cierre:** tipo de plan, plazo y aporte; muestra la **comisión estimada** según `src/config/comisiones.ts`.
+- **Pre-cierre:** tipo de plan, plazo y aporte; muestra la **comisión estimada** según tu tabla de Configuración → Perfil → Comisiones.
 - **Objetivo del mes:** suma los aportes cerrados y muestra la comisión estimada del mes.
 - **Informe de primera reunión (PDF):** perfil, situación financiera hoy, lo que vemos en su caso y estrategia (regular, única o regular + aporte único).
 - **Se quitó:** declaración de preexistencias, escáner del cuerpo, IMC, médico de cabecera y riesgos laborales de salud. Las acciones "Plan recomendado" y "Comparar plan actual" están ocultas hasta adaptarlas.
@@ -79,7 +79,6 @@ e2e/                Flujos completos en el navegador
 
 ## Pendiente (siguiente fase)
 
-- Cargar tu tabla real de comisiones en `src/config/comisiones.ts`.
 - Adaptar la Biblioteca y el informe de la segunda reunión (propuesta): hoy siguen pensados en tablas de coberturas de salud.
 - Proyección de valor del plan (escenarios conservador, moderado y optimista, sin garantizar rendimientos).
 - Cuestionario de perfil de riesgo completo y checklist de KYC en el cierre.

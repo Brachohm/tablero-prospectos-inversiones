@@ -9,6 +9,18 @@ test('Objetivo del mes: se llena con los cierres y muestra la comisión estimada
   await expect(obj).toContainText('$0 de $2000 en aportes cerrados')
   await expect(obj).toContainText('Te faltan $2000')
 
+  // Tabla de comisiones escrita a mano en Configuración
+  await page.goto('/#/ajustes')
+  const com = page.getByRole('region', { name: '💼 Comisiones' })
+  await expect(com).toContainText('Aún no hay comisiones')
+  await com.getByRole('button', { name: '+ Agregar comisión' }).click()
+  await com.getByLabel('Desde (años de plazo)').fill('10')
+  await com.getByLabel('Comisión (%)').fill('30')
+  await page.getByRole('button', { name: 'Guardar y actualizar' }).click()
+  await expect(page.getByText('Configuración guardada y actualizada')).toBeVisible()
+  await page.reload()
+  await expect(com.getByLabel('Comisión (%)')).toHaveValue('30')
+
   const cerrar = async (nombre: string, aporte: string) => {
     await page.goto('/')
     await page.goto('/#/nueva/nuevo')

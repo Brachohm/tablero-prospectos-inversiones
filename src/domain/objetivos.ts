@@ -8,6 +8,7 @@ import { MAX_OBJETIVOS, OBJETIVOS_INICIALES } from "../config/objetivos";
 import { ETAPA_CERRADO, ETAPA_PRECIERRE } from "../config/ficha";
 import { hoyISO } from "./fechas";
 import { comisionDe } from "./comisiones";
+import type { FilaComision } from "../config/comisiones";
 import { etapaDe, num, txt, vendido } from "./ficha";
 import type { Prospecto } from "./tipos";
 
@@ -89,6 +90,7 @@ export function objetivoMes(
   items: readonly Prospecto[],
   hoy: string = hoyISO(),
   objetivos: readonly ObjetivoConfig[] = OBJETIVOS_INICIALES,
+  comisiones?: readonly FilaComision[],
 ): Objetivo {
   const lista = normalizarObjetivos(objetivos);
   const meta = lista[0].monto;
@@ -132,7 +134,7 @@ export function objetivoMes(
       .filter((p) => etapaDe(p) === ETAPA_PRECIERRE)
       .reduce((s, p) => s + (prima(p) ?? 0), 0),
     diasRestantes: ultimo - Number(hoy.slice(8, 10)),
-    comision: Math.round(delMes.reduce((a, p) => a + (comisionDe(p)?.monto ?? 0), 0) * 100) / 100,
+    comision: Math.round(delMes.reduce((a, p) => a + (comisionDe(p, comisiones)?.monto ?? 0), 0) * 100) / 100,
   };
 }
 

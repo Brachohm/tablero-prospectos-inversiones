@@ -8,6 +8,7 @@ import { MENSAJES_CONFIG, PERFIL_INICIAL } from "../config/ajustes";
 import { HERRAMIENTAS_INICIALES, type Herramientas } from "./herramientas";
 import type { Jornada } from "./jornada";
 import type { ObjetivoConfig } from "./objetivos";
+import type { FilaComision } from "../config/comisiones";
 import { sinEmojis } from "./texto";
 
 export type ClaveMensaje =
@@ -65,6 +66,8 @@ export interface Ajustes {
   jornadas?: Jornada[];
   /** Objetivos del mes (1 a 4) con su beneficio. */
   objetivos?: ObjetivoConfig[];
+  /** Tabla de comisiones por tipo de plan y plazo (la escribe el asesor). */
+  comisiones?: FilaComision[];
   /** Argumentos del sistema que el asesor ocultó (o guardó como suyos). */
   argumentosOcultos?: string[];
   creado: number;

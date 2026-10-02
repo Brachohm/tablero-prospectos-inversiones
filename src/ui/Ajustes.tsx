@@ -30,6 +30,9 @@ import { sinEmojis, tieneEmojis } from "../domain/texto";
 import { normalizarObjetivos } from "../domain/objetivos";
 import { valorUSD } from "../domain/oferta";
 import { MAX_OBJETIVOS, MIN_OBJETIVOS } from "../config/objetivos";
+import { MAX_COMISIONES, type FilaComision } from "../config/comisiones";
+import { TIPOS_PLAN } from "../config/ficha";
+import { normalizarComisiones } from "../domain/comisiones";
 import { conceptosLlenos, type TablaCoberturas } from "../domain/comparar";
 import { useArgumentos, useAviso } from "./hooks";
 import { ir, volver, type SeccionAjustes } from "./router";
@@ -56,6 +59,7 @@ export function AjustesVista({ sec }: { sec: SeccionAjustes }) {
   const [archivos, setArchivos] = useState<CambiosArchivo>({});
   const [guardando, setGuardando] = useState(false);
   const [objetivos, setObjetivos] = useState<FilaObjetivo[] | null>(null);
+  const [comisiones, setComisiones] = useState<FilaCom[] | null>(null);
   /** Foto nueva (File), quitada (null) o sin cambio (undefined). */
   const [foto, setFoto] = useState<File | null | undefined>(undefined);
 
@@ -74,9 +78,12 @@ export function AjustesVista({ sec }: { sec: SeccionAjustes }) {
   const objetivosActuales: FilaObjetivo[] =
     objetivos ??
     normalizarObjetivos(guardados?.objetivos).map((o) => ({ monto: String(o.monto), beneficio: o.beneficio, detalle: o.detalle }));
+  const comisionesActuales: FilaCom[] =
+    comisiones ?? normalizarComisiones(guardados?.comisiones).map((c) => ({ plan: c.plan, desde: String(c.desde), pct: String(c.pct) }));
   const hayCambios =
     perfil !== null ||
     objetivos !== null ||
+    comisiones !== null ||
     foto !== undefined ||
     Object.keys(textos).length > 0 ||
     Object.keys(archivos).length > 0;
@@ -84,7 +91,7 @@ export function AjustesVista({ sec }: { sec: SeccionAjustes }) {
     foto === null ? undefined : foto ? { nombre: foto.name, tipo: foto.type, bytes: foto.size } : guardados?.perfil.foto;
 
   const guardar = async () => {
-    const ep = errorPerfil(perfilActual) || errorObjetivos(objetivosActuales);
+    const ep = errorPerfil(perfilActual) || errorObjetivos(objetivosActuales) || errorComisiones(comisionesActuales);
     if (ep) return avisar(ep);
     setGuardando(true);
     const mensajes = { ...base.mensajes };
@@ -109,6 +116,7 @@ export function AjustesVista({ sec }: { sec: SeccionAjustes }) {
       objetivos: normalizarObjetivos(
         objetivosActuales.map((o) => ({ monto: valorUSD(o.monto) ?? 0, beneficio: o.beneficio, detalle: o.detalle })),
       ),
+      comisiones: normalizarComisiones(comisionesActuales.map((c) => ({ plan: c.plan, desde: numero(c.desde), pct: numero(c.pct) }))),
     };
     for (const [c, f] of Object.entries(archivos) as [ClaveMensaje, File | null][])
       void biblioteca.ponerArchivo(idArchivo(c), f);
@@ -116,6 +124,7 @@ export function AjustesVista({ sec }: { sec: SeccionAjustes }) {
     await biblioteca.guardar("ajustes", nuevo);
     setPerfil(null);
     setObjetivos(null);
+    setComisiones(null);
     setTextos({});
     setArchivos({});
     setFoto(undefined);
@@ -126,6 +135,7 @@ export function AjustesVista({ sec }: { sec: SeccionAjustes }) {
   const descartar = () => {
     setPerfil(null);
     setObjetivos(null);
+    setComisiones(null);
     setTextos({});
     setArchivos({});
     setFoto(undefined);
@@ -171,6 +181,7 @@ export function AjustesVista({ sec }: { sec: SeccionAjustes }) {
           <FotoPerfil nueva={foto} hay={!!fotoActual} set={setFoto} />
           <SeccionPerfil p={perfilActual} set={setPerfil} />
           <SeccionObjetivos filas={objetivosActuales} set={setObjetivos} />
+          <SeccionComisiones filas={comisionesActuales} set={setComisiones} />
           <Herramientas guardados={guardados} pendiente={hayCambios} />
         </>
       ) : (
@@ -217,6 +228,100 @@ export function AjustesVista({ sec }: { sec: SeccionAjustes }) {
         </div>
       )}
     </div>
+  );
+}
+
+interface FilaCom {
+  plan: FilaComision["plan"];
+  desde: string;
+  pct: string;
+}
+
+const numero = (x: string) => Number(x.replace(",", "."));
+
+function errorComisiones(fs: FilaCom[]): string {
+  for (const [i, f] of fs.entries()) {
+    const d = numero(f.desde);
+    const p = numero(f.pct);
+    if (!f.desde.trim() || !Number.isFinite(d) || d < 0) return `Escribe el plazo desde el que aplica la comisión ${i + 1}`;
+    if (!f.pct.trim() || !Number.isFinite(p) || p <= 0 || p > 200) return `Escribe el porcentaje de la comisión ${i + 1}`;
+  }
+  const k = fs.map((f) => f.plan + "|" + numero(f.desde));
+  const rep = k.findIndex((x, i) => k.indexOf(x) !== i);
+  if (rep !== -1) return `La comisión ${rep + 1} repite tipo de plan y plazo`;
+  return "";
+}
+
+/** Tabla de comisiones: por tipo de plan, desde qué plazo y qué porcentaje. */
+function SeccionComisiones({ filas, set }: { filas: FilaCom[]; set: (f: FilaCom[]) => void }) {
+  const id = useId();
+  const cambiar = (i: number, c: Partial<FilaCom>) => set(filas.map((f, j) => (j === i ? { ...f, ...c } : f)));
+  return (
+    <section className="miss" aria-labelledby={id + "t"}>
+      <h2 className="sub-h" id={id + "t"}>
+        💼 Comisiones
+      </h2>
+      <p className="an-note">
+        Tu comisión por tipo de plan y plazo. Contribución regular: porcentaje sobre el aporte anual (12 × el mensual).
+        Contribución única: porcentaje sobre el aporte total. A cada venta se le aplica la fila con el plazo más alto que
+        no supere el plazo del plan.
+      </p>
+      {!filas.length && <p className="an-note">Aún no hay comisiones: agrega la primera fila.</p>}
+      <ol className="objetivos-edit">
+        {filas.map((f, i) => (
+          <li key={i} aria-label={`Comisión ${i + 1}`}>
+            <div className="f">
+              <label htmlFor={`${id}p${i}`}>
+                <span>Tipo de plan (comisión {i + 1})</span>
+              </label>
+              <select id={`${id}p${i}`} value={f.plan} onChange={(e) => cambiar(i, { plan: e.target.value as FilaCom["plan"] })}>
+                {TIPOS_PLAN.map((t) => (
+                  <option key={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+            <div className="oe-fila">
+              <div className="f">
+                <label htmlFor={`${id}d${i}`}>
+                  <span>Desde (años de plazo)</span>
+                </label>
+                <input
+                  id={`${id}d${i}`}
+                  inputMode="numeric"
+                  value={f.desde}
+                  placeholder="10"
+                  onChange={(e) => cambiar(i, { desde: e.target.value.replace(/[^\d]/g, "") })}
+                />
+              </div>
+              <div className="f">
+                <label htmlFor={`${id}c${i}`}>
+                  <span>Comisión (%)</span>
+                </label>
+                <input
+                  id={`${id}c${i}`}
+                  inputMode="decimal"
+                  value={f.pct}
+                  placeholder="30"
+                  onChange={(e) => cambiar(i, { pct: e.target.value.replace(/[^\d.,]/g, "") })}
+                />
+              </div>
+            </div>
+            <button type="button" className="enlace" onClick={() => set(filas.filter((_, j) => j !== i))}>
+              Quitar comisión {i + 1}
+            </button>
+          </li>
+        ))}
+      </ol>
+      {filas.length < MAX_COMISIONES && (
+        <button
+          type="button"
+          className="btn ghost small"
+          onClick={() => set([...filas, { plan: TIPOS_PLAN[0], desde: "", pct: "" }])}
+        >
+          + Agregar comisión
+        </button>
+      )}
+    </section>
   );
 }
 

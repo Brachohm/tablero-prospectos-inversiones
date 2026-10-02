@@ -35,9 +35,9 @@ test('crear ficha → llenar → analizar → guardar → reabrir', async ({ pag
   await campo(page, '¿Para qué quiere invertir?').selectOption('Retiro o jubilación')
   await campo(page, '¿En cuánto tiempo necesitará ese dinero?').selectOption('10 a 20 años')
 
-  // Ya va a contratar: pre-cierre con tipo de plan, plazo y aporte → comisión estimada
+  // Ya va a contratar: pre-cierre con tipo de plan, plazo y aporte (sin tabla de comisiones, avisa dónde escribirla)
   await precierre(page, 'Plan Futuro', '100', '12')
-  await expect(page.getByText(/Comisión estimada: \$360/)).toBeVisible()
+  await expect(page.getByText(/Escribe tu tabla de comisiones en Configuración/)).toBeVisible()
 
   // Historial de contactos (desde + acciones)
   await accion(page, 'Registrar contacto')

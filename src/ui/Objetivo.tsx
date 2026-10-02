@@ -8,7 +8,7 @@ import { ir } from "./router";
 
 export function Objetivo({ items, hoy }: { items: readonly Prospecto[]; hoy: string }) {
   const { ajustes, perfil } = useAjustesPerfil();
-  const o = objetivoMes(items, hoy, ajustes?.objetivos);
+  const o = objetivoMes(items, hoy, ajustes?.objetivos, ajustes?.comisiones);
   const proposito = perfil.proposito?.trim();
   const siguiente = o.escalones.find((e) => !e.logrado);
   return (

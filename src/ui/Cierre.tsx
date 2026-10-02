@@ -265,7 +265,7 @@ export function PreCierre({
   const hoy = hoyISO();
   const sim = simularCierre(items, p, hoy, ajustes?.objetivos);
   const meta = sim.con.escalones.find((e) => !e.logrado);
-  const com = comisionDe(p);
+  const com = comisionDe(p, ajustes?.comisiones);
 
   const setPs = (fn: (ps: ProductoCierre[]) => ProductoCierre[]) => actualizar((x) => conProductos(x, fn(productosDe(x))));
   const setP = (id: string, cambio: Partial<ProductoCierre>) => setPs((xs) => xs.map((y) => (y.id === id ? { ...y, ...cambio } : y)));
@@ -301,10 +301,14 @@ export function PreCierre({
           <input id={base + "plazo"} inputMode="numeric" value={txt(p, "plazo")} onChange={(e) => actualizar((x) => ({ ...x, plazo: e.target.value }))} />
         </div>
       </div>
-      {com && (
+      {com ? (
         <p className="an-status">
           💼 Comisión estimada: <b>{usd(com.monto)}</b> ({com.pct}% sobre {usd(com.base)})
         </p>
+      ) : (
+        !ajustes?.comisiones?.length && (
+          <p className="an-note">💼 Escribe tu tabla de comisiones en Configuración → Perfil para ver la comisión estimada.</p>
+        )
       )}
       {ps.map((x, i) => {
         const otro = !!x.nombre && !planes.some((pl) => pl.nombre === x.nombre);

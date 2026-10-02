@@ -4,7 +4,7 @@ Brief del proyecto. Léelo antes de escribir código.
 
 ## 1. Qué es y para quién
 
-Una app para **Bracho**, asesor **independiente** de inversiones en **Ecuador**, para registrar y analizar prospectos **desde el celular**. Ofrece **fondos unit linked de contribución regular** y **de contribución única**. Cobra comisión según el **tipo de plan y el plazo** (`src/config/comisiones.ts`).
+Una app para **Bracho**, asesor **independiente** de inversiones en **Ecuador**, para registrar y analizar prospectos **desde el celular**. Ofrece **fondos unit linked de contribución regular** y **de contribución única**. Cobra comisión según el **tipo de plan y el plazo** (tabla editable en Configuración → Perfil → Comisiones).
 
 Es una copia adaptada de `tablero-prospectos-saludsa`: comparte el núcleo (etapas, gamificación, CRM, Centro de Gestión, mensajes, referidos, copias de seguridad, uso 100 % local). `DECISIONES.md` viene de esa app: sus decisiones sobre el núcleo siguen valiendo; las de salud (preexistencias, escáner, coberturas, Vitality) ya no aplican.
 
