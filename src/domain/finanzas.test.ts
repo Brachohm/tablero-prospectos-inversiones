@@ -1,4 +1,4 @@
-import { capacidadDe, deudaTarjeta, pesoDeudas, metaRetiroDe, metasDe, montoMeta, perfilEfectivo, puntajePerfil } from "./finanzas";
+import { ahorroMetaDe, capacidadDe, deudaTarjeta, pesoDeudas, metaRetiroDe, metasDe, montoMeta, perfilEfectivo, puntajePerfil } from "./finanzas";
 import { ficha } from "./test-utils";
 
 describe("capacidad de ahorro", () => {
@@ -16,6 +16,24 @@ describe("deudas (sin preguntar la tasa)", () => {
     expect(pesoDeudas(ficha("nuevo", { ingreso: "1000", deudaCuota: "350" }))).toBe(35);
     expect(pesoDeudas(ficha("nuevo", { deudaCuota: "350" }))).toBeNull();
     expect(deudaTarjeta(ficha("nuevo", { deudas: "Tarjeta y préstamo" }))).toBe(true);
+  });
+});
+
+describe("ahorro para la meta (sin rendimiento)", () => {
+  it("monto ÷ años que le quedan trabajando, al año y al mes", () => {
+    expect(ahorroMetaDe(ficha("nuevo", { edad: "35", edadRetiro: "65", metaMonto: "180000" }))).toEqual({
+      monto: 180000,
+      edad: 35,
+      edadRetiro: 65,
+      anios: 30,
+      anual: 6000,
+      mensual: 500,
+    });
+  });
+  it("sin edad, sin monto o con la edad de retiro ya cumplida: no calcula", () => {
+    expect(ahorroMetaDe(ficha("nuevo", { edadRetiro: "65", metaMonto: "100000" }))).toBeNull();
+    expect(ahorroMetaDe(ficha("nuevo", { edad: "40", edadRetiro: "65" }))).toBeNull();
+    expect(ahorroMetaDe(ficha("nuevo", { edad: "66", edadRetiro: "65", metaMonto: "100000" }))).toBeNull();
   });
 });
 

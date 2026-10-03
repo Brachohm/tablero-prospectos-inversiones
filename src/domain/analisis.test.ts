@@ -100,6 +100,12 @@ describe("análisis local", () => {
     const a = analisisLocal(ficha("nuevo", { meta: "Crear patrimonio", meta2: "Comprar vivienda", meta2Monto: "40000" }), HOY);
     expect(a.busca.join("|")).toMatch(/Meta 2: comprar vivienda \(\$40\.?000\)/);
   });
+  it("avisa cuando el aporte no llega al ahorro que pide su meta", () => {
+    const a = analisisLocal(ficha("nuevo", { edad: "35", edadRetiro: "65", metaMonto: "180000", aporte: "300" }), HOY);
+    const r = a.recs.find((x) => x.id === "bmeta");
+    expect(r?.d).toMatch(/necesita ahorrar ~\$500 al mes \(\$6\.?000 al año\)/);
+    expect(ids(ficha("nuevo", { edad: "35", edadRetiro: "65", metaMonto: "180000", aporte: "600" }))).not.toContain("bmeta");
+  });
   it("avisa cuando la meta y el aporte no cuadran", () => {
     expect(ids(ficha("nuevo", { metaMonto: "100000", aporte: "100", horizonte: "5 a 10 años" }))).toContain("brec");
   });

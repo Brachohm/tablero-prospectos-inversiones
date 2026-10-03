@@ -75,6 +75,29 @@ export function deudaTarjeta(p: Prospecto): boolean {
   return /tarjeta/i.test(txt(p, "deudas"));
 }
 
+export interface AhorroMeta {
+  monto: number;
+  edad: number;
+  edadRetiro: number;
+  /** Años que le quedan trabajando (hasta la edad de retiro). */
+  anios: number;
+  /** Ahorro aproximado, sin contar rendimiento. */
+  anual: number;
+  mensual: number;
+}
+
+/** Cuánto ahorrar para llegar al monto que quiere, en los años que le quedan trabajando (sin rendimiento). */
+export function ahorroMetaDe(p: Prospecto): AhorroMeta | null {
+  const monto = num(p, "metaMonto");
+  const edad = num(p, "edad");
+  const edadRetiro = num(p, "edadRetiro");
+  if (monto === null || monto <= 0 || edad === null || edadRetiro === null) return null;
+  const anios = edadRetiro - edad;
+  if (anios <= 0) return null;
+  const anual = Math.round(monto / anios);
+  return { monto, edad, edadRetiro, anios, anual, mensual: Math.round(monto / anios / 12) };
+}
+
 export interface MetaRetiro {
   renta: number;
   anios: number;
@@ -83,7 +106,7 @@ export interface MetaRetiro {
   faltan: number | null;
 }
 
-/** Meta de retiro: renta mensual deseada × 12 × años de retiro (sin rendimiento ni IESS). */
+/** Fichas antiguas: meta de retiro con la renta mensual deseada × 12 × años de retiro (sin rendimiento ni IESS). */
 export function metaRetiroDe(p: Prospecto): MetaRetiro | null {
   const renta = num(p, "rentaRetiro");
   const edadR = num(p, "edadRetiro");

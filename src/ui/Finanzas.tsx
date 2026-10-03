@@ -1,15 +1,27 @@
 /** Resúmenes calculados dentro de la ficha: metas, flujo del mes y perfil de riesgo. */
-import { APORTE_COMODO_PCT, capacidadDe, DEUDA_ALTA_PCT, metaRetiroDe, metasDe, pesoDeudas, puntajePerfil } from "../domain/finanzas";
+import { ahorroMetaDe, APORTE_COMODO_PCT, capacidadDe, DEUDA_ALTA_PCT, metaRetiroDe, metasDe, pesoDeudas, puntajePerfil } from "../domain/finanzas";
 import { usd } from "../domain/fechas";
 import { txt } from "../domain/ficha";
 import type { Prospecto } from "../domain/tipos";
 
 export function ResumenMetas({ p }: { p: Prospecto }) {
-  const r = txt(p, "meta") === "Retiro o jubilación" ? metaRetiroDe(p) : null;
+  const a = ahorroMetaDe(p);
+  const r = !a && txt(p, "meta") === "Retiro o jubilación" ? metaRetiroDe(p) : null;
   const metas = metasDe(p);
-  if (!r && metas.length < 2) return null;
+  if (!a && !r && metas.length < 2) {
+    if (txt(p, "metaMonto") && txt(p, "edadRetiro") && !txt(p, "edad"))
+      return <p className="an-note">Escribe su edad en Datos del prospecto para calcular cuánto ahorrar.</p>;
+    return null;
+  }
   return (
     <div className="an-status resumen-fin" aria-label="Resumen de metas">
+      {a && (
+        <p>
+          🎯 Para contar con <b>{usd(a.monto)}</b> a los {a.edadRetiro} años le quedan <b>{a.anios} años</b> trabajando: necesita
+          ahorrar cerca de <b>{usd(a.anual)} al año</b>, es decir <b>{usd(a.mensual)} al mes</b>. Sin contar rendimiento: con
+          rendimiento el aporte puede ser menor.
+        </p>
+      )}
       {r && (
         <p>
           🎯 Meta de retiro estimada: <b>{usd(r.monto)}</b> ({usd(r.renta)} al mes durante {r.anios} años

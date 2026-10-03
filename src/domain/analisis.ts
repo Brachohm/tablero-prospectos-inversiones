@@ -9,7 +9,7 @@ import { VALIDAR } from "../config/saludsa";
 import { CAMPO, campoActivo, esCambio, num, tieneMotivo, tipoDe, txt, vacio } from "./ficha";
 import { diasHasta, fmtFecha, hoyISO, usd } from "./fechas";
 import { contarDatos } from "./datos";
-import { capacidadDe, DEUDA_ALTA_PCT, deudaTarjeta, metasDe, montoMeta, pesoDeudas, puntajePerfil } from "./finanzas";
+import { ahorroMetaDe, capacidadDe, DEUDA_ALTA_PCT, deudaTarjeta, metasDe, montoMeta, pesoDeudas, puntajePerfil } from "./finanzas";
 import type { Causa, NivelVeredicto, Prospecto, TipoCausa, Veredicto } from "./tipos";
 
 export interface Recordatorio {
@@ -73,7 +73,7 @@ export function aniosHorizonte(p: Prospecto): number | null {
     "10 a 20 años": 15,
     "Más de 20 años": 25,
   };
-  return h[txt(p, "horizonte")] ?? null;
+  return h[txt(p, "horizonte")] ?? ahorroMetaDe(p)?.anios ?? null;
 }
 
 /** Perfil de riesgo coherente: lo que dice y cómo reaccionaría a una caída. */
@@ -285,8 +285,15 @@ export function analisisLocal(p: Prospecto, hoy: string = hoyISO()): AnalisisLoc
       t: "Objeción: desconfianza",
       d: "Muestra quién emite el plan, cómo está regulado en Ecuador y cómo consultará su estado de cuenta.",
     });
-  const meta = montoMeta(p);
-  const ap = num(p, "aporte");
+  const ap = num(p, "precio") ?? num(p, "aporte");
+  const am = ahorroMetaDe(p);
+  if (am && ap !== null && ap > 0 && ap < am.mensual)
+    recs.push({
+      id: "bmeta",
+      t: "El aporte no llega a su meta",
+      d: `Para juntar ${usd(am.monto)} en ${am.anios} años necesita ahorrar ~${usd(am.mensual)} al mes (${usd(am.anual)} al año) sin contar rendimiento; hoy plantea ${usd(ap)}. Ajusta aporte, edad de retiro o meta.`,
+    });
+  const meta = am ? null : montoMeta(p);
   if (meta !== null && ap !== null && anios !== null && ap > 0) {
     const sinRend = ap * 12 * anios;
     if (sinRend < meta * 0.6)

@@ -278,9 +278,8 @@ export const MISIONES: readonly Mision[] = [
         ph: "Bonos de permanencia, aportes hechos, liquidez…",
       },
       { k: "meta", l: "¿Para qué quiere invertir? (meta principal)", t: "select", o: METAS, xp: 15, grupo: "Sus metas" },
-      { k: "edadRetiro", l: "¿A qué edad quiere retirarse?", t: "number", xp: 10, min: 40, max: 90, cuando: { k: "meta", v: "Retiro o jubilación" }, grupo: "Sus metas" },
-      { k: "rentaRetiro", l: "¿Con cuánto al mes quiere vivir en su retiro? (USD de hoy)", t: "number", xp: 10, min: 0, cuando: { k: "meta", v: "Retiro o jubilación" }, grupo: "Sus metas" },
-      { k: "metaMonto", l: "¿Cuánto necesita para esa meta? (USD)", t: "number", xp: 10, min: 0, ph: "En retiro, vacío = se calcula con la renta", grupo: "Sus metas" },
+      { k: "metaMonto", l: "¿Con cuánto quisiera contar? (USD)", t: "number", xp: 10, min: 0, ph: "El monto que quiere ahorrar", grupo: "Sus metas" },
+      { k: "edadRetiro", l: "¿A qué edad quiere retirarse?", t: "number", xp: 10, min: 30, max: 90, grupo: "Sus metas" },
       {
         k: "horizonte",
         l: "¿En cuánto tiempo necesitará ese dinero?",

@@ -368,9 +368,13 @@ test('levantamiento: meta de retiro, capacidad de ahorro y perfil de riesgo con 
   // Metas: retiro calculado con la renta deseada
   await abrir(page, 'Descubrimiento')
   await campo(page, '¿Para qué quiere invertir? (meta principal)').selectOption('Retiro o jubilación')
+  await campo(page, '¿Con cuánto quisiera contar? (USD)').fill('180000')
   await campo(page, '¿A qué edad quiere retirarse?').fill('65')
-  await campo(page, '¿Con cuánto al mes quiere vivir en su retiro? (USD de hoy)').fill('800')
-  await expect(page.getByLabel('Resumen de metas')).toContainText(/Meta de retiro estimada: \$192\.?000/)
+  // 40 años hoy → 25 años trabajando: $7.200 al año, $600 al mes
+  const metas = page.getByLabel('Resumen de metas')
+  await expect(metas).toContainText('25 años')
+  await expect(metas).toContainText(/\$7\.?200 al año/)
+  await expect(metas).toContainText('$600 al mes')
   await campo(page, 'Segunda meta (opcional)').selectOption('Educación de los hijos')
   await expect(campo(page, 'Tercera meta (opcional)')).toBeVisible()
   await campo(page, '¿Cuánto puede invertir al mes? (USD)').fill('300')
