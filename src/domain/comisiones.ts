@@ -2,6 +2,7 @@
 import { COMISIONES, MAX_COMISIONES, type FilaComision } from "../config/comisiones";
 import { TIPOS_PLAN } from "../config/ficha";
 import { num, txt } from "./ficha";
+import { aniosInversion } from "./finanzas";
 import type { Prospecto } from "./tipos";
 
 export interface Comision {
@@ -26,7 +27,7 @@ export function normalizarComisiones(fs: readonly FilaComision[] | undefined): F
 
 export function comisionDe(p: Prospecto, tabla: readonly FilaComision[] | undefined = COMISIONES): Comision | null {
   const plan = txt(p, "tipoPlan");
-  const plazo = num(p, "plazo");
+  const plazo = num(p, "plazo") ?? aniosInversion(p);
   const aporte = num(p, "precio");
   if (!plan || plazo === null || aporte === null || aporte <= 0) return null;
   const fila = normalizarComisiones(tabla)

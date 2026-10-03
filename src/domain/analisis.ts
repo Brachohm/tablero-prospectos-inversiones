@@ -9,7 +9,7 @@ import { VALIDAR } from "../config/saludsa";
 import { CAMPO, campoActivo, esCambio, num, tieneMotivo, tipoDe, txt, vacio } from "./ficha";
 import { diasHasta, fmtFecha, hoyISO, usd } from "./fechas";
 import { contarDatos } from "./datos";
-import { ahorroMetaDe, capacidadDe, DEUDA_ALTA_PCT, fondoEmergenciaDe, proyeccionAhorroDe, deudaTarjeta, metasDe, montoMeta, pesoDeudas, puntajePerfil } from "./finanzas";
+import { ahorroMetaDe, aniosInversion, capacidadDe, esUnica, DEUDA_ALTA_PCT, fondoEmergenciaDe, proyeccionAhorroDe, deudaTarjeta, metasDe, montoMeta, pesoDeudas, puntajePerfil } from "./finanzas";
 import type { Causa, NivelVeredicto, Prospecto, TipoCausa, Veredicto } from "./tipos";
 
 export interface Recordatorio {
@@ -51,12 +51,12 @@ export const MAP_OBJ: Readonly<Record<string, string>> = {
 
 const CLAVES_CAMBIO = [
   "institucion", "producto", "tiempoCon", "saldoActual", "motivos", "grieta", "conoce", "noPerder",
-  "depende", "edad", "meta", "horizonte", "aporte", "perfil", "reaccion", "objecion",
+  "depende", "edad", "meta", "plazoAnios", "aporte", "perfil", "reaccion", "objecion",
   "ingresoRango", "gastos",
 ];
 const CLAVES_NUEVO = [
-  "ahorroHoy", "porque", "depende", "edad", "meta", "horizonte", "aporte", "perfil", "reaccion",
-  "metaMonto", "edadRetiro", "ahorros", "costoEvento", "objecion", "ingresoRango", "gastos", "tipoIngreso",
+  "ahorroHoy", "porque", "depende", "edad", "meta", "plazoAnios", "tipoPlan", "aporte", "perfil", "reaccion",
+  "metaMonto", "ahorros", "costoEvento", "objecion", "ingresoRango", "gastos", "tipoIngreso",
 ];
 
 function usdCampo(p: Prospecto, k: string): string {
@@ -64,16 +64,9 @@ function usdCampo(p: Prospecto, k: string): string {
   return n === null ? txt(p, k) : usd(n);
 }
 
-/** Años de horizonte (punto medio del rango elegido), o null. */
+/** Tiempo de inversión en años (en cuánto tiempo va a usar ese dinero), o null. */
 export function aniosHorizonte(p: Prospecto): number | null {
-  const h: Record<string, number> = {
-    "Menos de 3 años": 2,
-    "3 a 5 años": 4,
-    "5 a 10 años": 7,
-    "10 a 20 años": 15,
-    "Más de 20 años": 25,
-  };
-  return h[txt(p, "horizonte")] ?? ahorroMetaDe(p)?.anios ?? null;
+  return aniosInversion(p);
 }
 
 /** Perfil de riesgo coherente: lo que dice y cómo reaccionaría a una caída. */
@@ -247,12 +240,6 @@ export function analisisLocal(p: Prospecto, hoy: string = hoyISO()): AnalisisLoc
       t: "Decide con alguien más",
       d: `Invita a ${txt(p, "decideCon")} a la segunda reunión: así nadie decide con información a medias.`,
     });
-  if (txt(p, "metaFlex") === "Es indispensable: tiene que llegar")
-    recs.push({
-      id: "mind",
-      t: "Meta indispensable",
-      d: "Arma la propuesta con el escenario conservador: si la meta tiene que llegar, no cuentes con el optimista.",
-    });
   if (txt(p, "fuenteUnico") && !vacio(p, "capital"))
     recs.push({
       id: "orig",
@@ -292,17 +279,23 @@ export function analisisLocal(p: Prospecto, hoy: string = hoyISO()): AnalisisLoc
   const ap = num(p, "precio") ?? num(p, "aporte");
   const am = ahorroMetaDe(p);
   const pa = proyeccionAhorroDe(p);
-  if (pa && ap !== null && ap > 0 && ap < pa.mensual)
+  if (pa && !pa.unica && ap !== null && ap > 0 && ap < pa.mensual)
     recs.push({
       id: "bmeta",
       t: "El aporte no llega a su meta",
-      d: `Con su ahorro de hoy y un ${pa.rend}% anual estimado, para juntar ${usd(pa.monto)} en ${pa.anios} años necesita ~${usd(pa.mensual)} al mes (${usd(pa.anual)} al año); hoy plantea ${usd(ap)} y llegaría a ~${usd(pa.finalConAporte ?? 0)}. Ajusta aporte, edad de retiro o meta.`,
+      d: `Con su ahorro de hoy y un ${pa.rend}% anual estimado, para juntar ${usd(pa.monto)} en ${pa.anios} años necesita ~${usd(pa.mensual)} al mes (${usd(pa.anual)} al año); hoy plantea ${usd(ap)} y llegaría a ~${usd(pa.finalConAporte ?? 0)}. Ajusta aporte, plazo o meta.`,
     });
-  else if (!pa && am && ap !== null && ap > 0 && ap < am.mensual)
+  else if (pa && pa.unica && pa.aporte !== null && pa.aporte < pa.unico)
+    recs.push({
+      id: "bmeta",
+      t: "El aporte único no llega a su meta",
+      d: `Con un ${pa.rend}% anual estimado, para juntar ${usd(pa.monto)} en ${pa.anios} años necesita aportar hoy ~${usd(pa.unico)}; con ${usd(pa.aporte)} llegaría a ~${usd(pa.finalConAporte ?? 0)}. Ajusta aporte, plazo o meta.`,
+    });
+  else if (!pa && am && !esUnica(p) && ap !== null && ap > 0 && ap < am.mensual)
     recs.push({
       id: "bmeta",
       t: "El aporte no llega a su meta",
-      d: `Para juntar ${usd(am.monto)} en ${am.anios} años necesita ahorrar ~${usd(am.mensual)} al mes (${usd(am.anual)} al año) sin contar rendimiento; hoy plantea ${usd(ap)}. Ajusta aporte, edad de retiro o meta.`,
+      d: `Para juntar ${usd(am.monto)} en ${am.anios} años necesita ahorrar ~${usd(am.mensual)} al mes (${usd(am.anual)} al año) sin contar rendimiento; hoy plantea ${usd(ap)}. Ajusta aporte, plazo o meta.`,
     });
   const meta = am ? null : montoMeta(p);
   if (meta !== null && ap !== null && anios !== null && ap > 0) {

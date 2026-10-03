@@ -14,7 +14,7 @@ export async function accion(page: Page, nombre: string | RegExp) {
 /** Pre-cierre sin planes en la Biblioteca: el producto se escribe (contribución regular por defecto). */
 export async function precierre(page: Page, producto: string, aporte: string, plazo = '') {
   await accion(page, 'Ya va a contratar')
-  await campo(page, 'Tipo de plan').selectOption('Contribución regular')
+  await campo(page, 'Tipo de plan elegido').selectOption('Contribución regular')
   if (plazo) await campo(page, 'Plazo (años)').fill(plazo)
   await campo(page, 'Producto seleccionado').fill(producto)
   await campo(page, 'Aporte mensual (USD)').fill(aporte)

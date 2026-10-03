@@ -16,7 +16,7 @@ import { firma } from "./herramientas";
 import { fmtFecha, hoyISO } from "./fechas";
 import { esCambio, motivosDe, num, tipoDe, txt } from "./ficha";
 import { aniosHorizonte, perfilIncoherente } from "./analisis";
-import { ahorroMetaDe, capacidadDe, fondoEmergenciaDe, proyeccionAhorroDe, DEUDA_ALTA_PCT, deudaTarjeta, metasDe, montoMeta, pesoDeudas, perfilEfectivo } from "./finanzas";
+import { ahorroMetaDe, aniosInversion, capacidadDe, textoPlazo, fondoEmergenciaDe, proyeccionAhorroDe, DEUDA_ALTA_PCT, deudaTarjeta, metasDe, montoMeta, pesoDeudas, perfilEfectivo } from "./finanzas";
 import { reunionDe } from "./mensajes";
 import { fmtUSD, ofertaInforme, planDeOferta, type OfertaInforme } from "./oferta";
 import type { Argumento, Plan } from "./biblioteca";
@@ -72,7 +72,7 @@ export function proteccionHoy(p: Prospecto): { l: string; estado: EstadoCobertur
     !x ? "?" : si.includes(x) ? "si" : parcial.includes(x) ? "parcial" : "no";
   return [
     { l: "Meta definida", estado: v("meta") ? (montoMeta(p) ? "si" : "parcial") : "?" },
-    { l: "Plazo claro", estado: v("horizonte") ? "si" : "?" },
+    { l: "Plazo claro", estado: aniosInversion(p) ? "si" : "?" },
     { l: "Aporte que puede sostener", estado: aporteSostenible(p) },
     { l: "Deudas bajo control", estado: deudasBajoControl(p) },
     { l: "Protección para su familia", estado: sn(v("seguroVida"), ["Sí, propio"], ["Solo el de su trabajo"]) },
@@ -124,7 +124,7 @@ export function estrategia(p: Prospecto): Estrategia {
   } else {
     porque.push("Un aporte mensual constante convierte su meta en un hábito, y el tiempo hace el resto.");
   }
-  if (v("meta")) porque.push(`Pensado para su meta: ${v("meta").toLowerCase()}${v("horizonte") ? `, en ${v("horizonte").toLowerCase()}` : ""}.`);
+  if (v("meta")) porque.push(`Pensado para su meta: ${v("meta").toLowerCase()}${textoPlazo(p) ? `, en ${textoPlazo(p).toLowerCase()}` : ""}.`);
 
   const pf = perfilEfectivo(p) ?? v("perfil");
   if (pf === "Conservador" || v("reaccion") === "Retiraría todo")
@@ -179,10 +179,17 @@ export function informe(
   const ms = metasDe(p);
   add("Su meta", ms[0] ? ms[0].meta + (ms[0].monto ? ` · ${fmtUSD(ms[0].monto)}` : "") : "");
   const am = ahorroMetaDe(p);
-  add("Plazo", v("horizonte") || (am ? `${am.anios} años (hasta los ${am.edadRetiro})` : ""));
+  add("Tiempo de inversión", textoPlazo(p));
+  add("Tipo de plan", v("tipoPlan"));
   const pa = proyeccionAhorroDe(p);
-  if (pa) add("Ahorro necesario", `${fmtUSD(pa.mensual)} al mes (${fmtUSD(pa.anual)} al año, con ${pa.rend}% anual estimado)`);
-  else if (am) add("Ahorro necesario", `${fmtUSD(am.mensual)} al mes (${fmtUSD(am.anual)} al año)`);
+  if (pa)
+    add(
+      "Ahorro necesario",
+      pa.unica
+        ? `${fmtUSD(pa.unico)} hoy, de una vez (con ${pa.rend}% anual estimado)`
+        : `${fmtUSD(pa.mensual)} al mes (${fmtUSD(pa.anual)} al año, con ${pa.rend}% anual estimado)`,
+    );
+  else if (am) add("Ahorro necesario", am.unico ? `${fmtUSD(am.unico)} de una vez` : `${fmtUSD(am.mensual)} al mes (${fmtUSD(am.anual)} al año)`);
   const ah = num(p, "ahorros");
   if (ah !== null) add("Ahorro de hoy", fmtUSD(ah));
   if (ms.length > 1) add("Otras metas", ms.slice(1).map((m) => m.meta).join(" · "));

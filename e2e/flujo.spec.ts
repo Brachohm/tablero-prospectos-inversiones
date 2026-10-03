@@ -33,7 +33,7 @@ test('crear ficha → llenar → analizar → guardar → reabrir', async ({ pag
   await expect(campo(page, 'Costos que conoce (administración, entrada, salida…)')).toHaveValue('2 % anual')
 
   await campo(page, '¿Para qué quiere invertir? (meta principal)').selectOption('Retiro o jubilación')
-  await campo(page, '¿En cuánto tiempo necesitará ese dinero?').selectOption('10 a 20 años')
+  await campo(page, '¿En cuánto tiempo va a usar ese dinero? (años)').fill('15')
 
   // Ya va a contratar: pre-cierre con tipo de plan, plazo y aporte (sin tabla de comisiones, avisa dónde escribirla)
   await precierre(page, 'Plan Futuro', '100', '12')
@@ -245,7 +245,7 @@ test('ficha: sin presentación ni seguimiento; + acciones; etapas solas; dos reu
   // Ya va a contratar → pre-cierre con tipo de plan y plazo
   await accion(page, 'Ya va a contratar')
   await expect(page.getByText('Etapa: Pre-cierre')).toBeVisible()
-  await expect(campo(page, 'Tipo de plan')).toBeVisible()
+  await expect(campo(page, 'Tipo de plan elegido')).toBeVisible()
 
   // El referido quedó en la Base de datos
   await page.getByRole('button', { name: 'Guardar y volver' }).click()
@@ -365,12 +365,13 @@ test('levantamiento: meta de retiro, capacidad de ahorro y perfil de riesgo con 
   await campo(page, '¿Aporta al IESS?').selectOption('Sí')
   await expect(campo(page, 'Años de aportes al IESS')).toBeVisible()
 
-  // Metas: retiro calculado con la renta deseada
+  // Metas: tipo de plan, monto y tiempo de inversión → ahorro anual y mensual
   await abrir(page, 'Descubrimiento')
   await campo(page, '¿Para qué quiere invertir? (meta principal)').selectOption('Retiro o jubilación')
+  await campo(page, 'Tipo de plan').selectOption('Contribución regular')
   await campo(page, '¿Con cuánto quisiera contar? (USD)').fill('180000')
-  await campo(page, '¿A qué edad quiere retirarse?').fill('65')
-  // 40 años hoy → 25 años trabajando: $7.200 al año, $600 al mes
+  await campo(page, '¿En cuánto tiempo va a usar ese dinero? (años)').fill('25')
+  // 25 años: $7.200 al año, $600 al mes
   const metas = page.getByLabel('Resumen de metas')
   await expect(metas).toContainText('25 años')
   await expect(metas).toContainText(/\$7\.?200 al año/)
@@ -381,6 +382,10 @@ test('levantamiento: meta de retiro, capacidad de ahorro y perfil de riesgo con 
   const proy = page.getByLabel('Proyección del ahorro')
   await expect(proy).toContainText(/podría llegar a \$33\.?864/)
   await expect(proy).toContainText('no es una promesa')
+  // Contribución única: lo que tendría que aportar hoy, de una vez
+  await campo(page, 'Tipo de plan').selectOption('Contribución única')
+  await expect(proy).toContainText(/aportar hoy, de una vez, cerca de \$43\.?154/)
+  await campo(page, 'Tipo de plan').selectOption('Contribución regular')
   await campo(page, 'Segunda meta (opcional)').selectOption('Educación de los hijos')
   await expect(campo(page, 'Tercera meta (opcional)')).toBeVisible()
   await campo(page, '¿Cuánto puede invertir al mes? (USD)').fill('300')

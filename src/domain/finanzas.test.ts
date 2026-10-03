@@ -20,42 +20,57 @@ describe("deudas (sin preguntar la tasa)", () => {
 });
 
 describe("ahorro para la meta (sin rendimiento)", () => {
-  it("monto ÷ años que le quedan trabajando, al año y al mes", () => {
-    expect(ahorroMetaDe(ficha("nuevo", { edad: "35", edadRetiro: "65", metaMonto: "180000" }))).toEqual({
+  it("regular: lo que falta ÷ tiempo de inversión, al año y al mes", () => {
+    expect(ahorroMetaDe(ficha("nuevo", { plazoAnios: "30", metaMonto: "180000" }))).toEqual({
       monto: 180000,
-      edad: 35,
-      edadRetiro: 65,
       anios: 30,
+      unico: 0,
       anual: 6000,
       mensual: 500,
     });
+    // Con ahorro de hoy, solo se ahorra lo que falta
+    expect(ahorroMetaDe(ficha("nuevo", { plazoAnios: "10", metaMonto: "50000", ahorros: "14000" }))?.mensual).toBe(300);
   });
-  it("sin edad, sin monto o con la edad de retiro ya cumplida: no calcula", () => {
-    expect(ahorroMetaDe(ficha("nuevo", { edadRetiro: "65", metaMonto: "100000" }))).toBeNull();
-    expect(ahorroMetaDe(ficha("nuevo", { edad: "40", edadRetiro: "65" }))).toBeNull();
-    expect(ahorroMetaDe(ficha("nuevo", { edad: "66", edadRetiro: "65", metaMonto: "100000" }))).toBeNull();
+  it("única: lo que falta, de una vez", () => {
+    expect(ahorroMetaDe(ficha("nuevo", { tipoPlan: "Contribución única", plazoAnios: "10", metaMonto: "50000", ahorros: "10000" }))).toMatchObject({
+      unico: 40000,
+      anual: 0,
+    });
+  });
+  it("sin tiempo de inversión o sin monto: no calcula; lee fichas antiguas", () => {
+    expect(ahorroMetaDe(ficha("nuevo", { metaMonto: "100000" }))).toBeNull();
+    expect(ahorroMetaDe(ficha("nuevo", { plazoAnios: "10" }))).toBeNull();
+    expect(ahorroMetaDe(ficha("nuevo", { edad: "35", edadRetiro: "65", metaMonto: "180000" }))?.anios).toBe(30);
   });
 });
 
 describe("proyección del ahorro con interés compuesto anual", () => {
-  it("su ahorro de hoy crece; el aporte anual cubre lo que falta", () => {
-    // 10 años al 5 %: 10.000 → 16.289; faltan 33.711 → aporte anual 2.680 (×1,05^k)
-    const x = proyeccionAhorroDe(ficha("nuevo", { edad: "55", edadRetiro: "65", metaMonto: "50000", ahorros: "10000", rendEstimado: "5" }))!;
-    expect(x).toMatchObject({ anios: 10, rend: 5, ahorroHoy: 10000, ahorroFuturo: 16289, falta: 33711, anual: 2680, mensual: 223 });
-    // El saldo del último año llega a la meta
+  it("regular: su ahorro de hoy crece; el aporte anual cubre lo que falta", () => {
+    // 10 años al 5 %: 10.000 → 16.289; faltan 33.711 → aporte anual 2.680
+    const x = proyeccionAhorroDe(ficha("nuevo", { edad: "55", plazoAnios: "10", metaMonto: "50000", ahorros: "10000", rendEstimado: "5" }))!;
+    expect(x).toMatchObject({ unica: false, anios: 10, rend: 5, ahorroHoy: 10000, ahorroFuturo: 16289, falta: 33711, anual: 2680, mensual: 223 });
     expect(x.puntos.at(-1)).toMatchObject({ anio: 10, edad: 65 });
     expect(Math.abs(x.puntos.at(-1)!.saldo - 50000)).toBeLessThanOrEqual(5);
   });
+  it("única: el aporte de hoy que, con interés compuesto, llega a la meta", () => {
+    // 50.000 / 1,05^10 = 30.696; menos su ahorro de hoy (10.000)
+    const x = proyeccionAhorroDe(ficha("nuevo", { tipoPlan: "Contribución única", plazoAnios: "10", metaMonto: "50000", ahorros: "10000", rendEstimado: "5" }))!;
+    expect(x).toMatchObject({ unica: true, unico: 20696, anual: 0, mensual: 0 });
+    expect(Math.abs(x.puntos.at(-1)!.saldo - 50000)).toBeLessThanOrEqual(5);
+    expect(x.puntos[0].edad).toBeNull();
+    const c = proyeccionAhorroDe(ficha("nuevo", { tipoPlan: "Contribución única", plazoAnios: "10", metaMonto: "50000", rendEstimado: "5", capital: "20000" }))!;
+    expect(c.finalConAporte).toBe(32578);
+  });
   it("con 0 % de rendimiento es el cálculo simple; si su ahorro ya alcanza, no falta nada", () => {
-    expect(proyeccionAhorroDe(ficha("nuevo", { edad: "35", edadRetiro: "65", metaMonto: "180000", rendEstimado: "0" }))).toMatchObject({ anual: 6000, mensual: 500 });
-    expect(proyeccionAhorroDe(ficha("nuevo", { edad: "40", edadRetiro: "65", metaMonto: "20000", ahorros: "15000", rendEstimado: "5" }))).toMatchObject({ falta: 0, anual: 0 });
+    expect(proyeccionAhorroDe(ficha("nuevo", { plazoAnios: "30", metaMonto: "180000", rendEstimado: "0" }))).toMatchObject({ anual: 6000, mensual: 500 });
+    expect(proyeccionAhorroDe(ficha("nuevo", { plazoAnios: "25", metaMonto: "20000", ahorros: "15000", rendEstimado: "5" }))).toMatchObject({ falta: 0, anual: 0 });
   });
   it("muestra a cuánto llegaría con el aporte que plantea", () => {
-    const x = proyeccionAhorroDe(ficha("nuevo", { edad: "35", edadRetiro: "65", metaMonto: "180000", rendEstimado: "0", aporte: "300" }))!;
+    const x = proyeccionAhorroDe(ficha("nuevo", { plazoAnios: "30", metaMonto: "180000", rendEstimado: "0", aporte: "300" }))!;
     expect(x.finalConAporte).toBe(108000);
   });
   it("sin rendimiento escrito no proyecta (queda el cálculo simple)", () => {
-    expect(proyeccionAhorroDe(ficha("nuevo", { edad: "35", edadRetiro: "65", metaMonto: "180000" }))).toBeNull();
+    expect(proyeccionAhorroDe(ficha("nuevo", { plazoAnios: "30", metaMonto: "180000" }))).toBeNull();
   });
 });
 
@@ -64,6 +79,18 @@ describe("fondo de emergencia (recomendación)", () => {
     expect(fondoEmergenciaDe(ficha("nuevo", { gastos: "1000" }))).toEqual({ min: 3000, max: 6000, base: "gastos" });
     expect(fondoEmergenciaDe(ficha("nuevo", { ingresoRango: "$1.000 a $2.000" }))).toEqual({ min: 4500, max: 9000, base: "ingreso" });
     expect(fondoEmergenciaDe(ficha("nuevo"))).toBeNull();
+  });
+});
+
+describe("preguntas según el tipo de plan", () => {
+  it("aporte mensual solo si no es única; capital solo si no es regular", async () => {
+    const { campoActivo, CAMPO } = await import("./ficha");
+    const aporte = CAMPO["aporte"];
+    const capital = CAMPO["capital"];
+    expect(campoActivo(aporte, ficha("nuevo", { tipoPlan: "Contribución única" }))).toBe(false);
+    expect(campoActivo(capital, ficha("nuevo", { tipoPlan: "Contribución única" }))).toBe(true);
+    expect(campoActivo(capital, ficha("nuevo", { tipoPlan: "Contribución regular" }))).toBe(false);
+    expect([campoActivo(aporte, ficha("nuevo")), campoActivo(capital, ficha("nuevo"))]).toEqual([true, true]);
   });
 });
 

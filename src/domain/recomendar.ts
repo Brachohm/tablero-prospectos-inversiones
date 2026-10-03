@@ -17,7 +17,7 @@ import { crearPlan, lineas, normalizar, type Documento, type Plan } from "./bibl
 import { aplicarPrecarga, precargaDesdeDocumento } from "./extraer";
 import { esCambio, motivosDe, num, txt } from "./ficha";
 import { aniosHorizonte } from "./analisis";
-import { perfilEfectivo } from "./finanzas";
+import { perfilEfectivo, textoPlazo } from "./finanzas";
 import { usd } from "./fechas";
 import type { Prospecto } from "./tipos";
 
@@ -94,7 +94,7 @@ export function necesidadesDe(p: Prospecto): Necesidad[] {
     add("aporte", 3, `Puede aportar ${usd(aporte)} al mes`);
     out.get("aporte")!.tope = aporte;
   }
-  if (v("horizonte") || v("plazo")) add("plazo", 2, v("plazo") ? `Plazo elegido: ${v("plazo")} años` : `Su meta: ${v("horizonte").toLowerCase()}`);
+  if (v("plazo") || textoPlazo(p)) add("plazo", 2, v("plazo") ? `Plazo elegido: ${v("plazo")} años` : `Tiempo de inversión: ${textoPlazo(p)}`);
   add("costos", 2, "Lo esencial: saber cuánto le cuesta el plan");
 
   const anios = aniosHorizonte(p);

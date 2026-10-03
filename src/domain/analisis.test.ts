@@ -84,12 +84,11 @@ describe("análisis local", () => {
         tipoIngreso: "Negocio propio",
         malaExp: "Sí, con un asesor",
         decideCon: "Su esposa",
-        metaFlex: "Es indispensable: tiene que llegar",
         capital: "5000",
         fuenteUnico: "Herencia",
       }),
     );
-    expect(r).toEqual(expect.arrayContaining(["capa", "dcar", "svid", "iess", "ivar", "malx", "deci", "mind", "orig"]));
+    expect(r).toEqual(expect.arrayContaining(["capa", "dcar", "svid", "iess", "ivar", "malx", "deci", "orig"]));
     expect(ids(ficha("nuevo", { decideCon: "Nadie" }))).not.toContain("deci");
   });
   it("si el aporte no le alcanza, el veredicto pide ajustarlo", () => {
@@ -101,13 +100,17 @@ describe("análisis local", () => {
     expect(a.busca.join("|")).toMatch(/Meta 2: comprar vivienda \(\$40\.?000\)/);
   });
   it("avisa cuando el aporte no llega al ahorro que pide su meta", () => {
-    const a = analisisLocal(ficha("nuevo", { edad: "35", edadRetiro: "65", metaMonto: "180000", aporte: "300" }), HOY);
+    const a = analisisLocal(ficha("nuevo", { plazoAnios: "30", metaMonto: "180000", aporte: "300" }), HOY);
     const r = a.recs.find((x) => x.id === "bmeta");
     expect(r?.d).toMatch(/necesita ahorrar ~\$500 al mes \(\$6\.?000 al año\)/);
-    expect(ids(ficha("nuevo", { edad: "35", edadRetiro: "65", metaMonto: "180000", aporte: "600" }))).not.toContain("bmeta");
+    expect(ids(ficha("nuevo", { plazoAnios: "30", metaMonto: "180000", aporte: "600" }))).not.toContain("bmeta");
   });
   it("avisa cuando la meta y el aporte no cuadran", () => {
-    expect(ids(ficha("nuevo", { metaMonto: "100000", aporte: "100", horizonte: "5 a 10 años" }))).toContain("brec");
+    // Fichas antiguas con el plazo por rangos: también se calcula con su punto medio (7 años)
+    expect(ids(ficha("nuevo", { metaMonto: "100000", aporte: "100", horizonte: "5 a 10 años" }))).toContain("bmeta");
+    // Contribución única: compara el aporte único con lo que necesita hoy
+    const u = analisisLocal(ficha("nuevo", { tipoPlan: "Contribución única", plazoAnios: "10", metaMonto: "50000", rendEstimado: "5", capital: "20000" }), HOY);
+    expect(u.recs.find((x) => x.id === "bmeta")?.t).toBe("El aporte único no llega a su meta");
   });
   it("días al vencimiento", () => {
     const r = analisisLocal(ficha("cambio", { vencimiento: "2026-10-20" }), HOY).recs.find((x) => x.id === "venc");

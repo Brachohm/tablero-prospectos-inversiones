@@ -10,21 +10,27 @@ export function ResumenMetas({ p }: { p: Prospecto }) {
   const pa = proyeccionAhorroDe(p);
   const r = !a && txt(p, "meta") === "Retiro o jubilación" ? metaRetiroDe(p) : null;
   const metas = metasDe(p);
-  if (!a && !r && metas.length < 2) {
-    if (txt(p, "metaMonto") && txt(p, "edadRetiro") && !txt(p, "edad"))
-      return <p className="an-note">Escribe su edad en Datos del prospecto para calcular cuánto ahorrar.</p>;
-    return null;
-  }
+  if (!a && !r && metas.length < 2) return null;
   return (
     <div className="an-status resumen-fin" aria-label="Resumen de metas">
       {pa ? (
         <ProyeccionAhorro x={pa} />
-      ) : a && (
-        <p>
-          🎯 Para contar con <b>{usd(a.monto)}</b> a los {a.edadRetiro} años le quedan <b>{a.anios} años</b> trabajando: necesita
-          ahorrar cerca de <b>{usd(a.anual)} al año</b>, es decir <b>{usd(a.mensual)} al mes</b>. Sin contar rendimiento: con
-          rendimiento el aporte puede ser menor. Escribe el rendimiento estimado para proyectarlo con interés compuesto.
-        </p>
+      ) : (
+        a && (
+          <p>
+            🎯 Para contar con <b>{usd(a.monto)}</b> en <b>{a.anios} años</b>
+            {a.unico ? (
+              <>
+                {" "}necesita aportar <b>{usd(a.unico)}</b> de una vez.
+              </>
+            ) : (
+              <>
+                {" "}necesita ahorrar cerca de <b>{usd(a.anual)} al año</b>, es decir <b>{usd(a.mensual)} al mes</b>.
+              </>
+            )}{" "}
+            Sin contar rendimiento: escribe el rendimiento estimado para proyectarlo con interés compuesto.
+          </p>
+        )
       )}
       {r && (
         <p>
@@ -130,28 +136,34 @@ export function ResumenPerfil({ p }: { p: Prospecto }) {
 }
 
 function ProyeccionAhorro({ x }: { x: ProyeccionAhorroT }) {
+  const conEdad = x.puntos.some((pt) => pt.edad !== null);
   return (
     <div aria-label="Proyección del ahorro">
       <p>
-        🎯 Meta: <b>{usd(x.monto)}</b> a los {x.edadRetiro} años ({x.anios} años trabajando), con un rendimiento estimado de{" "}
-        {x.rend}% anual.
+        🎯 Meta: <b>{usd(x.monto)}</b> en <b>{x.anios} años</b> ({x.unica ? "contribución única" : "contribución regular"}), con un
+        rendimiento estimado de {x.rend}% anual.
       </p>
       {x.ahorroHoy > 0 && (
         <p>
           Su ahorro de hoy ({usd(x.ahorroHoy)}) podría llegar a <b>{usd(x.ahorroFuturo)}</b>.
         </p>
       )}
-      {x.falta > 0 ? (
+      {x.falta === 0 ? (
+        <p>✅ Con su ahorro de hoy y ese rendimiento ya llegaría a la meta.</p>
+      ) : x.unica ? (
+        <p>
+          Para cubrir lo que falta ({usd(x.falta)}) necesita aportar hoy, de una vez, cerca de <b>{usd(x.unico)}</b>.
+        </p>
+      ) : (
         <p>
           Para cubrir lo que falta ({usd(x.falta)}) necesita ahorrar cerca de <b>{usd(x.anual)} al año</b>, es decir{" "}
           <b>{usd(x.mensual)} al mes</b>.
         </p>
-      ) : (
-        <p>✅ Con su ahorro de hoy y ese rendimiento ya llegaría a la meta.</p>
       )}
       {x.aporte !== null && x.finalConAporte !== null && (
         <p>
-          Con el aporte que plantea ({usd(x.aporte)} al mes) llegaría a <b>{usd(x.finalConAporte)}</b>
+          Con el aporte que plantea ({usd(x.aporte)}
+          {x.unica ? " de una vez" : " al mes"}) llegaría a <b>{usd(x.finalConAporte)}</b>
           {x.finalConAporte >= x.monto ? " ✅" : ""}.
         </p>
       )}
@@ -161,7 +173,7 @@ function ProyeccionAhorro({ x }: { x: ProyeccionAhorroT }) {
           <thead>
             <tr>
               <th scope="col">Año</th>
-              <th scope="col">Edad</th>
+              {conEdad && <th scope="col">Edad</th>}
               <th scope="col">Con el aporte necesario</th>
               {x.aporte !== null && <th scope="col">Con su aporte</th>}
             </tr>
@@ -170,7 +182,7 @@ function ProyeccionAhorro({ x }: { x: ProyeccionAhorroT }) {
             {x.puntos.map((pt) => (
               <tr key={pt.anio}>
                 <th scope="row">{pt.anio}</th>
-                <td>{pt.edad}</td>
+                {conEdad && <td>{pt.edad}</td>}
                 <td>{usd(pt.saldo)}</td>
                 {x.aporte !== null && <td>{usd(pt.conAporte ?? 0)}</td>}
               </tr>

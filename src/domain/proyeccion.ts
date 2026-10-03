@@ -1,7 +1,7 @@
 /** Proyección del plan: cuánto podría acumular con su aporte y plazo, en tres escenarios. */
 import { ESCENARIOS_INICIALES, HITOS_ANIOS, type Escenarios } from "../config/proyeccion";
 import { num, txt } from "./ficha";
-import { montoMeta } from "./finanzas";
+import { aniosInversion, montoMeta } from "./finanzas";
 import type { Prospecto } from "./tipos";
 
 export interface PuntoProyeccion {
@@ -85,8 +85,7 @@ export function proyectar(
 export function proyeccionDe(p: Prospecto, tasas?: Partial<Escenarios>): Proyeccion | null {
   const plan = txt(p, "tipoPlan");
   const precio = num(p, "precio");
-  const plazo = num(p, "plazo");
-  const anios = plazo ?? null;
+  const anios = num(p, "plazo") ?? aniosInversion(p);
   if (anios === null) return null;
   let mensual = 0;
   let unico = 0;

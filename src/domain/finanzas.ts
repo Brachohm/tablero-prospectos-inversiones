@@ -75,32 +75,63 @@ export function deudaTarjeta(p: Prospecto): boolean {
   return /tarjeta/i.test(txt(p, "deudas"));
 }
 
+/** Años del rango elegido en versiones anteriores ("¿En cuánto tiempo necesitará ese dinero?"). */
+const HORIZONTE_ANIOS: Readonly<Record<string, number>> = {
+  "Menos de 3 años": 2,
+  "3 a 5 años": 4,
+  "5 a 10 años": 7,
+  "10 a 20 años": 15,
+  "Más de 20 años": 25,
+};
+
+/** Tiempo de inversión (años): en cuánto tiempo va a usar ese dinero. Lee también fichas antiguas. */
+export function aniosInversion(p: Prospecto): number | null {
+  const n = num(p, "plazoAnios");
+  if (n !== null && n > 0) return n;
+  const h = HORIZONTE_ANIOS[txt(p, "horizonte")];
+  if (h) return h;
+  const edad = num(p, "edad");
+  const er = num(p, "edadRetiro");
+  return edad !== null && er !== null && er > edad ? er - edad : null;
+}
+
+/** El tiempo de inversión en texto ("12 años"). */
+export function textoPlazo(p: Prospecto): string {
+  const n = num(p, "plazoAnios");
+  if (n !== null && n > 0) return `${n} ${n === 1 ? "año" : "años"}`;
+  if (txt(p, "horizonte")) return txt(p, "horizonte");
+  const a = aniosInversion(p);
+  return a ? `${a} años` : "";
+}
+
+export const esUnica = (p: Prospecto) => txt(p, "tipoPlan") === "Contribución única";
+
 export interface AhorroMeta {
   monto: number;
-  edad: number;
-  edadRetiro: number;
-  /** Años que le quedan trabajando (hasta la edad de retiro). */
+  /** Tiempo de inversión (años). */
   anios: number;
-  /** Ahorro aproximado, sin contar rendimiento. */
+  /** Contribución única: lo que tendría que aportar hoy, de una vez. Regular: 0. */
+  unico: number;
+  /** Contribución regular: ahorro aproximado, sin contar rendimiento. Única: 0. */
   anual: number;
   mensual: number;
 }
 
-/** Cuánto ahorrar para llegar al monto que quiere, en los años que le quedan trabajando (sin rendimiento). */
+/** Cuánto ahorrar para llegar al monto en el tiempo de inversión (sin rendimiento). */
 export function ahorroMetaDe(p: Prospecto): AhorroMeta | null {
   const monto = num(p, "metaMonto");
-  const edad = num(p, "edad");
-  const edadRetiro = num(p, "edadRetiro");
-  if (monto === null || monto <= 0 || edad === null || edadRetiro === null) return null;
-  const anios = edadRetiro - edad;
-  if (anios <= 0) return null;
-  const anual = Math.round(monto / anios);
-  return { monto, edad, edadRetiro, anios, anual, mensual: Math.round(monto / anios / 12) };
+  const anios = aniosInversion(p);
+  if (monto === null || monto <= 0 || anios === null || anios <= 0) return null;
+  const hoy = Math.max(0, num(p, "ahorros") ?? 0);
+  const falta = Math.max(0, monto - hoy);
+  if (esUnica(p)) return { monto, anios, unico: Math.round(falta), anual: 0, mensual: 0 };
+  return { monto, anios, unico: 0, anual: Math.round(falta / anios), mensual: Math.round(falta / anios / 12) };
 }
 
 export interface PuntoAhorro {
   anio: number;
-  edad: number;
+  /** Edad ese año (si se sabe su edad). */
+  edad: number | null;
   /** Saldo al cierre del año con el aporte necesario. */
   saldo: number;
   /** Saldo con el aporte que hoy plantea (si lo hay). */
@@ -108,62 +139,72 @@ export interface PuntoAhorro {
 }
 
 export interface ProyeccionAhorro {
+  unica: boolean;
   monto: number;
   anios: number;
-  edadRetiro: number;
   ahorroHoy: number;
   /** Rendimiento anual estimado (%). */
   rend: number;
-  /** En lo que se convierte su ahorro de hoy al llegar a la edad de retiro. */
+  /** En lo que se convierte su ahorro de hoy al final del plazo. */
   ahorroFuturo: number;
   /** Lo que falta cubrir con aportes (0 si su ahorro de hoy ya alcanza). */
   falta: number;
-  /** Aporte necesario, a fin de cada año, con interés compuesto anual. */
+  /** Contribución única: aporte necesario hoy, de una vez. */
+  unico: number;
+  /** Contribución regular: aporte necesario a fin de cada año, con interés compuesto anual. */
   anual: number;
   mensual: number;
-  /** Aporte que hoy plantea (mensual) y a cuánto llegaría con él. */
+  /** Aporte que hoy plantea (mensual en regular, único en única) y a cuánto llegaría con él. */
   aporte: number | null;
   finalConAporte: number | null;
   puntos: PuntoAhorro[];
 }
 
 /**
- * Proyección del ahorro con interés compuesto anual: su ahorro de hoy crece al
- * rendimiento estimado y los aportes de cada año (a fin de año) también.
- * Calcula el aporte que hace falta para llegar al monto a la edad de retiro.
+ * Proyección del ahorro con interés compuesto anual en el tiempo de inversión.
+ * Regular: su ahorro de hoy y los aportes de cada año (a fin de año) crecen al rendimiento estimado.
+ * Única: su ahorro de hoy y un aporte único hoy crecen al rendimiento estimado.
  */
 export function proyeccionAhorroDe(p: Prospecto): ProyeccionAhorro | null {
-  const base = ahorroMetaDe(p);
-  const rendTxt = txt(p, "rendEstimado");
-  if (!base || !rendTxt) return null;
+  const monto = num(p, "metaMonto");
+  const n = aniosInversion(p);
+  if (monto === null || monto <= 0 || n === null || n <= 0 || !txt(p, "rendEstimado")) return null;
+  const unica = esUnica(p);
   const rend = num(p, "rendEstimado") ?? 0;
   const r = rend / 100;
-  const n = base.anios;
   const ahorroHoy = Math.max(0, num(p, "ahorros") ?? 0);
   const f = Math.pow(1 + r, n);
   const ahorroFuturo = ahorroHoy * f;
-  const falta = Math.max(0, base.monto - ahorroFuturo);
-  const anual = falta === 0 ? 0 : r === 0 ? falta / n : (falta * r) / (f - 1);
-  const ap = num(p, "precio") ?? num(p, "aporte");
+  const falta = Math.max(0, monto - ahorroFuturo);
+  const unico = unica ? falta / f : 0;
+  const anual = unica || falta === 0 ? 0 : r === 0 ? falta / n : (falta * r) / (f - 1);
+  const ap = unica ? (num(p, "precio") ?? num(p, "capital")) : (num(p, "precio") ?? num(p, "aporte"));
   const aporte = ap !== null && ap > 0 ? ap : null;
+  const edad = num(p, "edad");
   const puntos: PuntoAhorro[] = [];
-  let saldo = ahorroHoy;
-  let conAp = ahorroHoy;
+  let saldo = ahorroHoy + unico;
+  let conAp = ahorroHoy + (unica ? (aporte ?? 0) : 0);
   const hitos = new Set([1, 5, 10, 15, 20, 25, 30, 35, 40, n].filter((a) => a <= n));
   for (let a = 1; a <= n; a++) {
     saldo = saldo * (1 + r) + anual;
-    conAp = conAp * (1 + r) + (aporte ?? 0) * 12;
+    conAp = conAp * (1 + r) + (unica ? 0 : (aporte ?? 0) * 12);
     if (hitos.has(a))
-      puntos.push({ anio: a, edad: base.edad + a, saldo: Math.round(saldo), conAporte: aporte !== null ? Math.round(conAp) : null });
+      puntos.push({
+        anio: a,
+        edad: edad !== null ? edad + a : null,
+        saldo: Math.round(saldo),
+        conAporte: aporte !== null ? Math.round(conAp) : null,
+      });
   }
   return {
-    monto: base.monto,
+    unica,
+    monto,
     anios: n,
-    edadRetiro: base.edadRetiro,
     ahorroHoy,
     rend,
     ahorroFuturo: Math.round(ahorroFuturo),
     falta: Math.round(falta),
+    unico: Math.round(unico),
     anual: Math.round(anual),
     mensual: Math.round(anual / 12),
     aporte,
@@ -215,7 +256,7 @@ export interface MetaFicha {
 /** Hasta tres metas, en orden de prioridad. */
 export function metasDe(p: Prospecto): MetaFicha[] {
   const out: MetaFicha[] = [];
-  if (txt(p, "meta")) out.push({ meta: txt(p, "meta"), monto: montoMeta(p), plazo: txt(p, "horizonte"), prioridad: 1 });
+  if (txt(p, "meta")) out.push({ meta: txt(p, "meta"), monto: montoMeta(p), plazo: textoPlazo(p), prioridad: 1 });
   for (const n of [2, 3]) {
     const m = txt(p, `meta${n}`);
     if (m) out.push({ meta: m, monto: num(p, `meta${n}Monto`), plazo: txt(p, `meta${n}Plazo`), prioridad: out.length + 1 });
@@ -238,7 +279,6 @@ export const PUNTOS_PERFIL: Readonly<Record<string, Readonly<Record<string, numb
     "Que crezca lo más posible": 3,
   },
   rq_peso: { "Más del 50 %": 1, "Entre 25 y 50 %": 2, "Menos del 25 %": 3 },
-  horizonte: { "Menos de 3 años": 1, "3 a 5 años": 1, "5 a 10 años": 2, "10 a 20 años": 3, "Más de 20 años": 3 },
   ingresoEstable: { "Muy variable": 1, Variable: 2, Estable: 3 },
 };
 
@@ -263,6 +303,9 @@ export function puntajePerfil(p: Prospecto): PuntajePerfil {
   const pts = Object.entries(PUNTOS_PERFIL)
     .map(([k, m]) => m[txt(p, k)])
     .filter((x): x is number => typeof x === "number");
+  // El tiempo de inversión también cuenta: menos de 5 años, 1; de 5 a 9, 2; 10 o más, 3.
+  const anios = aniosInversion(p);
+  if (anios !== null) pts.push(anios < 5 ? 1 : anios < 10 ? 2 : 3);
   const promedio = pts.length ? Math.round((pts.reduce((a, b) => a + b, 0) / pts.length) * 100) / 100 : 0;
   const sugerido: PerfilRiesgo | null =
     pts.length < MIN_RESPUESTAS_PERFIL ? null : promedio < 1.7 ? "Conservador" : promedio < 2.4 ? "Moderado" : "Arriesgado";
@@ -270,7 +313,7 @@ export function puntajePerfil(p: Prospecto): PuntajePerfil {
   const d = declarado as PerfilRiesgo;
   return {
     respondidas: pts.length,
-    total: Object.keys(PUNTOS_PERFIL).length,
+    total: Object.keys(PUNTOS_PERFIL).length + 1,
     promedio,
     sugerido,
     declarado,

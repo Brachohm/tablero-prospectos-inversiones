@@ -84,8 +84,9 @@ describe("avance", () => {
 
   it("elegir un motivo agrega sus campos al total de la misión", () => {
     const desc = mision("desc");
-    const sin = ficha("cambio", { motivos: ["otro"], otro_desc: "x" });
-    const con = ficha("cambio", { motivos: ["otro", "liquidez"], otro_desc: "x" });
+    const llenos = { motivos: ["otro"], otro_desc: "x", meta: "Crear patrimonio", metaMonto: "1", plazoAnios: "5", institucion: "X", producto: "Y" };
+    const sin = ficha("cambio", llenos);
+    const con = ficha("cambio", { ...llenos, motivos: ["otro", "liquidez"] });
     expect(misionStats(desc, con).pct).toBeLessThan(misionStats(desc, sin).pct);
   });
 });

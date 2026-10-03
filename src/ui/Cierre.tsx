@@ -288,7 +288,7 @@ export function PreCierre({
       <div className="two">
         <div className="f">
           <label htmlFor={base + "tipoPlan"}>
-            <span>Tipo de plan</span>
+            <span>Tipo de plan elegido</span>
           </label>
           <select id={base + "tipoPlan"} value={txt(p, "tipoPlan")} onChange={(e) => actualizar((x) => ({ ...x, tipoPlan: e.target.value }))}>
             <option value="">Elegir…</option>
@@ -301,7 +301,7 @@ export function PreCierre({
           <label htmlFor={base + "plazo"}>
             <span>Plazo (años)</span>
           </label>
-          <input id={base + "plazo"} inputMode="numeric" value={txt(p, "plazo")} onChange={(e) => actualizar((x) => ({ ...x, plazo: e.target.value }))} />
+          <input id={base + "plazo"} inputMode="numeric" placeholder={txt(p, "plazoAnios") ? `${txt(p, "plazoAnios")} (de sus metas)` : ""} value={txt(p, "plazo")} onChange={(e) => actualizar((x) => ({ ...x, plazo: e.target.value }))} />
         </div>
       </div>
       {com ? (

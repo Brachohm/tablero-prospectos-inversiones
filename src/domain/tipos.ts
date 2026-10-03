@@ -38,7 +38,7 @@ export interface Campo {
   solo?: Tipo;
   /** Solo aplica si este motivo de inconformidad está elegido. */
   motivo?: MotivoId;
-  /** Solo aplica si el campo `k` vale `v` (p. ej. origen = "Referido"); `v: "*"` = si `k` tiene algo escrito. */
+  /** Solo aplica si el campo `k` vale `v` (p. ej. origen = "Referido"); `v: "*"` = si `k` tiene algo escrito; `v: "!X"` = si `k` no vale X. */
   cuando?: { k: string; v: string };
   /** Subtítulo del grupo al que pertenece (dentro de la sección). */
   grupo?: string;
