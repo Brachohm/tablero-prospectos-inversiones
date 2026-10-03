@@ -16,7 +16,7 @@ import { firma } from "./herramientas";
 import { fmtFecha, hoyISO } from "./fechas";
 import { esCambio, motivosDe, num, tipoDe, txt } from "./ficha";
 import { aniosHorizonte, perfilIncoherente } from "./analisis";
-import { ahorroMetaDe, capacidadDe, DEUDA_ALTA_PCT, deudaTarjeta, metasDe, montoMeta, pesoDeudas, perfilEfectivo } from "./finanzas";
+import { ahorroMetaDe, capacidadDe, fondoEmergenciaDe, proyeccionAhorroDe, DEUDA_ALTA_PCT, deudaTarjeta, metasDe, montoMeta, pesoDeudas, perfilEfectivo } from "./finanzas";
 import { reunionDe } from "./mensajes";
 import { fmtUSD, ofertaInforme, planDeOferta, type OfertaInforme } from "./oferta";
 import type { Argumento, Plan } from "./biblioteca";
@@ -71,7 +71,6 @@ export function proteccionHoy(p: Prospecto): { l: string; estado: EstadoCobertur
   const sn = (x: string, si: string[], parcial: string[] = []): EstadoCobertura =>
     !x ? "?" : si.includes(x) ? "si" : parcial.includes(x) ? "parcial" : "no";
   return [
-    { l: "Fondo de emergencia", estado: sn(v("emergencia"), ["Sí"], ["Parcial"]) },
     { l: "Meta definida", estado: v("meta") ? (montoMeta(p) ? "si" : "parcial") : "?" },
     { l: "Plazo claro", estado: v("horizonte") ? "si" : "?" },
     { l: "Aporte que puede sostener", estado: aporteSostenible(p) },
@@ -140,7 +139,12 @@ export function estrategia(p: Prospecto): Estrategia {
     );
   if (metasDe(p).length > 1) porque.push(`Ordena sus ${metasDe(p).length} metas por prioridad: primero la que no puede esperar.`);
   if (edad !== null && edad >= EDAD_MAYOR) complementos.push("A medida que se acerque la meta, mover el dinero a fondos más estables.");
-  if (v("emergencia") === "No") complementos.push("Primero, un fondo de emergencia: así no tendrá que retirar antes de tiempo.");
+  const fe = fondoEmergenciaDe(p);
+  complementos.push(
+    fe
+      ? `Un fondo de emergencia de ${fmtUSD(fe.min)} a ${fmtUSD(fe.max)} (3 a 6 meses de ${fe.base === "gastos" ? "sus gastos" : "su ingreso"}), aparte del plan.`
+      : "Un fondo de emergencia de 3 a 6 meses de sus gastos, aparte del plan.",
+  );
 
   costoBeneficio.push("Un aporte que pueda sostener sin apretar su presupuesto: la constancia vale más que el monto.");
   const cap = capacidadDe(p);
@@ -176,7 +180,11 @@ export function informe(
   add("Su meta", ms[0] ? ms[0].meta + (ms[0].monto ? ` · ${fmtUSD(ms[0].monto)}` : "") : "");
   const am = ahorroMetaDe(p);
   add("Plazo", v("horizonte") || (am ? `${am.anios} años (hasta los ${am.edadRetiro})` : ""));
-  if (am) add("Ahorro necesario", `${fmtUSD(am.mensual)} al mes (${fmtUSD(am.anual)} al año)`);
+  const pa = proyeccionAhorroDe(p);
+  if (pa) add("Ahorro necesario", `${fmtUSD(pa.mensual)} al mes (${fmtUSD(pa.anual)} al año, con ${pa.rend}% anual estimado)`);
+  else if (am) add("Ahorro necesario", `${fmtUSD(am.mensual)} al mes (${fmtUSD(am.anual)} al año)`);
+  const ah = num(p, "ahorros");
+  if (ah !== null) add("Ahorro de hoy", fmtUSD(ah));
   if (ms.length > 1) add("Otras metas", ms.slice(1).map((m) => m.meta).join(" · "));
   const cap = capacidadDe(p);
   if (cap) add("Le queda al mes", fmtUSD(cap.sobrante));

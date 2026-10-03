@@ -9,7 +9,7 @@ import { VALIDAR } from "../config/saludsa";
 import { CAMPO, campoActivo, esCambio, num, tieneMotivo, tipoDe, txt, vacio } from "./ficha";
 import { diasHasta, fmtFecha, hoyISO, usd } from "./fechas";
 import { contarDatos } from "./datos";
-import { ahorroMetaDe, capacidadDe, DEUDA_ALTA_PCT, deudaTarjeta, metasDe, montoMeta, pesoDeudas, puntajePerfil } from "./finanzas";
+import { ahorroMetaDe, capacidadDe, DEUDA_ALTA_PCT, fondoEmergenciaDe, proyeccionAhorroDe, deudaTarjeta, metasDe, montoMeta, pesoDeudas, puntajePerfil } from "./finanzas";
 import type { Causa, NivelVeredicto, Prospecto, TipoCausa, Veredicto } from "./tipos";
 
 export interface Recordatorio {
@@ -51,12 +51,12 @@ export const MAP_OBJ: Readonly<Record<string, string>> = {
 
 const CLAVES_CAMBIO = [
   "institucion", "producto", "tiempoCon", "saldoActual", "motivos", "grieta", "conoce", "noPerder",
-  "depende", "edad", "meta", "horizonte", "aporte", "perfil", "reaccion", "emergencia", "objecion",
+  "depende", "edad", "meta", "horizonte", "aporte", "perfil", "reaccion", "objecion",
   "ingresoRango", "gastos",
 ];
 const CLAVES_NUEVO = [
   "ahorroHoy", "porque", "depende", "edad", "meta", "horizonte", "aporte", "perfil", "reaccion",
-  "emergencia", "costoEvento", "objecion", "ingresoRango", "gastos", "tipoIngreso",
+  "metaMonto", "edadRetiro", "ahorros", "costoEvento", "objecion", "ingresoRango", "gastos", "tipoIngreso",
 ];
 
 function usdCampo(p: Prospecto, k: string): string {
@@ -174,12 +174,16 @@ export function analisisLocal(p: Prospecto, hoy: string = hoyISO()): AnalisisLoc
     });
 
   // Condicionales
-  if (txt(p, "emergencia") === "No")
-    recs.push({
-      id: "emer",
-      t: "Sin fondo de emergencia",
-      d: "Primero un fondo de emergencia de 3 a 6 meses: si no, cualquier imprevisto lo obliga a rescatar con penalidad.",
-    });
+  const fe = fondoEmergenciaDe(p);
+  recs.push({
+    id: "emer",
+    t: "Recomiéndale un fondo de emergencia",
+    d:
+      (fe
+        ? `De 3 a 6 meses de ${fe.base === "gastos" ? "sus gastos" : "su ingreso"}: entre ${usd(fe.min)} y ${usd(fe.max)}, en una cuenta de fácil acceso. `
+        : "De 3 a 6 meses de sus gastos, en una cuenta de fácil acceso. ") +
+      "Así un imprevisto no lo obliga a rescatar su inversión con penalidad.",
+  });
   if (!vacio(p, "deudas"))
     recs.push({
       id: "deu",
@@ -287,7 +291,14 @@ export function analisisLocal(p: Prospecto, hoy: string = hoyISO()): AnalisisLoc
     });
   const ap = num(p, "precio") ?? num(p, "aporte");
   const am = ahorroMetaDe(p);
-  if (am && ap !== null && ap > 0 && ap < am.mensual)
+  const pa = proyeccionAhorroDe(p);
+  if (pa && ap !== null && ap > 0 && ap < pa.mensual)
+    recs.push({
+      id: "bmeta",
+      t: "El aporte no llega a su meta",
+      d: `Con su ahorro de hoy y un ${pa.rend}% anual estimado, para juntar ${usd(pa.monto)} en ${pa.anios} años necesita ~${usd(pa.mensual)} al mes (${usd(pa.anual)} al año); hoy plantea ${usd(ap)} y llegaría a ~${usd(pa.finalConAporte ?? 0)}. Ajusta aporte, edad de retiro o meta.`,
+    });
+  else if (!pa && am && ap !== null && ap > 0 && ap < am.mensual)
     recs.push({
       id: "bmeta",
       t: "El aporte no llega a su meta",

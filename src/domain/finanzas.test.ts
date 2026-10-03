@@ -1,4 +1,4 @@
-import { ahorroMetaDe, capacidadDe, deudaTarjeta, pesoDeudas, metaRetiroDe, metasDe, montoMeta, perfilEfectivo, puntajePerfil } from "./finanzas";
+import { ahorroMetaDe, capacidadDe, fondoEmergenciaDe, proyeccionAhorroDe, deudaTarjeta, pesoDeudas, metaRetiroDe, metasDe, montoMeta, perfilEfectivo, puntajePerfil } from "./finanzas";
 import { ficha } from "./test-utils";
 
 describe("capacidad de ahorro", () => {
@@ -34,6 +34,36 @@ describe("ahorro para la meta (sin rendimiento)", () => {
     expect(ahorroMetaDe(ficha("nuevo", { edadRetiro: "65", metaMonto: "100000" }))).toBeNull();
     expect(ahorroMetaDe(ficha("nuevo", { edad: "40", edadRetiro: "65" }))).toBeNull();
     expect(ahorroMetaDe(ficha("nuevo", { edad: "66", edadRetiro: "65", metaMonto: "100000" }))).toBeNull();
+  });
+});
+
+describe("proyección del ahorro con interés compuesto anual", () => {
+  it("su ahorro de hoy crece; el aporte anual cubre lo que falta", () => {
+    // 10 años al 5 %: 10.000 → 16.289; faltan 33.711 → aporte anual 2.680 (×1,05^k)
+    const x = proyeccionAhorroDe(ficha("nuevo", { edad: "55", edadRetiro: "65", metaMonto: "50000", ahorros: "10000", rendEstimado: "5" }))!;
+    expect(x).toMatchObject({ anios: 10, rend: 5, ahorroHoy: 10000, ahorroFuturo: 16289, falta: 33711, anual: 2680, mensual: 223 });
+    // El saldo del último año llega a la meta
+    expect(x.puntos.at(-1)).toMatchObject({ anio: 10, edad: 65 });
+    expect(Math.abs(x.puntos.at(-1)!.saldo - 50000)).toBeLessThanOrEqual(5);
+  });
+  it("con 0 % de rendimiento es el cálculo simple; si su ahorro ya alcanza, no falta nada", () => {
+    expect(proyeccionAhorroDe(ficha("nuevo", { edad: "35", edadRetiro: "65", metaMonto: "180000", rendEstimado: "0" }))).toMatchObject({ anual: 6000, mensual: 500 });
+    expect(proyeccionAhorroDe(ficha("nuevo", { edad: "40", edadRetiro: "65", metaMonto: "20000", ahorros: "15000", rendEstimado: "5" }))).toMatchObject({ falta: 0, anual: 0 });
+  });
+  it("muestra a cuánto llegaría con el aporte que plantea", () => {
+    const x = proyeccionAhorroDe(ficha("nuevo", { edad: "35", edadRetiro: "65", metaMonto: "180000", rendEstimado: "0", aporte: "300" }))!;
+    expect(x.finalConAporte).toBe(108000);
+  });
+  it("sin rendimiento escrito no proyecta (queda el cálculo simple)", () => {
+    expect(proyeccionAhorroDe(ficha("nuevo", { edad: "35", edadRetiro: "65", metaMonto: "180000" }))).toBeNull();
+  });
+});
+
+describe("fondo de emergencia (recomendación)", () => {
+  it("3 a 6 meses de gastos, o del ingreso si no hay gastos", () => {
+    expect(fondoEmergenciaDe(ficha("nuevo", { gastos: "1000" }))).toEqual({ min: 3000, max: 6000, base: "gastos" });
+    expect(fondoEmergenciaDe(ficha("nuevo", { ingresoRango: "$1.000 a $2.000" }))).toEqual({ min: 4500, max: 9000, base: "ingreso" });
+    expect(fondoEmergenciaDe(ficha("nuevo"))).toBeNull();
   });
 });
 

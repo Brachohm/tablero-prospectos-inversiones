@@ -280,6 +280,8 @@ export const MISIONES: readonly Mision[] = [
       { k: "meta", l: "¿Para qué quiere invertir? (meta principal)", t: "select", o: METAS, xp: 15, grupo: "Sus metas" },
       { k: "metaMonto", l: "¿Con cuánto quisiera contar? (USD)", t: "number", xp: 10, min: 0, ph: "El monto que quiere ahorrar", grupo: "Sus metas" },
       { k: "edadRetiro", l: "¿A qué edad quiere retirarse?", t: "number", xp: 10, min: 30, max: 90, grupo: "Sus metas" },
+      { k: "ahorros", l: "¿Con cuánto ahorro cuenta hoy? (USD)", t: "number", xp: 10, min: 0, ph: "0 si aún no tiene", grupo: "Sus metas" },
+      { k: "rendEstimado", l: "Rendimiento anual estimado (%)", t: "number", xp: 5, min: 0, max: 30, ph: "Ej. 5 (supuesto, no garantizado)", grupo: "Sus metas" },
       {
         k: "horizonte",
         l: "¿En cuánto tiempo necesitará ese dinero?",
@@ -358,15 +360,6 @@ export const MISIONES: readonly Mision[] = [
       { k: "gastos", l: "Gastos fijos del hogar (USD al mes, aproximado)", t: "number", xp: 10, min: 0, ph: "Vivienda, comida, colegios, servicios…", grupo: "Flujo del mes" },
       { k: "deudaCuota", l: "Cuotas de deudas que paga al mes (USD)", t: "number", xp: 10, min: 0, ph: "0 si no tiene", grupo: "Flujo del mes" },
       { k: "deudas", l: "¿Qué deudas son?", t: "text", xp: 5, ph: "Tarjeta, préstamo de auto, hipoteca…", cuando: { k: "deudaCuota", v: "*" }, grupo: "Flujo del mes" },
-      {
-        k: "emergencia",
-        l: "¿Tiene un fondo de emergencia de 3 a 6 meses de gastos?",
-        t: "select",
-        o: ["Sí", "Parcial", "No"],
-        xp: 10,
-        grupo: "Lo que tiene y lo que debe",
-      },
-      { k: "ahorros", l: "Ahorros e inversiones que tiene hoy (USD)", t: "number", xp: 10, min: 0, grupo: "Lo que tiene y lo que debe" },
       { k: "vivienda", l: "Su vivienda", t: "select", o: ["Propia, pagada", "Propia, con hipoteca", "Arrienda", "Vive con familia"], xp: 5, grupo: "Lo que tiene y lo que debe" },
       {
         k: "seguroVida",

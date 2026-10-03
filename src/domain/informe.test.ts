@@ -78,7 +78,9 @@ describe("informe 1: situación financiera hoy", () => {
     expect(i.proteccion.every((x) => x.estado === "si")).toBe(true);
     expect(i.nivel).toBe(100);
     expect(i.resumen).toContainEqual({ l: "Le queda al mes", v: "$1.200" });
-    expect(informe(ficha("nuevo", { emergencia: "No" }), perfil, HOY).proteccion[0].estado).toBe("no");
+    // El fondo de emergencia ya no se pregunta: va como recomendación, con su monto
+    expect(i.proteccion.map((x) => x.l)).not.toContain("Fondo de emergencia");
+    expect(i.estrategia.complementos.join(" ")).toMatch(/fondo de emergencia de \$3\.?600 a \$7\.?200/);
     expect(informe(ficha("nuevo"), perfil, HOY).riesgos).toBeNull();
   });
 });

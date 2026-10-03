@@ -98,6 +98,88 @@ export function ahorroMetaDe(p: Prospecto): AhorroMeta | null {
   return { monto, edad, edadRetiro, anios, anual, mensual: Math.round(monto / anios / 12) };
 }
 
+export interface PuntoAhorro {
+  anio: number;
+  edad: number;
+  /** Saldo al cierre del año con el aporte necesario. */
+  saldo: number;
+  /** Saldo con el aporte que hoy plantea (si lo hay). */
+  conAporte: number | null;
+}
+
+export interface ProyeccionAhorro {
+  monto: number;
+  anios: number;
+  edadRetiro: number;
+  ahorroHoy: number;
+  /** Rendimiento anual estimado (%). */
+  rend: number;
+  /** En lo que se convierte su ahorro de hoy al llegar a la edad de retiro. */
+  ahorroFuturo: number;
+  /** Lo que falta cubrir con aportes (0 si su ahorro de hoy ya alcanza). */
+  falta: number;
+  /** Aporte necesario, a fin de cada año, con interés compuesto anual. */
+  anual: number;
+  mensual: number;
+  /** Aporte que hoy plantea (mensual) y a cuánto llegaría con él. */
+  aporte: number | null;
+  finalConAporte: number | null;
+  puntos: PuntoAhorro[];
+}
+
+/**
+ * Proyección del ahorro con interés compuesto anual: su ahorro de hoy crece al
+ * rendimiento estimado y los aportes de cada año (a fin de año) también.
+ * Calcula el aporte que hace falta para llegar al monto a la edad de retiro.
+ */
+export function proyeccionAhorroDe(p: Prospecto): ProyeccionAhorro | null {
+  const base = ahorroMetaDe(p);
+  const rendTxt = txt(p, "rendEstimado");
+  if (!base || !rendTxt) return null;
+  const rend = num(p, "rendEstimado") ?? 0;
+  const r = rend / 100;
+  const n = base.anios;
+  const ahorroHoy = Math.max(0, num(p, "ahorros") ?? 0);
+  const f = Math.pow(1 + r, n);
+  const ahorroFuturo = ahorroHoy * f;
+  const falta = Math.max(0, base.monto - ahorroFuturo);
+  const anual = falta === 0 ? 0 : r === 0 ? falta / n : (falta * r) / (f - 1);
+  const ap = num(p, "precio") ?? num(p, "aporte");
+  const aporte = ap !== null && ap > 0 ? ap : null;
+  const puntos: PuntoAhorro[] = [];
+  let saldo = ahorroHoy;
+  let conAp = ahorroHoy;
+  const hitos = new Set([1, 5, 10, 15, 20, 25, 30, 35, 40, n].filter((a) => a <= n));
+  for (let a = 1; a <= n; a++) {
+    saldo = saldo * (1 + r) + anual;
+    conAp = conAp * (1 + r) + (aporte ?? 0) * 12;
+    if (hitos.has(a))
+      puntos.push({ anio: a, edad: base.edad + a, saldo: Math.round(saldo), conAporte: aporte !== null ? Math.round(conAp) : null });
+  }
+  return {
+    monto: base.monto,
+    anios: n,
+    edadRetiro: base.edadRetiro,
+    ahorroHoy,
+    rend,
+    ahorroFuturo: Math.round(ahorroFuturo),
+    falta: Math.round(falta),
+    anual: Math.round(anual),
+    mensual: Math.round(anual / 12),
+    aporte,
+    finalConAporte: aporte !== null ? Math.round(conAp) : null,
+    puntos,
+  };
+}
+
+/** Fondo de emergencia recomendado: de 3 a 6 meses de sus gastos (o del ingreso, si no hay gastos). */
+export function fondoEmergenciaDe(p: Prospecto): { min: number; max: number; base: "gastos" | "ingreso" } | null {
+  const g = num(p, "gastos");
+  if (g !== null && g > 0) return { min: Math.round(g * 3), max: Math.round(g * 6), base: "gastos" };
+  const ing = ingresoDe(p);
+  return ing ? { min: Math.round(ing.v * 3), max: Math.round(ing.v * 6), base: "ingreso" } : null;
+}
+
 export interface MetaRetiro {
   renta: number;
   anios: number;
