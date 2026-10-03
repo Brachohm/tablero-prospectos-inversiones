@@ -87,9 +87,9 @@ export function clasificar(l0: string): { categoria: IdCategoria; dato: boolean 
   if (NIEGA.test(n) || LEGAL.test(n) || !TANGIBLE.test(n)) return null;
   // Tiempos de espera: van como aviso, no como bondad.
   if (ESPERA.test(n) && /carencia|espera/.test(n)) return null;
-  // La prima, el deducible y el copago son costos, no bondades (salvo "sin deducible").
+  // El aporte mínimo y los cargos son costos, no bondades (salvo "sin cargo" o "sin penalidad").
   const tb = tablaDesdeTexto(l);
-  if (tb.prima || ((tb.deducible || tb.copago) && !/\bsin (deducible|copago|coaseguro)/.test(n))) return null;
+  if (tb.prima || tb.unico || ((tb.admin || tb.entrada || tb.rescate) && !/\bsin (cargo|penalidad|costo|comision)/.test(n))) return null;
   const cat = ORDEN_CLASIFICAR.find((id) => CATEGORIAS.find((c) => c.id === id)!.re.test(n));
   if (!cat) return null;
   return { categoria: cat, dato: /\d/.test(n) || /ilimitad|sin costo|gratuit|24\s?\/\s?7/.test(n) };
@@ -193,8 +193,8 @@ export function letraChicaDe(item: PlanCatalogo): LetraChica {
     return null;
   };
   return {
-    deducible: lineaDoc(/\bdeducible/) ?? (t.deducible?.trim() || null),
-    copago: lineaDoc(/\b(copago|coaseguro)/) ?? (t.copago?.trim() || null),
+    deducible: lineaDoc(/\b(administracion|cargo anual|comision anual)/) ?? (t.admin?.trim() || null),
+    copago: lineaDoc(/\b(rescate|penalidad)/) ?? (t.rescate?.trim() || null),
     carencias: carencias.sort((a, b) => (a.meses ?? Infinity) - (b.meses ?? Infinity)),
     exclusiones,
   };
@@ -202,54 +202,4 @@ export function letraChicaDe(item: PlanCatalogo): LetraChica {
 
 export function nombreCategoria(c: IdCategoria): string {
   return CATEGORIAS.find((x) => x.id === c)!.l;
-}
-
-/* ---------- Deducible y copago, explicados en simple ---------- */
-
-const usd = (n: number) => "$" + n.toLocaleString("es-EC", { maximumFractionDigits: Number.isInteger(n) ? 0 : 2, minimumFractionDigits: Number.isInteger(n) ? 0 : 2 });
-
-export interface ExplicacionDeducible {
-  /** "$300 al año", "$500 por evento" o lo que dice la tabla. */
-  valor: string;
-  que: string;
-  /** Ejemplo con su propio monto (null si no se sabe el monto). */
-  ejemplo: string | null;
-  cuando: string;
-}
-
-/** Qué es el deducible, con un ejemplo con su monto. `monto` del pre-cierre; `tabla`, lo que dice el plan. */
-export function explicarDeducible(monto: number | null, tabla: string | null): ExplicacionDeducible {
-  const n = normalizar(tabla ?? "");
-  const m = monto ?? (tabla ? valorDe(tabla) : null);
-  const porAno = /anual|ano\b|por ano|al ano/.test(n);
-  const porEvento = /evento|caso|enfermedad|incapacidad|diagnostico/.test(n);
-  const valor = m !== null ? `${usd(m)}${porAno ? " al año" : porEvento ? " por evento" : ""}` : tabla?.trim() || "Por confirmar con la aseguradora";
-  const gasto = m !== null ? Math.max(1000, Math.ceil((m * 4) / 100) * 100) : null;
-  return {
-    valor,
-    que: "Es la parte de sus gastos médicos que usted paga primero, de su bolsillo, antes de que el seguro empiece a cubrir.",
-    ejemplo:
-      m !== null && gasto !== null
-        ? `Ejemplo: si tiene gastos por ${usd(gasto)}, usted cubre los primeros ${usd(m)} y el seguro cubre los ${usd(gasto - m)} restantes, según el porcentaje de cobertura de su plan.`
-        : null,
-    cuando: porAno
-      ? "Se cuenta por año: una vez que lo completa, en ese año ya no lo vuelve a pagar."
-      : porEvento
-        ? "Se cuenta por evento: se aplica en cada enfermedad o accidente distinto."
-        : "Según el plan se cuenta por año o por evento (validar con la aseguradora).",
-  };
-}
-
-/** Qué es el copago o coaseguro, con un ejemplo si es un porcentaje. */
-export function explicarCopago(tabla: string): string {
-  const pct = /(\d+(?:[.,]\d+)?)\s*%/.exec(tabla);
-  const base = "El copago (o coaseguro) es la parte de cada gasto que usted sigue pagando después del deducible.";
-  if (!pct) return base;
-  const p = Number(pct[1].replace(",", "."));
-  return `${base} Con ${p}%, de cada $100 usted paga $${Math.round(p * 100) / 100} y el seguro los otros $${Math.round((100 - p) * 100) / 100}.`;
-}
-
-function valorDe(s: string): number | null {
-  const v = interpretar(s);
-  return v.tipo === "num" && !v.pct ? v.n : null;
 }

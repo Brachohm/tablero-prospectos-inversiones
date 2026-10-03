@@ -45,7 +45,7 @@ export function BibliotecaVista({ sec }: { sec: SeccionBiblioteca }) {
   const precargar = (d: Documento, auto = false) => {
     const x = precargaDesdeDocumento(d);
     if (!totalPrecarga(x)) {
-      if (!auto) avisar("No encontré coberturas, carencias ni valores en ese documento: no invento nada, llena el plan a mano");
+      if (!auto) avisar("No encontré características, costos ni valores en ese documento: no invento nada, llena el plan a mano");
       return;
     }
     const nombre = (d.plan || d.nombre).trim();
@@ -484,7 +484,7 @@ function Planes({
       {planes.length === 0 ? (
         <div className="empty" style={{ marginTop: 14 }}>
           <b>Arma tu catálogo de planes</b>
-          Copia del anexo de cada plan sus coberturas, carencias, exclusiones, beneficios y garantías. Al armar una oferta,
+          Copia de las condiciones de cada plan sus características, costos, rescates, beneficios y garantías. Al armar una oferta,
           los beneficios se proponen como bonos.
         </div>
       ) : (
@@ -512,8 +512,8 @@ function Planes({
                 ))}
                 <p className="an-note">
                   {conceptosLlenos((p.tabla ?? {}) as TablaCoberturas).length
-                    ? `Tabla de coberturas: ${conceptosLlenos((p.tabla ?? {}) as TablaCoberturas).length} conceptos`
-                    : "Sin tabla de coberturas: llénala para comparar en cambios de seguro"}
+                    ? `Tabla de datos: ${conceptosLlenos((p.tabla ?? {}) as TablaCoberturas).length} conceptos`
+                    : "Sin tabla de datos: llénala para comparar con la inversión actual de un cliente"}
                 </p>
                 {p.fuente && <p className="an-note">Fuente: {p.fuente}</p>}
                 <div className="doc-acc">
@@ -581,7 +581,7 @@ function EditorPlan({
             ))}
             {conceptosLlenos(info.tabla).length > 0 && (
               <li>
-                Tabla de coberturas: {conceptosLlenos(info.tabla).length} conceptos (pág. {info.paginas.tabla?.join(", ")})
+                Tabla de datos: {conceptosLlenos(info.tabla).length} conceptos (pág. {info.paginas.tabla?.join(", ")})
               </li>
             )}
           </ul>
@@ -626,11 +626,11 @@ function EditorPlan({
           </div>
         );
       })}
-      <h3 className="sub2">Tabla de coberturas (para comparar con el plan actual de un cliente)</h3>
+      <h3 className="sub2">Tabla de datos del plan (para comparar con la inversión actual de un cliente)</h3>
       <EditorTabla
         tabla={(p.tabla ?? {}) as TablaCoberturas}
         set={(t) => setP({ ...p, tabla: t })}
-        titulo={`Tabla de coberturas de ${p.nombre || "este plan"}`}
+        titulo={`Tabla de datos de ${p.nombre || "este plan"}`}
         docs={docs}
       />
       <div className="actions">
@@ -708,8 +708,8 @@ function Argumentos({
         </p>
         {sistema.length === 0 ? (
           <p className="an-note">
-            Aún no hay suficiente material: carga al menos dos planes con beneficios o tabla de coberturas, documentos, o
-            compara planes en fichas de cambio de seguro.
+            Aún no hay suficiente material: carga al menos dos planes con beneficios o tabla de datos, documentos, o
+            compara planes en fichas de quien ya invierte.
           </p>
         ) : (
           <div className="list" style={{ marginTop: 8 }}>
@@ -839,7 +839,7 @@ function EditorArgumento({
         <input
           id={ids.titulo}
           value={a.titulo}
-          placeholder="La maternidad tiene carencia: contratar antes"
+          placeholder="El bono de permanencia premia quedarse: empezar pronto"
           onChange={(e) => setA({ ...a, titulo: e.target.value })}
         />
       </div>

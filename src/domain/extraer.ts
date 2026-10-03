@@ -10,19 +10,24 @@ import { conceptosLlenos, tablaDesdeTexto, type TablaCoberturas } from "./compar
 
 export type CampoExtraido = "coberturas" | "carencias" | "exclusiones" | "beneficios" | "garantias";
 
-/** Títulos de sección que suelen tener los anexos y condiciones. */
+/**
+ * Títulos de sección que suelen tener las condiciones y fichas de los planes.
+ * Los campos guardan nombres heredados: `coberturas` = características,
+ * `carencias` = cargos y costos, `exclusiones` = rescates y penalidades.
+ */
 const TITULOS: readonly [CampoExtraido, RegExp][] = [
-  ["carencias", /^(carencias?|periodos? de (carencia|espera)|tiempos? de espera)\b/],
-  ["exclusiones", /^(exclusiones|gastos no cubiertos|no (se )?cubre|riesgos excluidos)\b/],
-  ["garantias", /^(garantias?)\b/],
-  ["coberturas", /^(coberturas?|tabla de beneficios|beneficios cubiertos|prestaciones|plan de beneficios)\b/],
-  ["beneficios", /^(beneficios adicionales|servicios adicionales|valores agregados|asistencias?|beneficios)\b/],
-];
+  // Solo el título exacto: "Cargo de administración: 1,5 %" es un dato, no un título.
+  ["carencias", /^(cargos|costos|gastos|comisiones|cargos y costos|costos del plan|estructura de costos)$/],
+  ["exclusiones", /^(rescates|retiros anticipados|penalidades|valores de rescate|tabla de rescates|cancelacion anticipada)$/],
+  ["garantias", /^(garantias?)$/],
+  ["coberturas", /^(caracteristicas|caracteristicas del plan|condiciones del plan|datos del plan|resumen del plan|coberturas)$/],
+  ["beneficios", /^(beneficios adicionales|servicios adicionales|valores agregados|asistencias?|beneficios|ventajas)$/],
+]
 
 /** Líneas sueltas que, aunque no estén bajo un título, dicen claramente qué son. */
 const SUELTAS: readonly [CampoExtraido, RegExp][] = [
-  ["carencias", /(carencia|periodo de espera|tiempo de espera).*\d+\s*(mes|dia)/],
-  ["exclusiones", /^(se excluye|no cubre|excluid[oa]s?\b|exclusion\b)/],
+  ["carencias", /^(cargo|comision|costo) (de |por )?(administracion|entrada|inicial|anual|gestion)/],
+  ["exclusiones", /(rescate|retiro anticipado|cancelacion anticipada).*\d+\s*%/],
 ];
 
 const MAX_POR_CAMPO = 12;
@@ -70,16 +75,16 @@ export function precargaDesdeDocumento(doc: Documento): Precarga {
   const agregar = (campo: CampoExtraido, l: string, pag: number) => {
     const t = limpiar(l);
     if (!util(t) || esTitulo(t)) return;
-    // Prima, deducible y copago son datos de la tabla (y del precio), no puntos de una lista.
+    // Los aportes mínimos son datos de la tabla (y del precio), no puntos de una lista.
     const tb = tablaDesdeTexto(t);
-    if (tb.prima || tb.deducible || tb.copago) return;
+    if (tb.prima || tb.unico) return;
     const xs = (campos[campo] ??= []);
     if (xs.length >= MAX_POR_CAMPO || xs.some((x) => normalizar(x) === normalizar(t))) return;
     xs.push(t);
     anotar(campo, pag);
   };
 
-  // Líneas que sirven para la tabla (no las de carencias ni exclusiones: "Maternidad: 10 meses" es una espera).
+  // Líneas que sirven para la tabla.
   const paraTabla: string[][] = doc.paginas.map(() => []);
 
   doc.paginas.forEach((texto, i) => {
@@ -106,11 +111,12 @@ export function precargaDesdeDocumento(doc: Documento): Precarga {
       const suelta = SUELTAS.find(([, re]) => re.test(n));
       const campo = suelta?.[0] ?? actual;
       if (campo) agregar(campo, l, pag);
-      if (campo !== "carencias" && campo !== "exclusiones") paraTabla[i].push(l);
+      // En un plan de inversión los cargos y los rescates también son datos de la tabla.
+      paraTabla[i].push(l);
     }
   });
 
-  // Tabla de coberturas: valores que el documento escribe junto a cada concepto
+  // Tabla de datos: valores que el documento escribe junto a cada concepto
   const tabla: TablaCoberturas = {};
   paraTabla.forEach((ls, i) => {
     const t = tablaDesdeTexto(ls.join("\n"));

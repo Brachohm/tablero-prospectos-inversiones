@@ -104,7 +104,7 @@ export interface AnalisisPlan {
 export function primaActualDe(p: Prospecto, t: TablaCoberturas): number | null {
   const v = interpretar(t.prima);
   if (v.tipo === "num") return v.n;
-  return num(p, "primaActual");
+  return num(p, "aporteActual");
 }
 
 export function primaPlanDe(plan: Plan): number | null {
@@ -136,7 +136,7 @@ export function analizarPlan(p: Prospecto, actual: TablaCoberturas, plan: Plan):
   const pa = primaActualDe(p, actual);
   const pp = primaPlanDe(plan);
   const diferencia = pa !== null && pp !== null ? Math.round((pp - pa) * 100) / 100 : null;
-  const presupuesto = num(p, "pre_limite");
+  const presupuesto = num(p, "aporte");
   const fueraPresupuesto = pp !== null && presupuesto !== null && presupuesto > 0 && pp > presupuesto;
   let puntos = mejoras.reduce((s, f) => s + peso(f), 0) - peores.reduce((s, f) => s + peso(f) * 1.5, 0);
   if (diferencia !== null && pa) {
@@ -181,31 +181,30 @@ export function beneficios(a: AnalisisPlan): string[] {
   for (const f of a.filas)
     if (!f.actual && f.plan && !["no"].includes(interpretar(f.plan).tipo)) out.push(`${f.l}: ${f.plan}`);
   for (const b of lineas(a.plan.beneficios)) out.push(`Incluye: ${b}`);
-  if (a.diferencia !== null && a.diferencia < 0) out.unshift(`Paga ${fmtUSD(-a.diferencia)} menos al mes`);
   return out;
 }
 
 /** Lo que debe saber antes de decidir (honestidad). */
 export function avisos(a: AnalisisPlan): string[] {
   const out = a.filas.filter((f) => f.res === "peor").map((f) => `${f.l}: ${f.plan || "—"} (hoy ${f.actual || "—"})`);
-  for (const c of lineas(a.plan.carencias)) out.push(`Carencia: ${c}`);
-  for (const e of lineas(a.plan.exclusiones)) out.push(`Exclusión: ${e}`);
-  if (a.fueraPresupuesto) out.unshift("Supera el máximo que dijo poder pagar");
+  for (const c of lineas(a.plan.carencias)) out.push(`Costo: ${c}`);
+  for (const e of lineas(a.plan.exclusiones)) out.push(`Rescate: ${e}`);
+  if (a.fueraPresupuesto) out.unshift("Su aporte mínimo supera lo que puede aportar");
   return out;
 }
 
 export function textoComparacion(p: Prospecto, a: AnalisisPlan): string {
   const nombre = txt(p, "nombre").split(/\s+/)[0] || "";
   const r: string[] = [];
-  r.push(nombre ? `Hola ${nombre}, comparé su plan actual con *${a.plan.nombre}*:` : `Comparé su plan actual con *${a.plan.nombre}*:`);
+  r.push(nombre ? `Hola ${nombre}, comparé su inversión actual con *${a.plan.nombre}*:` : `Comparé su inversión actual con *${a.plan.nombre}*:`);
   const pa = primaActualDe(p, tablaDe(p.planActual?.tabla));
   if (a.primaPlan !== null)
     r.push(
-      `Inversión: ${fmtUSD(a.primaPlan)} al mes` +
+      `Aporte mínimo: ${fmtUSD(a.primaPlan)} al mes` +
         (pa !== null && a.diferencia !== null
           ? a.diferencia === 0
-            ? " (lo mismo que paga hoy)"
-            : ` (hoy paga ${fmtUSD(pa)}: ${a.diferencia > 0 ? "+" : "-"}${fmtUSD(Math.abs(a.diferencia))})`
+            ? " (lo mismo que aporta hoy)"
+            : ` (hoy aporta ${fmtUSD(pa)})`
           : ""),
     );
   const bs = beneficios(a).filter((b) => !b.startsWith("Paga "));
@@ -221,14 +220,14 @@ export function textoComparacion(p: Prospecto, a: AnalisisPlan): string {
     for (const f of av) r.push(`• ${f.l}: ${f.plan}`);
   }
   r.push("");
-  r.push(`Condiciones sujetas a lo que establezca la aseguradora (${VALIDAR}).`);
+  r.push(`Costos, rescates y fondos sujetos a lo que establezca la aseguradora (${VALIDAR}). Los rendimientos no están garantizados.`);
   return r.join("\n");
 }
 
 /* ---------- Cargar una tabla ---------- */
 
-/** Conceptos que califican a otros: "emergencias en el exterior" es del exterior, no de emergencias. */
-const CALIFICAN: readonly IdConcepto[] = ["exterior", "preexistencias"];
+/** Conceptos que se revisan primero: "años sin penalidad" no es la penalidad; "aporte único" no es el mensual; el bono de permanencia no es la permanencia. */
+const CALIFICAN: readonly IdConcepto[] = ["sinPenalidad", "unico", "bono", "historico"];
 
 function conceptoDe(texto: string): IdConcepto | null {
   const t = normalizar(texto);
@@ -263,7 +262,9 @@ export function tablaDesdeTexto(texto: string): TablaCoberturas {
     const sep = l.split(/:|\t| {2,}| - | – /);
     if (sep.length > 1) valor = sep[sep.length - 1].trim();
     if (!valor || !/\d|no |si\b|sí|incluye|ilimitad/i.test(valor)) {
-      const m = l.match(/(\$\s?[\d.,]+|[\d.,]+\s?%|[\d.,]+\s?d[ií]as|no (cubre|incluye|aplica)|ilimitad\w*|incluye|s[ií])\s*$/i);
+      const m = l.match(
+        /(\$\s?[\d.,]+|[\d.,]+\s?%|[\d.,]+\s?d[ií]as|(desde el |a partir del )?a[ñn]o \d+|\d+\s?a[ñn]os|no (cubre|incluye|aplica|permite)|ilimitad\w*|incluye|s[ií])\s*$/i,
+      );
       valor = m ? m[0].trim() : "";
     }
     if (valor) t[id] = valor;

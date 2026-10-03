@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { accion, campo } from './util'
+import { abrir, accion, campo } from './util'
 
 /** PDF mínimo con una línea de texto por página (con su tabla xref correcta). */
 function pdf(paginas: (string | string[])[]): Buffer {
@@ -44,40 +44,40 @@ test('Biblioteca: cargar PDF, buscar, guardar argumento, plan y la oferta del in
 
   // Cargar un PDF: el texto se lee en el dispositivo
   await page.getByRole('button', { name: '+ Cargar documento' }).click()
-  await page.getByLabel('Plan (si es un anexo)').fill('Plan Familia')
+  await page.getByLabel('Plan (si es un anexo)').fill('Plan Futuro')
   await campo(page, 'Nombre').fill('Condiciones generales')
   await page
     .getByLabel('Archivo PDF')
     .setInputFiles({
       name: 'condiciones.pdf',
       mimeType: 'application/pdf',
-      buffer: pdf(['Coberturas generales del contrato', 'La maternidad tiene un periodo de carencia de diez meses']),
+      buffer: pdf(['Condiciones generales del contrato', 'El bono de permanencia se paga a partir del ano diez']),
     })
   await expect(page.getByText(/Documento cargado: 2 páginas/)).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Condiciones generales' })).toBeVisible()
 
   // Buscar (sin importar tildes) y guardar el fragmento como argumento
-  await page.getByLabel('Buscar en tus documentos').fill('período MATERNIDAD')
+  await page.getByLabel('Buscar en tus documentos').fill('PERMANENCIA bóno')
   const res = page.getByRole('region', { name: 'Resultados' })
   await expect(res.getByText('pág. 2')).toBeVisible()
-  await expect(res.locator('mark').first()).toHaveText('maternidad')
+  await expect(res.locator('mark').first()).toHaveText('bono')
   await res.getByRole('button', { name: 'Guardar como argumento' }).click()
   await expect(page.getByRole('heading', { name: 'Nuevo argumento' })).toBeVisible()
   await expect(page.getByLabel('Fuente')).toHaveValue('Condiciones generales, pág. 2')
-  await page.getByLabel('Idea en una línea').fill('Contratar antes: la maternidad tiene carencia')
+  await page.getByLabel('Idea en una línea').fill('Quedarse premia: bono de permanencia')
   await page.getByRole('button', { name: 'Familia y dependientes' }).click()
   await page.getByRole('button', { name: 'Guardar argumento' }).click()
-  await expect(page.getByText('Contratar antes: la maternidad tiene carencia')).toBeVisible()
+  await expect(page.getByText('Quedarse premia: bono de permanencia')).toBeVisible()
 
   // Plan del catálogo
   await page.getByRole('tab', { name: /Planes/ }).click()
   await page.getByRole('button', { name: '+ Nuevo plan' }).click()
-  await campo(page, 'Nombre del plan').fill('Plan Familia')
-  await campo(page, 'Beneficios y servicios incluidos').fill('Telemedicina 24/7\nChequeo preventivo anual')
-  await campo(page, 'Carencias (tiempos de espera)').fill('Maternidad: 10 meses')
+  await campo(page, 'Nombre del plan').fill('Plan Futuro')
+  await campo(page, 'Beneficios y servicios incluidos').fill('Estado de cuenta en linea\nRevision anual de fondos')
+  await campo(page, 'Cargos y costos').fill('Administracion: 1,5% anual')
   await page.getByRole('button', { name: 'Guardar plan' }).click()
   const plan = page.locator('article.plan')
-  await expect(plan.getByRole('heading', { name: 'Plan Familia' })).toBeVisible()
+  await expect(plan.getByRole('heading', { name: 'Plan Futuro' })).toBeVisible()
   await expect(plan.getByText('validar con la aseguradora')).toBeVisible()
 
   // Sin ancho de más en el teléfono
@@ -92,7 +92,7 @@ test('Biblioteca: cargar PDF, buscar, guardar argumento, plan y la oferta del in
   await campo(page, 'WhatsApp').fill('0991234567')
   await campo(page, '¿Quién depende de esta persona?').fill('su hija')
   await accion(page, 'Ya va a contratar')
-  await campo(page, 'Producto seleccionado').selectOption({ label: 'Plan Familia' })
+  await campo(page, 'Producto seleccionado').selectOption({ label: 'Plan Futuro' })
   await campo(page, 'Aporte mensual (USD)').fill('90')
   // La oferta ya no se llena a mano: no está en "+ acciones"
   await expect(page.getByRole('group', { name: 'Acciones con el prospecto' }).getByRole('button', { name: /Oferta irresistible/ })).toHaveCount(0)
@@ -119,38 +119,85 @@ test('Biblioteca: cargar PDF, buscar, guardar argumento, plan y la oferta del in
   expect(d.suggestedFilename()).toMatch(/^propuesta-Ana-Torres-.*\.pdf$/)
 })
 
-test('Biblioteca: el plan se precarga desde el PDF, solo con lo que dice el documento', async ({ page }) => {
+const PAGS_FUTURO = [
+  ['CARACTERISTICAS', '- Plazos de 10 a 30 anos', '- Cobertura por fallecimiento: $20.000', '', '', 'Aporte minimo mensual: $50'],
+  ['COSTOS', '- Cargo de administracion: 1,5% anual', '', '', 'RESCATES', '- Penalidad por rescate anticipado: 10% el primer ano'],
+]
+
+async function cargarPlan(page: import('@playwright/test').Page, plan: string, paginas: string[][]) {
   await page.goto('/#/biblioteca')
   await page.getByRole('button', { name: '+ Cargar documento' }).click()
   await page.getByLabel('Tipo').selectOption('anexo')
-  await page.getByLabel('Plan (si es un anexo)').fill('Plan Salud Total')
-  await campo(page, 'Nombre').fill('Anexo Salud Total')
-  await page.getByLabel('Archivo PDF').setInputFiles({
-    name: 'anexo.pdf',
-    mimeType: 'application/pdf',
-    buffer: pdf([
-      ['COBERTURAS', '- Hospitalizacion y cirugia al 100%', '- Emergencias 24/7', '', '', 'Prima mensual: $120', 'Deducible anual: $300'],
-      ['CARENCIAS', '- Maternidad: 10 meses', '', '', 'EXCLUSIONES', '- Tratamientos esteticos'],
-    ]),
-  })
+  await page.getByLabel('Plan (si es un anexo)').fill(plan)
+  await campo(page, 'Nombre').fill('Condiciones ' + plan)
+  await page.getByLabel('Archivo PDF').setInputFiles({ name: 'plan.pdf', mimeType: 'application/pdf', buffer: pdf(paginas) })
+}
+
+test('Biblioteca: el plan se precarga desde el PDF, solo con lo que dice el documento', async ({ page }) => {
+  await cargarPlan(page, 'Plan Futuro', PAGS_FUTURO)
   // Se abre el plan precargado para revisarlo
   const ed = page.getByRole('region', { name: 'Editar plan' })
-  await expect(ed.getByRole('status')).toContainText('Precargado del PDF: Anexo Salud Total')
+  await expect(ed.getByRole('status')).toContainText('Precargado del PDF: Condiciones Plan Futuro')
   await expect(ed.getByRole('status')).toContainText('Solo copié lo que está escrito en el documento')
-  await expect(campo(page, 'Nombre del plan')).toHaveValue('Plan Salud Total')
-  await expect(campo(page, 'Coberturas principales')).toHaveValue('Hospitalizacion y cirugia al 100%\nEmergencias 24/7')
-  await expect(campo(page, 'Carencias (tiempos de espera)')).toHaveValue('Maternidad: 10 meses')
-  await expect(campo(page, 'Exclusiones')).toHaveValue('Tratamientos esteticos')
-  await expect(campo(page, 'Precio de referencia')).toHaveValue('$120')
-  await expect(campo(page, 'Fuente')).toHaveValue('Anexo Salud Total, págs. 1, 2')
+  await expect(campo(page, 'Nombre del plan')).toHaveValue('Plan Futuro')
+  await expect(campo(page, 'Características principales')).toHaveValue('Plazos de 10 a 30 anos\nCobertura por fallecimiento: $20.000')
+  await expect(campo(page, 'Cargos y costos')).toHaveValue('Cargo de administracion: 1,5% anual')
+  await expect(campo(page, 'Rescates y penalidades')).toHaveValue('Penalidad por rescate anticipado: 10% el primer ano')
+  await expect(campo(page, 'Aporte de referencia')).toHaveValue('$50')
+  await expect(campo(page, 'Fuente')).toHaveValue('Condiciones Plan Futuro, págs. 1, 2')
   await page.getByRole('button', { name: 'Guardar plan' }).click()
   const plan = page.locator('article.plan')
-  await expect(plan.getByRole('heading', { name: 'Plan Salud Total' })).toBeVisible()
-  await expect(plan).toContainText('Tabla de coberturas: 3 conceptos')
-  await expect(plan).toContainText('Fuente: Anexo Salud Total, págs. 1, 2')
+  await expect(plan.getByRole('heading', { name: 'Plan Futuro' })).toBeVisible()
+  await expect(plan).toContainText(/Tabla de datos: \d+ conceptos/)
+  await expect(plan).toContainText('Fuente: Condiciones Plan Futuro, págs. 1, 2')
 
   // Desde la lista de documentos también se puede volver a precargar
   await page.getByRole('tab', { name: /Documentos/ }).click()
   await page.getByRole('button', { name: 'Precargar plan' }).click()
   await expect(page.getByRole('heading', { name: 'Actualizar plan desde el PDF' })).toBeVisible()
+})
+
+test('Plan recomendado: lee los PDF de la Biblioteca según lo que necesita la persona', async ({ page }) => {
+  await cargarPlan(page, 'Plan Futuro', PAGS_FUTURO)
+  await page.getByRole('button', { name: 'Guardar plan' }).click()
+  await cargarPlan(page, 'Plan Ahorro', [['CARACTERISTICAS', '- Plazos de 5 a 15 anos', '', '', 'Aporte minimo mensual: $80']])
+  await page.getByRole('button', { name: 'Guardar plan' }).click()
+
+  await page.goto('/#/nueva/nuevo')
+  await page.getByLabel(/La persona aceptó/).click()
+  await campo(page, 'Nombre').fill('Rosa Mena')
+  await campo(page, '¿Quién depende de esta persona?').fill('Dos hijos')
+  await abrir(page, 'Descubrimiento')
+  await campo(page, '¿Cuánto puede invertir al mes? (USD)').fill('60')
+  await accion(page, 'Plan recomendado')
+  const rec = page.locator('#recomendar')
+  await expect(rec.getByRole('group', { name: 'Lo que necesita' })).toContainText('Protección para su familia (cobertura de vida)')
+  await expect(rec.getByRole('group', { name: 'Lo que necesita' })).toContainText('Aporta hasta $60 al mes')
+  const mejor = rec.locator('article.rec-plan.mejor')
+  await expect(mejor.getByRole('heading', { name: 'Plan Futuro' })).toBeVisible()
+  await expect(mejor).toContainText('Cobertura por fallecimiento: $20.000')
+  await expect(mejor).toContainText('Condiciones Plan Futuro, pág. 1')
+  // El Plan Ahorro pide más de lo que puede aportar
+  await rec.getByText(/Otros planes/).click()
+  await expect(rec.getByRole('article', { name: 'Plan Ahorro' })).toContainText('pide más de lo que puede aportar')
+  await mejor.getByRole('button', { name: 'Usar en la propuesta' }).click()
+  await expect(mejor).toContainText('✓ En la propuesta')
+})
+
+test('Ya invierte: compara su inversión actual con los planes de la Biblioteca', async ({ page }) => {
+  await cargarPlan(page, 'Plan Futuro', PAGS_FUTURO)
+  await page.getByRole('button', { name: 'Guardar plan' }).click()
+  await page.goto('/#/nueva/cambio')
+  await page.getByLabel(/La persona aceptó/).click()
+  await campo(page, 'Nombre').fill('Luis Paz')
+  await accion(page, 'Comparar inversión actual')
+  const cmp = page.getByRole('region', { name: 'Su inversión actual vs. tus planes' })
+  await cmp.getByRole('button', { name: 'Pegar texto' }).click()
+  await cmp.getByLabel('Pega la tabla (un dato por línea)').fill('Aporte minimo mensual: $100\nCargo de administracion: 3%\nCobertura por fallecimiento: No incluye')
+  await cmp.getByRole('button', { name: 'Reconocer' }).click()
+  await cmp.getByRole('button', { name: 'Ver la comparación' }).click()
+  await expect(cmp).toContainText('⭐ Recomendado')
+  await expect(cmp).toContainText('Plan Futuro')
+  await expect(cmp).toContainText('Aporte mínimo $50 al mes · hoy aporta $100 al mes')
+  await expect(cmp).toContainText('Cobertura por fallecimiento: $20.000 (hoy no lo tiene)')
 })

@@ -4,21 +4,21 @@
  * 1. Catálogo: los planes guardados y, además, los que salen solos de los
  *    documentos cargados (anexos y tarifas de cada plan), sin tener que
  *    precargarlos a mano.
- * 2. Necesidades: se leen de la ficha (quién depende, edad, ocupación,
- *    preexistencias, motivos, presupuesto, lo que contó).
+ * 2. Necesidades: se leen de la ficha (aporte, capital, plazo, liquidez,
+ *    dependientes, perfil de riesgo, motivos de quien ya invierte).
  * 3. Cada plan se revisa necesidad por necesidad: primero su tabla de
- *    coberturas, luego sus listas y, por último, el texto de sus PDF. Cada
+ *    datos, luego sus listas y, por último, el texto de sus PDF. Cada
  *    razón cita el documento y la página. Lo que no aparece queda "por
  *    confirmar": nunca se supone que sí cubre.
  */
 import { CONCEPTO_BY, interpretar, primaPlanDe, tablaDe } from "./comparar";
-import { EDAD_MAYOR } from "../config/ficha";
-import { ESPERA, MODALIDADES, NECESIDADES, NIEGA, RECONOCER_MODALIDAD, type IdNecesidad, type Modalidad } from "../config/recomendar";
+import { ESPERA, NECESIDADES, NIEGA, RECONOCER_MODALIDAD, type IdNecesidad, type Modalidad } from "../config/recomendar";
 import { crearPlan, lineas, normalizar, type Documento, type Plan } from "./biblioteca";
 import { aplicarPrecarga, precargaDesdeDocumento } from "./extraer";
-import { esCambio, motivosDe, num, tipoDe, txt } from "./ficha";
-import { riesgosDe } from "./ocupacion";
-import { personasDe, preResumen, preStats } from "./pre";
+import { esCambio, motivosDe, num, txt } from "./ficha";
+import { aniosHorizonte } from "./analisis";
+import { perfilEfectivo } from "./finanzas";
+import { usd } from "./fechas";
 import type { Prospecto } from "./tipos";
 
 /* ---------- 1. Catálogo ---------- */
@@ -71,111 +71,72 @@ export interface Necesidad {
   peso: number;
   /** De dónde sale (para mostrarlo). */
   por: string;
-  /** Palabras extra para buscar en los PDF (p. ej. sus condiciones declaradas). */
+  /** Palabras extra para buscar en los PDF. */
   extra: string[];
-}
-
-const FAMILIA = /\b(hij[oa]s?|bebe|embaraz|esposa|pareja|novia|familia|maternidad)/;
-const NINOS = /\b(hij[oa]s?|bebe|nin[oa]s?|recien nacid)/;
-const VIAJE = /\b(viaj|exterior|extranjer|fuera del pais)/;
-
-/** Palabras comunes que no sirven para reconocer a un médico o un lugar. */
-const GENERICAS = new Set(["doctor", "doctora", "medico", "medica", "clinica", "consultorio", "hospital", "centro", "especialista"]);
-
-/** Palabras sueltas útiles de un texto (para buscarlas en los PDF). */
-function palabrasDe(s: string): string[] {
-  return normalizar(s)
-    .split(/[^\p{L}\p{N}]+/u)
-    .filter((w) => w.length >= 5 && !GENERICAS.has(w));
-}
-
-/* ---------- Médico de cabecera ---------- */
-
-export interface MedicoCabecera {
-  tiene: boolean;
-  /** No tiene problema en atenderse en la red de convenio. */
-  aceptaRed: boolean;
-  nombre: string;
-  especialidad: string;
-  lugar: string;
-}
-
-export function medicoDe(p: Prospecto): MedicoCabecera {
-  return {
-    tiene: txt(p, "medicoCabecera") === "Sí",
-    aceptaRed: txt(p, "redConvenio") === "Sí",
-    nombre: txt(p, "medicoNombre"),
-    especialidad: txt(p, "medicoEspecialidad"),
-    lugar: txt(p, "medicoLugar"),
-  };
-}
-
-/** Qué modalidad le conviene, en una línea (para el pre-cierre y la recomendación). */
-export function consejoModalidad(m: MedicoCabecera): string {
-  if (!m.tiene) return "";
-  return m.aceptaRed
-    ? "No tiene problema con la red de convenio: puedes recomendar planes de modalidad Abierta o Mixta y también de red cerrada."
-    : "Tiene médico de cabecera: lo más recomendable son los planes de modalidad Abierta o Mixta.";
+  /** Tope numérico (p. ej. lo que puede aportar): si el valor del plan lo supera, no cumple. */
+  tope?: number;
 }
 
 export function necesidadesDe(p: Prospecto): Necesidad[] {
   const out = new Map<IdNecesidad, Necesidad>();
-  const add = (id: IdNecesidad, peso: number, por: string, extra: string[] = []) => {
+  const add = (id: IdNecesidad, peso: number, por: string) => {
     const x = out.get(id);
-    if (x && x.peso >= peso) return void x.extra.push(...extra);
-    out.set(id, { id, l: NECESIDADES[id].l, peso, por, extra: [...(x?.extra ?? []), ...extra] });
+    if (x && x.peso >= peso) return;
+    out.set(id, { id, l: NECESIDADES[id].l, peso, por, extra: [] });
   };
   const v = (k: string) => txt(p, k);
-  const texto = normalizar([v("porque"), v("depende"), v("grieta"), v("emergencia"), v("notas")].join(" "));
-  const edad = num(p, "edad");
-  const edades = [edad, ...personasDe(p).map((x) => Number(x.edad))].filter((n): n is number => n !== null && Number.isFinite(n) && n > 0);
+  const aporte = num(p, "precio") ?? num(p, "aporte");
+  const capital = num(p, "capital");
+  const unico = v("tipoPlan") === "Contribución única" || (capital !== null && capital > 0);
 
-  const evento = v("costoEvento") || v("emergencia");
-  add("hospital", evento ? 3 : 2, evento ? `Dijo: “${evento}”` : "Lo esencial: un evento grande es lo que más afecta los ahorros");
-  add("emergencias", 2, "Lo esencial en cualquier plan");
-  add("medicinas", 1, "Lo que más se usa en el día a día");
-
-  const r = riesgosDe(p);
-  if (r) add("accidentes", 2, `Por su trabajo (${r.ocupacion.toLowerCase()})`);
-  if (FAMILIA.test(texto) && (edad === null || edad <= 45)) add("maternidad", 2, v("depende") ? `Depende: ${v("depende")}` : "Planes de familia");
-  if (NINOS.test(normalizar(v("depende"))) || edades.some((e) => e < 18)) add("ninos", 2, "Hay niños en la familia");
-  if (/iess|seguro social/i.test(v("cobertura"))) add("ambulatorio", 1, "Complemento a su IESS");
-  if (edades.some((e) => e >= EDAD_MAYOR)) add("cronicas", 2, `Hay personas de ${EDAD_MAYOR} años o más`);
-  if (VIAJE.test(texto)) add("exterior", 1, "Mencionó viajes o el exterior");
-
-  // Preexistencias: sus condiciones declaradas se buscan por nombre en los PDF.
-  const conPre = tipoDe(p) === "nuevo" ? preStats(p).condiciones > 0 : v("declaro") === "Sí";
-  if (conPre) {
-    const condiciones = preResumen(p).flatMap((x) => x.con.flatMap((c) => c.items.map((i) => i.c)));
-    add("preexistencias", 3, condiciones.length ? `Declaró: ${condiciones.slice(0, 3).join(", ")}` : "Declaró condiciones de salud", condiciones.flatMap(palabrasDe));
+  if (unico) add("unico", 3, capital ? `Tiene ${usd(capital)} para un aporte único` : "Eligió contribución única");
+  if (v("tipoPlan") !== "Contribución única" && aporte) {
+    add("aporte", 3, `Puede aportar ${usd(aporte)} al mes`);
+    out.get("aporte")!.tope = aporte;
   }
+  if (v("horizonte") || v("plazo")) add("plazo", 2, v("plazo") ? `Plazo elegido: ${v("plazo")} años` : `Su meta: ${v("horizonte").toLowerCase()}`);
+  add("costos", 2, "Lo esencial: saber cuánto le cuesta el plan");
 
-  // Cambio de seguro: lo que hoy le falla pesa más.
+  const anios = aniosHorizonte(p);
+  if (v("emergencia") !== "Sí" || (anios !== null && anios < 10) || v("ingresoEstable") === "Muy variable")
+    add("liquidez", v("emergencia") === "No" ? 3 : 2, v("emergencia") === "No" ? "No tiene fondo de emergencia" : "Podría necesitar su dinero antes");
+  if (v("tipoIngreso") === "Independiente o profesional" || v("tipoIngreso") === "Negocio propio" || v("ingresoEstable") !== "Estable")
+    add("extra", 1, "Ingreso variable: aportes extra en los buenos meses");
+  if (v("ingresoEstable") === "Muy variable") add("retiros", 1, "Ingreso muy variable");
+
+  if (v("depende"))
+    add("vida", v("seguroVida") === "No" ? 3 : 2, v("seguroVida") === "No" ? `Dependen de él o ella (${v("depende")}) y no tiene seguro de vida` : `Dependen de él o ella: ${v("depende")}`);
+
+  const perfil = perfilEfectivo(p);
+  if (perfil === "Conservador") add("conservador", 3, "Perfil conservador");
+  else if (perfil === "Arriesgado") add("crecimiento", 2, "Perfil arriesgado");
+  else if (perfil === "Moderado") {
+    add("conservador", 1, "Perfil moderado");
+    add("crecimiento", 1, "Perfil moderado");
+  }
+  if (anios !== null && anios >= 10) add("bono", 1, "Plazo largo: puede aprovechar un bono de permanencia");
+  if (v("confianza") === "Ver su estado de cuenta cuando quiera") add("estado", 2, "Quiere ver su estado de cuenta cuando quiera");
+
+  // Ya invierte: lo que hoy le falla pesa más.
   if (esCambio(p))
     for (const m of motivosDe(p)) {
-      if (m === "atencion") add("telemedicina", 2, "Hoy le falla la atención");
+      if (m === "costos") add("costos", 3, "Hoy paga costos que no conoce o le parecen altos");
+      if (m === "liquidez") add("liquidez", 3, "Hoy no puede disponer de su dinero sin penalidad");
+      if (m === "transparencia") add("estado", 3, "Hoy no sabe cómo va su inversión");
+      if (m === "riesgo") add("conservador", 3, "Hoy le preocupa la volatilidad");
+      if (m === "rendimiento") add("crecimiento", 2, "Hoy su dinero rinde poco");
     }
-  if (v("red_falta") && !out.has("red")) add("red", 2, `Busca: ${v("red_falta")}`, palabrasDe(v("red_falta")));
-
-  // Médico de cabecera: si no quiere la red de convenio, pide modalidad Abierta o Mixta.
-  const med = medicoDe(p);
-  if (med.tiene && !med.aceptaRed)
-    add(
-      "medico",
-      3,
-      `Su médico de cabecera${med.nombre ? `: ${med.nombre}` : ""}${med.especialidad ? ` (${med.especialidad})` : ""}`,
-      palabrasDe(`${med.nombre} ${med.lugar}`),
-    );
 
   return [...out.values()].sort((a, b) => b.peso - a.peso);
 }
 
 /** Presupuesto y criterio de precio. */
 export function presupuestoDe(p: Prospecto): { limite: number | null; porPrecio: boolean } {
-  const limite = num(p, "pre_limite");
+  // El "precio" de un plan es su aporte mínimo: no entra si pide más de lo que puede aportar.
+  const limite = txt(p, "tipoPlan") === "Contribución única" ? null : (num(p, "precio") ?? num(p, "aporte"));
   return {
     limite: limite && limite > 0 ? limite : null,
-    porPrecio: txt(p, "criterio") === "Precio" || txt(p, "objecion") === "Precio" || motivosDe(p).includes("costos"),
+    porPrecio: txt(p, "objecion") === "No tengo dinero ahora" || motivosDe(p).includes("costos"),
   };
 }
 
@@ -272,49 +233,36 @@ export function modalidadDe(item: PlanCatalogo): { m: Modalidad; fuente: string 
   return null;
 }
 
-/** Seguir con su médico: su médico en los PDF del plan, o la modalidad. */
-function revisarMedico(item: PlanCatalogo, n: Necesidad): RevisionNecesidad {
-  if (n.extra.length) {
-    const d = enDocs(item.docs, n.extra);
-    if (d.cubre) return { n, veredicto: "cubre", ev: { t: `Su médico aparece en el plan: ${d.cubre.t}`, fuente: d.cubre.fuente }, avisos: [] };
-  }
-  const mod = modalidadDe(item);
-  if (!mod) return { n, veredicto: "?", ev: null, avisos: [] };
-  const ev = { t: MODALIDADES[mod.m].ev, fuente: mod.fuente };
-  return mod.m === "cerrada"
-    ? { n, veredicto: "falta", ev, avisos: [{ t: "Solo si su médico está en la red de convenio", fuente: VALIDAR_RED }] }
-    : { n, veredicto: "cubre", ev, avisos: mod.m === "mixta" ? [{ t: "Confirma cómo se cubre la atención fuera de la red", fuente: VALIDAR_RED }] : [] };
-}
-
-const VALIDAR_RED = "validar con la aseguradora";
-
 export function revisarNecesidad(item: PlanCatalogo, n: Necesidad): RevisionNecesidad {
-  if (n.id === "medico") return revisarMedico(item, n);
   const { plan, docs } = item;
   const def = NECESIDADES[n.id];
   const palabras = [...def.palabras, ...n.extra];
   const avisos: Evidencia[] = [];
-  for (const c of lineas(plan.carencias)) if (coincide(c, palabras)) avisos.push({ t: `Tiempo de espera: ${corto(c)}`, fuente: citar(item, c) });
+  for (const c of lineas(plan.carencias)) if (coincide(c, palabras)) avisos.push({ t: `Costo: ${corto(c)}`, fuente: citar(item, c) });
   const exclusion = lineas(plan.exclusiones).find((x) => coincide(x, palabras));
-  if (exclusion) avisos.push({ t: `Exclusión: ${corto(exclusion)}`, fuente: citar(item, exclusion) });
+  if (exclusion) avisos.push({ t: `Rescate: ${corto(exclusion)}`, fuente: citar(item, exclusion) });
 
-  // 1. Tabla de coberturas del plan
+  // 1. Tabla de datos del plan
   const t = tablaDe(plan.tabla);
   for (const c of def.conceptos) {
     const val = t[c]?.trim();
     if (!val) continue;
     const l = CONCEPTO_BY[c]?.l ?? c;
     const ev = { t: `${l}: ${val}`, fuente: citar(item, val, palabras) };
-    return { n, veredicto: interpretar(val).tipo === "no" ? "falta" : "cubre", ev, avisos };
+    const x = interpretar(val);
+    const pasa = n.tope !== undefined && x.tipo === "num" && x.n > n.tope;
+    // No repetir como aviso la misma línea que ya es la evidencia.
+    const otros = avisos.filter((a) => !normalizar(a.t).includes(normalizar(val)));
+    return { n, veredicto: x.tipo === "no" || pasa ? "falta" : "cubre", ev, avisos: otros };
   }
-  // 2. Coberturas, beneficios y garantías escritos en el plan
+  // 2. Características, beneficios y garantías escritos en el plan
   const lista = [...lineas(plan.coberturas), ...lineas(plan.beneficios), ...lineas(plan.garantias)].find(
     (x) => coincide(x, palabras) && !NIEGA.test(normalizar(x)),
   );
   if (lista) return { n, veredicto: "cubre", ev: { t: corto(lista), fuente: citar(item, lista) }, avisos };
   // 3. El texto de sus PDF
   const d = enDocs(docs, palabras);
-  if (d.espera && !avisos.length) avisos.push({ t: `Tiempo de espera: ${d.espera.t}`, fuente: d.espera.fuente });
+  if (d.espera && !avisos.length) avisos.push({ t: `Plazo o permanencia: ${d.espera.t}`, fuente: d.espera.fuente });
   if (d.cubre) {
     if (d.niega) avisos.push({ t: `Revisa: ${d.niega.t}`, fuente: d.niega.fuente });
     return { n, veredicto: "cubre", ev: d.cubre, avisos };
@@ -342,7 +290,7 @@ export function recomendar(p: Prospecto, planes: readonly Plan[], docs: readonly
     const precio = primaPlanDe(item.plan);
     const fueraPresupuesto = precio !== null && limite !== null && precio > limite;
     const modalidad = modalidadDe(item);
-    const noApta = revision.some((r) => r.n.id === "medico" && r.veredicto === "falta");
+    const noApta = false;
     return { item, modalidad, noApta, revision, ajuste: Math.round((cubre / total) * 100), precio, fueraPresupuesto, puntos: cubre - falta * 1.5 };
   });
   // Si elige por precio, el más económico suma hasta 2 puntos.

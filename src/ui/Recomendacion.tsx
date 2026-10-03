@@ -8,10 +8,8 @@ import { VALIDAR } from "../config/saludsa";
 import { productosDe, tieneProducto, totalMensual, valorRecomendado } from "../domain/cierre";
 import { usePlanEnPropuesta } from "./usarPlan";
 import { fmtUSD } from "../domain/oferta";
-import { MODALIDADES } from "../config/recomendar";
 import { fichaPlan, nombreCategoria } from "../domain/bondades";
-import { tieneVitality } from "../domain/vitality";
-import { consejoModalidad, medicoDe, necesidadesDe, presupuestoDe, recomendar, type Recomendacion, type RevisionNecesidad } from "../domain/recomendar";
+import { necesidadesDe, presupuestoDe, recomendar, type Recomendacion, type RevisionNecesidad } from "../domain/recomendar";
 import type { Prospecto } from "../domain/tipos";
 import { useBiblioteca } from "../store/biblioteca";
 import { ir } from "./router";
@@ -62,10 +60,6 @@ function Tarjeta({
       <div className="rec-cab">
         {mejor && <span className="tag">Mejor opción</span>}
         <h3>{pl.nombre}</h3>
-        {tieneVitality(r.item) && <span className="tag vitality">Incluye Vitality</span>}
-        <small className={"rec-modalidad" + (r.noApta ? " falta" : "")}>
-          {r.modalidad ? `${MODALIDADES[r.modalidad.m].l} · ${r.modalidad.fuente}` : "Modalidad por confirmar"}
-        </small>
         <div className="rec-ajuste" aria-label={`Ajuste a sus necesidades: ${r.ajuste}%`}>
           <b>{r.ajuste}%</b>
           <small>de lo que necesita, respaldado</small>
@@ -75,8 +69,8 @@ function Tarjeta({
         </div>
       </div>
       <p className="rec-precio">
-        {r.precio !== null ? `${fmtUSD(r.precio)} al mes (referencial)` : "Precio: no está en sus documentos"}
-        {r.fueraPresupuesto && <span className="falta"> · supera su presupuesto</span>}
+        {r.precio !== null ? `Aporte mínimo: ${fmtUSD(r.precio)} al mes` : "Aporte mínimo: no está en sus documentos"}
+        {r.fueraPresupuesto && <span className="falta"> · pide más de lo que puede aportar</span>}
       </p>
       {r.item.virtual && (
         <p className="an-note">Leído de: {r.item.docs.map((d) => d.nombre).join(", ")} (aún no está guardado en Planes).</p>
@@ -129,7 +123,6 @@ export function PlanRecomendado({ p, actualizar }: { p: Prospecto; actualizar: (
   const b = useBiblioteca();
   const necesidades = necesidadesDe(p);
   const { limite, porPrecio } = presupuestoDe(p);
-  const medico = medicoDe(p);
   const recs = useMemo(() => recomendar(p, b.planes, b.docs), [p, b.planes, b.docs]);
   const [mejor, ...resto] = recs;
 
@@ -160,11 +153,9 @@ export function PlanRecomendado({ p, actualizar }: { p: Prospecto; actualizar: (
             {n.l}
           </span>
         ))}
-        {limite !== null && <span className="chip">Hasta {fmtUSD(limite)} al mes</span>}
-        {porPrecio && <span className="chip">Elige por precio</span>}
-        {medico.tiene && medico.aceptaRed && <span className="chip">Acepta la red de convenio</span>}
+        {limite !== null && <span className="chip">Aporta hasta {fmtUSD(limite)} al mes</span>}
+        {porPrecio && <span className="chip">Cuida los costos</span>}
       </div>
-      {medico.tiene && <p className="an-status medico-consejo">🩺 {consejoModalidad(medico)}</p>}
       <p className="an-note">★ = clave para esta persona. Mientras más completa la ficha, más fina la recomendación.</p>
 
       {!mejor ? (
@@ -173,7 +164,7 @@ export function PlanRecomendado({ p, actualizar }: { p: Prospecto; actualizar: (
           <button type="button" className="enlace" onClick={() => ir({ v: "biblioteca", sec: "docs" })}>
             Carga los PDF de tus planes
           </button>{" "}
-          (anexos o tarifas, con el nombre del plan) para recomendar.
+          (condiciones, ficha del plan o tabla de costos, con el nombre del plan) para recomendar.
         </p>
       ) : (
         <>

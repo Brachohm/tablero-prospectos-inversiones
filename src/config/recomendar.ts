@@ -1,64 +1,53 @@
 /**
  * Necesidades que la app reconoce en la ficha para recomendar un plan.
- * `conceptos`: dónde mirar en la tabla de coberturas del plan.
+ * `conceptos`: dónde mirar en la tabla del plan.
  * `palabras`: qué buscar en los PDF del plan (minúsculas, sin tildes; basta el
  * inicio de la palabra). Editables.
  */
 import type { IdConcepto } from "./coberturas";
 
 export type IdNecesidad =
-  | "hospital"
-  | "emergencias"
-  | "medicinas"
-  | "accidentes"
-  | "maternidad"
-  | "ninos"
-  | "ambulatorio"
-  | "preexistencias"
-  | "cronicas"
-  | "exterior"
-  | "reembolso"
-  | "deducible"
-  | "red"
-  | "telemedicina"
-  | "medico";
+  | "aporte"
+  | "unico"
+  | "plazo"
+  | "costos"
+  | "liquidez"
+  | "retiros"
+  | "vida"
+  | "conservador"
+  | "crecimiento"
+  | "extra"
+  | "bono"
+  | "estado";
 
 export const NECESIDADES: Readonly<Record<IdNecesidad, { l: string; conceptos: IdConcepto[]; palabras: string[] }>> = {
-  hospital: { l: "Hospitalización y cirugía", conceptos: ["hospitalaria", "maximo"], palabras: ["hospitaliz", "cirugia"] },
-  emergencias: { l: "Emergencias", conceptos: ["emergencias"], palabras: ["emergencia"] },
-  medicinas: { l: "Medicinas", conceptos: ["medicinas"], palabras: ["medicamento", "medicinas", "farmac"] },
-  accidentes: { l: "Accidentes", conceptos: ["emergencias"], palabras: ["accidente"] },
-  maternidad: { l: "Maternidad", conceptos: ["maternidad"], palabras: ["maternidad", "parto", "embarazo"] },
-  ninos: { l: "Atención para los niños", conceptos: ["ambulatoria"], palabras: ["pediatr", "vacuna", "recien nacido"] },
-  ambulatorio: { l: "Consultas y exámenes", conceptos: ["ambulatoria", "examenes"], palabras: ["ambulatori", "consulta", "examen", "laboratorio"] },
-  preexistencias: { l: "Preexistencias declaradas", conceptos: ["preexistencias"], palabras: ["preexisten"] },
-  cronicas: { l: "Enfermedades crónicas y chequeos", conceptos: ["medicinas", "maximo"], palabras: ["cronic", "chequeo", "preventiv"] },
-  exterior: { l: "Cobertura en el exterior", conceptos: ["exterior"], palabras: ["exterior", "internacional", "extranjero"] },
-  reembolso: { l: "Reembolsos ágiles", conceptos: ["reembolso"], palabras: ["reembolso"] },
-  deducible: { l: "Deducible y copago bajos", conceptos: ["deducible", "copago"], palabras: ["deducible", "copago", "coaseguro"] },
-  red: { l: "Red de médicos y clínicas", conceptos: ["red"], palabras: ["red de", "prestador", "clinica"] },
-  telemedicina: { l: "Atención y telemedicina", conceptos: ["telemedicina"], palabras: ["telemedicina", "teleconsulta", "medico virtual"] },
-  // Se revisa por la modalidad del plan (y por si su médico aparece en sus PDF).
-  medico: { l: "Seguir con su médico de cabecera", conceptos: [], palabras: [] },
+  aporte: { l: "Un aporte mensual a su alcance", conceptos: ["prima"], palabras: ["aporte minimo", "aporte mensual", "prima minima"] },
+  unico: { l: "Aceptar su aporte único", conceptos: ["unico"], palabras: ["aporte unico", "prima unica", "aporte inicial"] },
+  plazo: { l: "Un plazo acorde a su meta", conceptos: ["plazo"], palabras: ["plazo", "duracion"] },
+  costos: { l: "Costos claros y bajos", conceptos: ["admin", "entrada"], palabras: ["administracion", "cargo", "comision", "costo"] },
+  liquidez: { l: "Poder retirar sin una gran penalidad", conceptos: ["sinPenalidad", "rescate"], palabras: ["rescate", "sin penalidad", "retiro anticipado"] },
+  retiros: { l: "Retiros parciales si los necesita", conceptos: ["retiros"], palabras: ["retiro parcial", "retiros parciales"] },
+  vida: { l: "Protección para su familia (cobertura de vida)", conceptos: ["vida"], palabras: ["fallecimiento", "seguro de vida", "suma asegurada"] },
+  conservador: { l: "Fondos conservadores", conceptos: ["fondos"], palabras: ["conservador", "renta fija", "bajo riesgo"] },
+  crecimiento: { l: "Fondos de crecimiento", conceptos: ["fondos"], palabras: ["agresivo", "crecimiento", "renta variable", "acciones"] },
+  extra: { l: "Aportes extra cuando le vaya bien", conceptos: ["extra"], palabras: ["aporte extraordinario", "aportes extra", "aporte adicional"] },
+  bono: { l: "Premio por permanecer (bono)", conceptos: ["bono"], palabras: ["bono", "lealtad", "permanencia"] },
+  estado: { l: "Ver su inversión cuando quiera", conceptos: ["estado"], palabras: ["estado de cuenta", "en linea", "consulta"] },
 };
 
+/** Modalidades de red (solo para planes de salud). En inversiones no aplica: no se reconoce ninguna. */
 export type Modalidad = "abierta" | "mixta" | "cerrada";
 
 export const MODALIDADES: Readonly<Record<Modalidad, { l: string; ev: string }>> = {
-  abierta: { l: "Modalidad abierta", ev: "Modalidad abierta: permite atenderse también fuera de la red de convenio" },
-  mixta: { l: "Modalidad mixta", ev: "Modalidad mixta: red de convenio y atención fuera de ella" },
-  cerrada: { l: "Red cerrada", ev: "Red cerrada: se atiende solo en la red de convenio" },
+  abierta: { l: "Modalidad abierta", ev: "" },
+  mixta: { l: "Modalidad mixta", ev: "" },
+  cerrada: { l: "Red cerrada", ev: "" },
 };
 
-/** Cómo reconocer la modalidad en un texto (minúsculas, sin tildes). El orden importa. */
-export const RECONOCER_MODALIDAD: readonly [Modalidad, RegExp][] = [
-  ["mixta", /\b(modalidad mixta|mixt[oa])\b/],
-  ["cerrada", /\b(red cerrada|modalidad cerrada|cerrad[oa]|red exclusiva|(solo|unicamente|exclusivamente) (en|dentro de) (la|su) red)\b/],
-  ["abierta", /\b(modalidad abierta|red abierta|abiert[oa]|libre eleccion)\b/],
-];
+export const RECONOCER_MODALIDAD: readonly [Modalidad, RegExp][] = [];
 
-/** Una línea del PDF que dice que algo NO está cubierto. */
-export const NIEGA = /\b(no (se )?(cubre|cubren|incluye|incluyen|aplica|ampara)|excluid|exclusion|se excluye|sin cobertura)/;
+/** Una línea del PDF que dice que algo NO aplica. */
+export const NIEGA = /\b(no (se )?(cubre|cubren|incluye|incluyen|aplica|permite|permiten|ampara)|excluid|exclusion|se excluye|sin cobertura)/;
 
-/** Una línea del PDF que habla de un tiempo de espera. */
-export const ESPERA = /(carencia|periodo de espera|tiempo de espera|\d+\s*(mes|meses|dias)\b)/;
+/** Una línea del PDF que habla de un tiempo de espera o permanencia mínima. */
+export const ESPERA = /(carencia|periodo de espera|tiempo de espera|permanencia minima|a partir del (ano|mes)|\d+\s*(mes|meses|anos|años)\b)/;

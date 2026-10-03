@@ -62,16 +62,15 @@ export interface Argumento {
 
 export const CAMPOS_PLAN: readonly { k: keyof Plan; l: string; lista?: boolean; ph?: string }[] = [
   { k: "nombre", l: "Nombre del plan" },
-  { k: "publico", l: "¿Para quién es?", ph: "Familias jóvenes, persona sola, mayores de 55…" },
-  { k: "modalidad", l: "Modalidad", ph: "Abierta, Mixta o Red cerrada" },
-  { k: "precio", l: "Precio de referencia", ph: "Desde 85 USD al mes" },
-  { k: "coberturas", l: "Coberturas principales", lista: true, ph: "Una por línea" },
-  { k: "carencias", l: "Carencias (tiempos de espera)", lista: true, ph: "Maternidad: 10 meses…" },
-  { k: "exclusiones", l: "Exclusiones", lista: true },
+  { k: "publico", l: "¿Para quién es?", ph: "Contribución regular para retiro, educación, primera inversión…" },
+  { k: "precio", l: "Aporte de referencia", ph: "Desde 50 USD al mes" },
+  { k: "coberturas", l: "Características principales", lista: true, ph: "Una por línea: plazos, fondos, cobertura de vida…" },
+  { k: "carencias", l: "Cargos y costos", lista: true, ph: "Administración: 1,5 % anual…" },
+  { k: "exclusiones", l: "Rescates y penalidades", lista: true, ph: "Rescate el año 1: 10 %…" },
   { k: "beneficios", l: "Beneficios y servicios incluidos", lista: true, ph: "Se proponen como bonos de la oferta" },
   { k: "garantias", l: "Garantías por escrito", lista: true },
   { k: "notas", l: "Notas" },
-  { k: "fuente", l: "Fuente", ph: "Anexo del plan, página 4" },
+  { k: "fuente", l: "Fuente", ph: "Condiciones del plan, página 4" },
 ];
 
 export function crearPlan(ahora = Date.now()): Plan {

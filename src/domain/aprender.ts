@@ -48,22 +48,17 @@ export function etiquetasDeTexto(t: string): string[] {
 }
 
 const ETIQUETA_CONCEPTO: Partial<Record<IdConcepto, string[]>> = {
-  prima: ["obj:Precio"],
-  deducible: ["mot:deducibles", "obj:Precio"],
-  copago: ["mot:deducibles"],
-  maximo: ["mot:cobertura", "emergencia"],
-  hospitalaria: ["mot:cobertura", "emergencia"],
-  ambulatoria: ["mot:cobertura"],
-  medicinas: ["mot:cobertura"],
-  examenes: ["mot:cobertura"],
-  maternidad: ["familia"],
-  emergencias: ["emergencia"],
-  odontologia: ["familia", "mot:cobertura"],
-  preexistencias: ["obj:Perder antigüedad o carencias"],
-  exterior: ["mot:cobertura"],
-  reembolso: ["mot:reembolsos"],
-  telemedicina: ["mot:atencion"],
-  red: ["mot:red"],
+  prima: ["obj:No tengo dinero ahora"],
+  unico: ["obj:Ya tengo ahorros"],
+  admin: ["mot:costos"],
+  entrada: ["mot:costos"],
+  rescate: ["mot:liquidez"],
+  sinPenalidad: ["mot:liquidez"],
+  retiros: ["mot:liquidez", "emergencia"],
+  vida: ["familia"],
+  fondos: ["mot:riesgo", "mot:rendimiento"],
+  bono: ["mot:rendimiento"],
+  estado: ["mot:transparencia", "obj:Desconfío de las inversiones"],
 };
 
 function auto(origen: OrigenAuto, clave: string, titulo: string, texto: string, etiquetas: string[], fuente: string): ArgumentoAuto {

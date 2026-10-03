@@ -86,30 +86,30 @@ describe("informe 1: situación financiera hoy", () => {
 describe("informe 2: propuesta y objeciones", () => {
   it("productos del pre-cierre, bonos, lo que gana y las respuestas a sus objeciones", async () => {
     const { propuesta, textoPropuesta } = await import("./propuesta");
-    const plan = { id: "pl", nombre: "Plan Plus", coberturas: "Hospitalización 100%\nEmergencias", beneficios: "Telemedicina" } as never;
+    const plan = { id: "pl", nombre: "Plan Plus", coberturas: "Cobertura por fallecimiento: $20.000\nPlazos de 10 a 30 años", beneficios: "Estado de cuenta en línea" } as never;
     const p = ficha("nuevo", {
       nombre: "Ana Torres",
       porque: "Nació mi hija",
       ocupacion: "Chofer",
       costoEvento: "Unos $8.000",
       productos: [{ id: "a", planId: "pl", nombre: "Plan Plus", deducible: "500", mensual: "95" }],
-      oferta: { bonos: [{ id: "b", t: "Le acompaño en cada reembolso", valor: "300" }] },
+      oferta: { bonos: [{ id: "b", t: "Revisión semestral de sus fondos", valor: "300" }] },
       objeciones2: ["dinero", "banco", "no-existe"],
       objecionOtra: "¿Y si me mudo?",
     });
-    const arg = { id: "x", titulo: "Una cirugía cuesta más que años de cuotas", texto: "", etiquetas: ["obj:No tengo dinero ahora"], fuente: "", creado: 0, mod: 0 };
+    const arg = { id: "x", titulo: "Empezar con poco también suma", texto: "", etiquetas: ["obj:No tengo dinero ahora"], fuente: "", creado: 0, mod: 0 };
     const pr = propuesta(p, perfil, HOY, [plan], [arg]);
     expect(pr.busca).toEqual(["Nació mi hija"]);
     expect(pr.productos).toMatchObject([
-      { nombre: "Plan Plus", mensual: 95, deducible: 500, coberturas: ["Hospitalización 100%", "Emergencias"], destacados: [] },
+      { nombre: "Plan Plus", mensual: 95, coberturas: ["Cobertura por fallecimiento: $20.000", "Plazos de 10 a 30 años"], destacados: [] },
     ]);
     // Bondades tangibles del plan, para el cierre
-    expect(pr.productos[0].bondades.map((b) => b.t)).toEqual(["Hospitalización 100%", "Telemedicina"]);
+    expect(pr.productos[0].bondades.map((b) => b.t)).toEqual(expect.arrayContaining(["Cobertura por fallecimiento: $20.000", "Estado de cuenta en línea"]));
     expect(pr.total).toBe(95);
     expect(pr.oferta.totalBonos).toBe(300);
     expect(pr.oferta.plan).toBe("Plan Plus");
     expect(pr.oferta.inversion).toBe(95);
-    expect(pr.gana).toEqual(["Telemedicina"]);
+    expect(pr.gana).toEqual(["Estado de cuenta en línea"]);
     expect(pr.objeciones.map((o) => o.titulo)).toEqual([
       "¿Con cuánto puedo empezar?",
       "¿En qué se diferencia de una cuenta de ahorros o un plazo fijo?",
@@ -118,7 +118,7 @@ describe("informe 2: propuesta y objeciones", () => {
     // Como preguntas frecuentes: nunca nombra la objeción con sus palabras
     expect(JSON.stringify(pr.objeciones)).not.toMatch(/no me alcanza|lo dejo en el banco|me mudo/i);
     expect(pr.objeciones[0].respuesta).toContain("Unos $8.000");
-    expect(pr.objeciones[0].apoyo).toBe("Una cirugía cuesta más que años de cuotas");
+    expect(pr.objeciones[0].apoyo).toBe("Empezar con poco también suma");
     expect(pr.pendiente).toBe(false);
     const t = textoPropuesta(pr);
     expect(t).toMatch(/^Hola Ana, buenos días\. Muchas gracias por su tiempo en nuestra segunda reunión/);

@@ -297,9 +297,8 @@ export function Ficha({ id }: { id: string }) {
     },
     { id: "cadena", l: "Cadena de referido", nota: cadenaCompleta(datosRef) ? undefined : "pendiente", si: conCadena },
     { id: "contacto", l: "Registrar contacto" },
-    // "Plan recomendado" y "Comparar plan actual" (tablas de coberturas) quedan fuera hasta adaptarlos a inversiones.
-    { id: "recomendar", l: "Plan recomendado", si: false },
-    { id: "comparar", l: "Comparar plan actual", si: false },
+    { id: "recomendar", l: "Plan recomendado" },
+    { id: "comparar", l: "Comparar inversión actual", si: tipoDe(p) === "cambio" },
     { id: "analizar", l: "Analizar ficha" },
     { id: "notas", l: "Notas" },
     { id: "contratar", l: "Ya va a contratar", clase: "fuerte", si: !cerrado && !perdido && !precierre },

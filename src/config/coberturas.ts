@@ -1,51 +1,52 @@
 /**
- * Conceptos de la tabla de coberturas para comparar el plan actual de la
- * persona con los planes de la Biblioteca. Editables.
- *   mejor: "mas"  → un valor mayor es mejor (montos, porcentajes de cobertura)
- *          "menos" → un valor menor es mejor (prima, deducible, copago, días)
+ * Conceptos de la tabla de cada plan para comparar la inversión actual de la
+ * persona con los planes de la Biblioteca (unit linked). Editables.
+ *   mejor: "mas"  → un valor mayor es mejor (cobertura de vida, bono)
+ *          "menos" → un valor menor es mejor (aporte mínimo, cargos, penalidades, años)
  *          "texto" → no se compara solo; se muestra lado a lado
  *   claves: palabras para reconocerlo en un Excel o PDF (sin tildes, minúsculas)
+ * El rendimiento histórico se muestra, nunca se compara ni se promete.
  */
 import type { MotivoId } from "../domain/tipos";
 
 export type IdConcepto =
   | "prima"
-  | "deducible"
-  | "copago"
-  | "maximo"
-  | "hospitalaria"
-  | "ambulatoria"
-  | "medicinas"
-  | "examenes"
-  | "maternidad"
-  | "emergencias"
-  | "odontologia"
-  | "preexistencias"
-  | "exterior"
-  | "reembolso"
-  | "telemedicina"
-  | "red";
+  | "unico"
+  | "plazo"
+  | "admin"
+  | "entrada"
+  | "rescate"
+  | "sinPenalidad"
+  | "vida"
+  | "fondos"
+  | "bono"
+  | "extra"
+  | "retiros"
+  | "estado"
+  | "historico";
 
 export const CONCEPTOS: readonly { id: IdConcepto; l: string; mejor: "mas" | "menos" | "texto"; claves: string[]; ph?: string }[] = [
-  { id: "prima", l: "Prima mensual (USD)", mejor: "menos", claves: ["prima", "cuota mensual", "valor mensual", "pago mensual", "tarifa"], ph: "$80" },
-  { id: "deducible", l: "Deducible", mejor: "menos", claves: ["deducible"], ph: "$500 al año" },
-  { id: "copago", l: "Copago / coaseguro", mejor: "menos", claves: ["copago", "coaseguro"], ph: "20%" },
-  { id: "maximo", l: "Cobertura máxima anual", mejor: "mas", claves: ["cobertura maxima", "monto maximo", "suma asegurada", "limite anual", "tope anual", "monto de cobertura"], ph: "$50.000" },
-  { id: "hospitalaria", l: "Hospitalización y cirugía", mejor: "mas", claves: ["hospital", "cirugia", "internacion"], ph: "100%" },
-  { id: "ambulatoria", l: "Consultas y ambulatorio", mejor: "mas", claves: ["ambulatori", "consulta"], ph: "80%" },
-  { id: "medicinas", l: "Medicinas", mejor: "mas", claves: ["medicina", "medicamento", "farmac"], ph: "80%" },
-  { id: "examenes", l: "Exámenes e imágenes", mejor: "mas", claves: ["examen", "laboratorio", "imagen", "diagnostico"], ph: "80%" },
-  { id: "maternidad", l: "Maternidad", mejor: "mas", claves: ["maternidad", "parto", "embarazo"], ph: "$2.000 / No incluye" },
-  { id: "emergencias", l: "Emergencias", mejor: "mas", claves: ["emergencia", "urgencia"], ph: "100%" },
-  { id: "odontologia", l: "Odontología", mejor: "mas", claves: ["odonto", "dental"], ph: "No incluye" },
-  { id: "preexistencias", l: "Preexistencias", mejor: "mas", claves: ["preexisten"], ph: "$5.000 después de 24 meses" },
-  { id: "exterior", l: "Cobertura en el exterior", mejor: "mas", claves: ["exterior", "internacional", "fuera del pais"], ph: "Emergencias / No" },
-  { id: "reembolso", l: "Días para el reembolso", mejor: "menos", claves: ["reembolso"], ph: "30 días" },
-  { id: "telemedicina", l: "Telemedicina", mejor: "mas", claves: ["telemedicina", "teleconsulta", "medico virtual"], ph: "Sí / No" },
-  { id: "red", l: "Red de clínicas", mejor: "texto", claves: ["red de", "clinicas", "prestadores"], ph: "Clínicas de Quito y Guayaquil" },
+  { id: "prima", l: "Aporte mínimo mensual (USD)", mejor: "menos", claves: ["aporte minimo", "aporte mensual", "prima minima", "prima mensual", "cuota mensual", "contribucion regular"], ph: "$50" },
+  { id: "unico", l: "Aporte único mínimo (USD)", mejor: "menos", claves: ["aporte unico", "prima unica", "aporte inicial", "contribucion unica"], ph: "$5.000" },
+  { id: "plazo", l: "Plazos disponibles", mejor: "texto", claves: ["plazo", "duracion", "vigencia del plan"], ph: "10 a 30 años" },
+  { id: "admin", l: "Cargo de administración", mejor: "menos", claves: ["administracion", "gestion del fondo", "comision anual", "cargo anual"], ph: "1,5 % anual" },
+  { id: "entrada", l: "Cargo inicial o de entrada", mejor: "menos", claves: ["cargo inicial", "cargo de entrada", "gastos iniciales", "cargo por aporte", "comision de entrada"], ph: "5 % del aporte" },
+  { id: "rescate", l: "Penalidad por rescate anticipado", mejor: "menos", claves: ["rescate", "penalidad", "retiro anticipado", "cancelacion anticipada", "valor de rescate"], ph: "10 % el primer año" },
+  { id: "sinPenalidad", l: "Años hasta retirar sin penalidad", mejor: "menos", claves: ["sin penalidad", "sin cargo de rescate", "libre de penalidad", "sin recargo"], ph: "Desde el año 6" },
+  { id: "vida", l: "Cobertura por fallecimiento", mejor: "mas", claves: ["fallecimiento", "seguro de vida", "suma asegurada", "muerte"], ph: "$20.000 o el saldo" },
+  { id: "fondos", l: "Fondos disponibles", mejor: "texto", claves: ["fondos disponibles", "portafolio", "fondo conservador", "fondo moderado", "fondo agresivo", "fondos de inversion"], ph: "Conservador, moderado y agresivo" },
+  { id: "bono", l: "Bono de permanencia o lealtad", mejor: "mas", claves: ["bono", "lealtad", "permanencia", "bonificacion"], ph: "2 % al año 10" },
+  { id: "extra", l: "Aportes extraordinarios", mejor: "texto", claves: ["aporte extraordinario", "aportes extra", "aporte adicional"], ph: "Sí, desde $100" },
+  { id: "retiros", l: "Retiros parciales", mejor: "texto", claves: ["retiro parcial", "retiros parciales"], ph: "Sí, desde el año 3" },
+  { id: "estado", l: "Estado de cuenta", mejor: "texto", claves: ["estado de cuenta", "consulta en linea", "reporte trimestral", "app"], ph: "En línea, cada mes" },
+  { id: "historico", l: "Rendimiento histórico de los fondos", mejor: "texto", claves: ["rendimiento historico", "rentabilidad historica", "rendimiento pasado"], ph: "Solo informativo: no garantiza" },
 ];
 
 /** Qué conceptos pesan más según los motivos de inconformidad de la persona. */
 export const CONCEPTOS_POR_MOTIVO: Readonly<Partial<Record<MotivoId, IdConcepto[]>>> = {
-  costos: ["prima"],
+  rendimiento: ["fondos", "bono"],
+  costos: ["admin", "entrada", "prima"],
+  liquidez: ["rescate", "sinPenalidad", "retiros"],
+  transparencia: ["estado"],
+  riesgo: ["fondos"],
 };

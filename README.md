@@ -91,6 +91,13 @@ e2e/                Flujos completos en el navegador
 - **Perfil de riesgo** (sección nueva): cuestionario con puntaje que sugiere conservador, moderado o arriesgado. Si lo que dice es más arriesgado que sus respuestas, la estrategia usa el más prudente.
 - El análisis, la estrategia, el informe de la primera reunión y la proyección usan todo esto (aporte exigente, deudas que pasan del 30 % del ingreso o de tarjeta, sin seguro de vida, IESS, ingreso variable, meta indispensable, quién decide…).
 
+## Fase 4 (hecha): Biblioteca para planes de inversión
+
+- **Tabla de datos de cada plan:** aporte mínimo mensual y único, plazos, cargo de administración, cargo inicial, penalidad por rescate, años hasta retirar sin penalidad, cobertura por fallecimiento, fondos, bono de permanencia, aportes extra, retiros parciales, estado de cuenta y rendimiento histórico (solo informativo, nunca se compara ni se promete).
+- **Precarga desde el PDF** de las condiciones del plan: reconoce secciones como Características, Costos, Rescates y Beneficios, y copia solo lo escrito, con su página.
+- **Plan recomendado** (en "+ acciones"): lee de la ficha lo que necesita la persona (aporte a su alcance, aporte único, plazo, costos, liquidez, cobertura de vida, fondos según su perfil, aportes extra, bono, estado de cuenta) y revisa cada plan en sus documentos, citando la página. Un plan cuyo aporte mínimo supera lo que puede aportar va al final.
+- **Comparar inversión actual** (fichas de quien ya invierte): carga los datos de su inversión actual y la compara concepto por concepto con tus planes.
+
 ## Pendiente
 
-- Biblioteca: hoy sigue pensada en tablas de coberturas de salud (planes, comparación, plan recomendado).
+- Nada crítico. Ideas: importar la proyección oficial de la aseguradora y guardar varias propuestas por cliente.

@@ -129,7 +129,7 @@ export function EditorTabla({
       {pegar && (
         <div className="f" style={{ marginTop: 8 }}>
           <label htmlFor={base + "pegar"}>
-            <span>Pega la tabla (una cobertura por línea)</span>
+            <span>Pega la tabla (un dato por línea)</span>
           </label>
           <textarea id={base + "pegar"} rows={5} value={texto} onChange={(e) => setTexto(e.target.value)} />
           <button
@@ -146,7 +146,7 @@ export function EditorTabla({
         </div>
       )}
       <p className="an-note">
-        {llenos} de {CONCEPTOS.length} conceptos. Escribe montos ($5.000), porcentajes (80%), días o “No incluye”.
+        {llenos} de {CONCEPTOS.length} conceptos. Escribe montos ($5.000), porcentajes (1,5 %), años o “No incluye”.
       </p>
       <div className="tc-filas">
         {CONCEPTOS.map((c) => (
@@ -167,7 +167,7 @@ export function EditorTabla({
 
 const ICONO: Record<Resultado, string> = { mejor: "✅", peor: "⚠️", igual: "＝", "?": "·" };
 
-/** Sección de la ficha de cambio de seguro. */
+/** Sección de la ficha de quien ya invierte. */
 export function ComparacionPlan({ p, actualizar }: { p: Prospecto; actualizar: (fn: (p: Prospecto) => Prospecto) => void }) {
   const enl = useEnlaces();
   const { planes } = useBiblioteca();
@@ -207,12 +207,12 @@ export function ComparacionPlan({ p, actualizar }: { p: Prospecto; actualizar: (
         <span className="mnum" aria-hidden="true">
           ⚖️
         </span>
-        <h2 id="t-comparar">Su plan actual vs. tus planes</h2>
+        <h2 id="t-comparar">Su inversión actual vs. tus planes</h2>
         <span className="mp">{llenos} conceptos</span>
       </div>
       <p className="an-note">
-        Carga la tabla de coberturas de su plan actual. La comparo con las tablas de tus planes de la Biblioteca y te
-        recomiendo uno según lo que paga hoy, su presupuesto y sus motivos de inconformidad.
+        Carga los datos de su inversión actual (aporte, cargos, rescates, fondos…). La comparo con las tablas de tus planes de la Biblioteca y te
+        recomiendo uno según lo que aporta hoy, lo que puede aportar y sus motivos de inconformidad.
       </p>
 
       {editar ? (
@@ -220,7 +220,7 @@ export function ComparacionPlan({ p, actualizar }: { p: Prospecto; actualizar: (
           <EditorTabla
             tabla={actual}
             set={set}
-            titulo="Tabla de coberturas del plan actual"
+            titulo="Datos de su inversión actual"
             alArchivo={(n) => actualizar((x) => ({ ...x, planActual: { ...(x.planActual ?? { tabla: {} }), archivo: n } }))}
           />
           {llenos > 0 && (
@@ -231,7 +231,7 @@ export function ComparacionPlan({ p, actualizar }: { p: Prospecto; actualizar: (
         </>
       ) : (
         <button type="button" className="btn ghost small" onClick={() => setEditar(true)}>
-          ✏️ Editar su plan actual{p.planActual?.archivo ? ` (${p.planActual.archivo})` : ""}
+          ✏️ Editar su inversión actual{p.planActual?.archivo ? ` (${p.planActual.archivo})` : ""}
         </button>
       )}
 
@@ -239,7 +239,7 @@ export function ComparacionPlan({ p, actualizar }: { p: Prospecto; actualizar: (
         <>
           {!ranking.length ? (
             <p className="an-status warn" style={{ marginTop: 12 }}>
-              Ningún plan de tu Biblioteca tiene su tabla de coberturas.{" "}
+              Ningún plan de tu Biblioteca tiene su tabla de datos.{" "}
               <button type="button" className="enlace" onClick={() => ir({ v: "biblioteca", sec: "planes" })}>
                 Llénalas en Planes
               </button>{" "}
@@ -262,18 +262,12 @@ export function ComparacionPlan({ p, actualizar }: { p: Prospecto; actualizar: (
                   <span className="vl">{a === ranking[0] ? "⭐ Recomendado" : "Alternativa"}</span>
                   <h3>{a.plan.nombre}</h3>
                   <p className="precio">
-                    {a.primaPlan !== null ? `${fmtUSD(a.primaPlan)} al mes` : "Precio por confirmar"}
-                    {pa !== null && a.diferencia !== null && (
-                      <span className={a.diferencia > 0 ? "mas" : "menos"}>
-                        {a.diferencia === 0
-                          ? " · igual a lo que paga hoy"
-                          : ` · ${a.diferencia > 0 ? "+" : "−"}${fmtUSD(Math.abs(a.diferencia))} frente a hoy (${fmtUSD(pa)})`}
-                      </span>
-                    )}
+                    {a.primaPlan !== null ? `Aporte mínimo ${fmtUSD(a.primaPlan)} al mes` : "Aporte mínimo por confirmar"}
+                    {pa !== null && <span> · hoy aporta {fmtUSD(pa)} al mes</span>}
                   </p>
                   <p className="an-note">
                     {a.mejoras} mejoras · {a.peores} {a.peores === 1 ? "punto en contra" : "puntos en contra"}
-                    {a.fueraPresupuesto && " · supera su presupuesto"}
+                    {a.fueraPresupuesto && " · pide más de lo que puede aportar"}
                   </p>
                   {beneficios(a).length > 0 && (
                     <div className="an-sec busca">
