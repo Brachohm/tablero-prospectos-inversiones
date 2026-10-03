@@ -1,20 +1,24 @@
-/* Tokens de diseño (paleta del prototipo). Modo claro y oscuro automático,
-   con `data-theme="light" | "dark"` en <html> para forzarlo. */
+/* Tokens de diseño: negro con dorado, siempre oscuro.
+   Los nombres (--violet, --coral…) se conservan del diseño original: --violet es
+   el color principal (dorado) y --coral el acento (bronce). */
 :root {
-  --bg: #F1F3FB;
-  --card: #FFFFFF;
-  --ink: #1B1F45;
-  --muted: #69709A;
-  --line: #E0E4F3;
-  --violet: #5B3DF5;
-  --violet-soft: #ECE8FF;
-  --coral: #FF6B57;
-  --coral-soft: #FFE9E5;
-  --mint: #12B886;
-  --mint-soft: #DDF6EC;
-  --sun: #FFB020;
-  --sun-soft: #FFF1D4;
-  --shadow: 0 1px 0 rgba(27, 31, 69, .04), 0 8px 24px -12px rgba(27, 31, 69, .25);
+  color-scheme: dark;
+  --bg: #0A0A0A;
+  --card: #161514;
+  --ink: #F3EDE0;
+  --muted: #A69E8C;
+  --line: #2E2A22;
+  --violet: #D4AF37;
+  --violet-soft: #2B2412;
+  --coral: #C8894B;
+  --coral-soft: #2E2116;
+  --mint: #5DBB86;
+  --mint-soft: #15291E;
+  --sun: #F0CE6A;
+  --sun-soft: #332A10;
+  /* Texto sobre los colores llenos (dorado, bronce, verde): oscuro para que se lea. */
+  --on-accent: #120F08;
+  --shadow: 0 1px 0 rgba(212, 175, 55, .06), 0 10px 26px -14px rgba(0, 0, 0, .8);
 
   --display: 'Sora', system-ui, sans-serif;
   --body: 'Plus Jakarta Sans', system-ui, sans-serif;
@@ -24,40 +28,4 @@
   --gutter: 16px;
   --radius: 18px;
   --radius-sm: 12px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #12142B;
-    --card: #1C2042;
-    --ink: #EEF0FF;
-    --muted: #9BA2CE;
-    --line: #2C3160;
-    --violet: #8B74FF;
-    --violet-soft: #2A2760;
-    --coral: #FF8272;
-    --coral-soft: #4A2A34;
-    --mint: #3DDBA9;
-    --mint-soft: #163F3B;
-    --sun: #FFC44D;
-    --sun-soft: #4A3A1B;
-    --shadow: 0 8px 24px -12px rgba(0, 0, 0, .6);
-  }
-}
-
-:root[data-theme="dark"] {
-  --bg: #12142B;
-  --card: #1C2042;
-  --ink: #EEF0FF;
-  --muted: #9BA2CE;
-  --line: #2C3160;
-  --violet: #8B74FF;
-  --violet-soft: #2A2760;
-  --coral: #FF8272;
-  --coral-soft: #4A2A34;
-  --mint: #3DDBA9;
-  --mint-soft: #163F3B;
-  --sun: #FFC44D;
-  --sun-soft: #4A3A1B;
-  --shadow: 0 8px 24px -12px rgba(0, 0, 0, .6);
 }
