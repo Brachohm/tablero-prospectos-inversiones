@@ -4,9 +4,9 @@ La app es 100 % local: tus fichas se guardan **solo en cada dispositivo** y nunc
 
 ## Una sola vez: activar GitHub Pages
 
-Este repo ya trae el flujo `.github/workflows/pages.yml`, que compila y publica la app sola en cada cambio de `main`.
+Cada cambio que se sube a `main` se compila solo y queda listo en la rama `gh-pages` (flujo `.github/workflows/pages.yml`).
 
-1. En este repo: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+1. En este repo: **Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: `gh-pages` / `(root)` → Save**.
 2. En 1–2 minutos la app queda en: **`https://brachohm.github.io/tablero-prospectos-inversiones/`**
 
 Las fichas de esta app no se mezclan con las de SaludSA aunque las dos estén en `brachohm.github.io`: cada una usa su propia base en el dispositivo.
